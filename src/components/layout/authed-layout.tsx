@@ -17,7 +17,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
         <SidebarProvider defaultOpen={true}>
           <SkipToMain />
           <AppSidebar />
-          <main className="flex w-full flex-col">
+          <main className="flex w-full flex-col bg-gradient-to-tl from-muted to-background">
             <div className="flex items-center sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <SidebarTrigger className="mr-5" />
               <AuthenticatedHeader className="mx-auto" />

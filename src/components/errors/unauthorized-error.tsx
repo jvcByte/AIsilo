@@ -6,7 +6,7 @@ export function UnauthorisedError() {
   const { history } = useRouter();
   return (
     <div className="h-svh">
-      <div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2">
+      <div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-tl from-muted to-background">
         <h1 className="text-[7rem] leading-tight font-bold">401</h1>
         <span className="font-medium">Unauthorized Access</span>
         <p className="text-muted-foreground text-center">

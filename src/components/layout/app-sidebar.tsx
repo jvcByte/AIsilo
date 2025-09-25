@@ -12,15 +12,15 @@ import { NavGroup } from "@/components/layout/nav-group";
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="floating" side="left">
-      <SidebarHeader>
+      <SidebarHeader className="bg-gradient-to-tl from-muted to-background">
         <AppTitle />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-gradient-to-tl from-muted to-background">
         {sidebarData.navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="bg-gradient-to-tl from-muted to-background">
         <div className="flex items-center justify-center gap-2 p-1">
           <img src="/jvcLogo.svg" alt="Logo" className="h-8 w-8" />
           <p className=" truncate text-center text-sm text-muted-foreground">

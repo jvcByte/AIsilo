@@ -29,7 +29,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   // Show loading state while connecting or redirecting
   if (isConnecting || isRedirecting || !isConnected) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-gradient-to-tl from-muted to-background">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-muted-foreground">

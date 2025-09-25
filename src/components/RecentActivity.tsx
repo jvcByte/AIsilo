@@ -214,7 +214,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
   const displayEvents = filteredEvents.slice(0, displayLimit);
 
   return (
-    <>
+    <div className="bg-gradient-to-tl from-muted to-background">
       {/* Search and Filter Section */}
       <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -586,6 +586,6 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           </div>
         </ScrollArea>
       )}
-    </>
+    </div>
   );
 }

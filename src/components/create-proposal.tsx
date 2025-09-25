@@ -6,7 +6,7 @@ export function CreateProposal() {
           Create Proposal
         </h1>
       </div>
-      <div className="rounded-lg border bg-card p-6">
+      <div className="rounded-lg border bg-card p-6 bg-gradient-to-tl from-muted to-background">
         <p className="text-muted-foreground">
           Create a new proposal for the DAO to vote on.
         </p>

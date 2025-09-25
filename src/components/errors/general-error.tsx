@@ -14,7 +14,7 @@ export function GeneralError({
   const { history } = useRouter();
   return (
     <div className={cn("h-svh w-full", className)}>
-      <div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2">
+      <div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-tl from-muted to-background">
         {!minimal && (
           <h1 className="text-[7rem] leading-tight font-bold">500</h1>
         )}
