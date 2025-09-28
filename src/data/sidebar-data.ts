@@ -7,7 +7,10 @@ import {
   Settings,
   Wrench,
   UserCog,
-  Users,
+  Key,
+  FileUp,
+  FilePenLine,
+  FileDown,
 } from "lucide-react";
 import { type SidebarData } from "@/lib/types";
 
@@ -27,9 +30,29 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
-          title: "Create Prposal",
-          url: "/create-proposal",
-          icon: Users,
+          title: "Upload File",
+          url: "/upload-file",
+          icon: FileUp,
+        },
+        {
+          title: "Type It",
+          url: "/type-file",
+          icon: FilePenLine,
+        },
+      ],
+    },
+    {
+      title: "Manage Data",
+      items: [
+        {
+          title: "Get File",
+          url: "/temp-route",
+          icon: FileDown,
+        },
+        {
+          title: "Grants",
+          url: "/temp-route",
+          icon: Key,
         },
       ],
     },

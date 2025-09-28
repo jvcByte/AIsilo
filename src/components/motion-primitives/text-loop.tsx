@@ -1,4 +1,3 @@
-"use client";
 import { cn } from "@/lib/utils";
 import {
   motion,
@@ -54,7 +53,7 @@ export function TextLoop({
   };
 
   return (
-    <div className={cn("relative inline-block whitespace-nowrap", className)}>
+    <div className={cn("", className)}>
       <AnimatePresence mode={mode} initial={false}>
         <motion.div
           key={currentIndex}

@@ -23,7 +23,7 @@ export function AppTitle() {
               onClick={() => setOpenMobile(false)}
               className="grid flex-1 text-start text-sm leading-tight"
             >
-              <span className="truncate font-bold">CXIII DAO</span>
+              <span className="truncate font-bold tracking-widest">FileIt</span>
               {/* <span className='truncate text-xs'>Dashboard</span> */}
             </Link>
           </div>

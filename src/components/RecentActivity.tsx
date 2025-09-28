@@ -150,7 +150,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
   if (isLoading) {
     return (
       <div className="space-y-3 sm:space-y-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-start space-x-3 sm:space-x-4">

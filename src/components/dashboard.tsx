@@ -30,32 +30,32 @@ export function Dashboard() {
       <div className="grid gap-2 grid-cols-2 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Total Proposals
+            Total Files
           </h3>
           <div className="text-base sm:text-2xl font-bold">{truncateAddress(contractOwner) || "0"}</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Active Votes
+            Protected Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">3</div>
+          <div className="text-base sm:text-2xl font-bold">0</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Your Votes
+            Archived Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">8</div>
+          <div className="text-base sm:text-2xl font-bold">0</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Voting Power
+            Access Granted
           </h3>
-          <div className="text-base md:text-2xl font-bold">156</div>
+          <div className="text-base md:text-2xl font-bold">0</div>
         </div>
       </div>
       <div className="rounded-lg border bg-card p-6 bg-gradient-to-tl from-muted to-background">
         <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-        <RecentActivity limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
+        <RecentAct                                                                                              ivity limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
       </div>
     </div>
   );
