@@ -1,6 +1,7 @@
-import { useDocuments, getEventStyle, type DocumentRegistryEventData } from "@/hooks/use-documents";
+import { useDocuments, getEventStyle, type DocumentRegistryEventData, type DocumentUploadedEventData, type RoleGrantedEventData, type RoleRevokedEventData } from "@/hooks/use-documents";
 import { formatRelativeTime, truncateAddress } from "@/lib/utils";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
+import contracts from "@/contracts/contracts";
 import { CHAIN_IDS } from "@/lib/chain-utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -49,19 +50,49 @@ interface RecentActivityProps {
 }
 
 export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps) {
-  const { uploadDocument, isLoading, error } = useDocuments();
+  const { events, isLoading, error } = useDocuments();
   const { address, chainId } = useAccount();
+
+  // Read role constants from contract
+  const { data: userRole } = useReadContract({
+    ...contracts.DocumentRegistry,
+    functionName: "USER_ROLE",
+    query: {
+      enabled: true,
+    },
+  });
+
+  const { data: defaultAdminRole } = useReadContract({
+    ...contracts.DocumentRegistry,
+    functionName: "DEFAULT_ADMIN_ROLE",
+    query: {
+      enabled: true,
+    },
+  });
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [eventTypeFilter, setEventTypeFilter] = useState<string>("all");
   const [displayLimit, setDisplayLimit] = useState(limit);
 
+  // Helper function to format role display
+  function formatRoleDisplay(role: string): string {
+    if (userRole && role === userRole) {
+      return "USER";
+    }
+    if (defaultAdminRole && role === defaultAdminRole) {
+      return "ADMIN";
+    }
+    return role.length > (window.innerWidth < 640 ? 15 : 20)
+      ? `${role.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
+      : role;
+  }
+
   // Filter and search events
   const filteredEvents = useMemo(() => {
-    if (!Array.isArray(uploadDocument)) return [];
+    if (!Array.isArray(events)) return [];
 
-    return uploadDocument.filter((event: { eventName: string; documentHash: string; uploadTime: { toString: () => any; }; uploader: any; sender: any; }) => {
+    return events.filter((event: DocumentRegistryEventData) => {
       // Event type filter
       if (eventTypeFilter !== "all" && event.eventName !== eventTypeFilter) {
         return false;
@@ -73,19 +104,30 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
       const query = searchQuery.toLowerCase();
 
       // Search in various fields based on event type
-      const searchableFields = [
-        event.documentHash,
-        event.uploadTime.toString(),
+      const searchableFields: string[] = [
+        event.transactionHash,
+        event.blockNumber.toString(),
       ];
 
       // Add event-specific fields
-      if (event.documentHash === "DocumentUploaded") {
-        searchableFields.push(event.documentHash);
-        searchableFields.push(event.uploader);
-      } else if (event.documentHash === "RoleGranted") {
-        searchableFields.push(event.documentHash, event.uploader);
-      } else if (event.documentHash === "RoleRevoked") {
-        searchableFields.push(event.documentHash, event.sender);
+      if (event.eventName === "DocumentUploaded") {
+        searchableFields.push(
+          (event as DocumentUploadedEventData).cid,
+          (event as DocumentUploadedEventData).user,
+          (event as DocumentUploadedEventData).docHash,
+        );
+      } else if (event.eventName === "RoleGranted") {
+        searchableFields.push(
+          (event as RoleGrantedEventData).role,
+          (event as RoleGrantedEventData).account,
+          (event as RoleGrantedEventData).sender,
+        );
+      } else if (event.eventName === "RoleRevoked") {
+        searchableFields.push(
+          (event as RoleRevokedEventData).role,
+          (event as RoleRevokedEventData).account,
+          (event as RoleRevokedEventData).sender,
+        );
       }
 
       const searchableText = searchableFields
@@ -95,7 +137,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
       return searchableText.includes(query);
     });
-  }, [uploadDocument, searchQuery, eventTypeFilter]);
+  }, [events, searchQuery, eventTypeFilter]);
 
   // Clear all filters
   const clearFilters = () => {
@@ -104,9 +146,17 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
     setDisplayLimit(limit);
   };
 
+  // Debug logging
+  console.log("RecentActivity Debug:", {
+    events,
+    isLoading,
+    error,
+    eventsLength: events?.length || 0,
+    filteredEventsLength: filteredEvents?.length || 0,
+  });
+
   // Check if any filters are active
-  const hasActiveFilters =
-    searchQuery.trim() !== "" || eventTypeFilter !== "all";
+  const hasActiveFilters = searchQuery.trim() !== "";
 
   // Empty state for no wallet connection
   if (!address) {
@@ -119,7 +169,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           Connect Your Wallet
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          Connect your wallet to view recent name service activities and
+          Connect your wallet to view recent contract activities and
           transactions.
         </p>
       </div>
@@ -193,8 +243,8 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
     );
   }
 
-  // No events state
-  if (!uploadDocument || uploadDocument.length === 0) {
+  // No events state - only show this if we're not loading and not in error state and events is actually an empty array (not undefined)
+  if (!isLoading && !error && events !== undefined && events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -204,7 +254,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           No Recent Activity
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          No recent name service activities found. Activities will appear here
+          No recent contract activities found. Activities will appear here
           once transactions are made.
         </p>
       </div>
@@ -222,7 +272,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, address, transaction hash, or block number..."
+              placeholder="Search by transaction hash, address, or block number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-10"
@@ -250,11 +300,9 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Events</SelectItem>
-                <SelectItem value="NameRegistered">Name Registered</SelectItem>
-                <SelectItem value="NameTransferred">
-                  Name Transferred
-                </SelectItem>
-                <SelectItem value="NameUpdated">Name Updated</SelectItem>
+                <SelectItem value="DocumentUploaded">Document Uploaded</SelectItem>
+                <SelectItem value="RoleGranted">Role Granted</SelectItem>
+                <SelectItem value="RoleRevoked">Role Revoked</SelectItem>
               </SelectContent>
             </Select>
 
@@ -288,11 +336,6 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                 "
               </Badge>
             )}
-            {eventTypeFilter !== "all" && (
-              <Badge variant="secondary" className="text-xs">
-                Type: {eventTypeFilter}
-              </Badge>
-            )}
           </div>
         )}
       </div>
@@ -304,7 +347,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
             variant="secondary"
             className="px-2 py-1 text-xs sm:px-3 sm:text-sm"
           >
-            {uploadDocument.length} Total Activities
+            {events.length} Total Events
           </Badge>
           {hasActiveFilters && (
             <Badge
@@ -335,7 +378,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
             No Results Found
           </h3>
           <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm mb-4">
-            No activities match your current search and filter criteria.
+            No events match your current search criteria.
           </p>
           <Button variant="outline" size="sm" onClick={clearFilters}>
             Clear Filters
@@ -345,18 +388,17 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
       {filteredEvents.length > 0 && (
         <ScrollArea
-          className={`${
-            heightClass ?? "h-[60vh] sm:h-[calc(90vh-13rem)]"
-          } w-full rounded-md`}
+          className={`${heightClass ?? "h-[60vh] sm:h-[calc(90vh-13rem)]"
+            } w-full rounded-md`}
         >
           <div className="space-y-3 sm:space-y-4 pr-2 sm:pr-4">
             {/* Events List */}
             <div className="grid gap-3 sm:gap-4">
               {displayEvents.map((event, index) => {
-                const { color } = getEventStyle(event as DocumentRegistryEventData);
+                const { color } = getEventStyle(event);
                 return (
                   <Card
-                    key={`${event.documentHash}-${event.uploadTime}`}
+                    key={`${event.transactionHash}-${event.logIndex}`}
                     className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary"
                   >
                     <CardContent className="p-3 sm:p-4">
@@ -364,14 +406,14 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                         {/* Event Icon - Smaller on mobile */}
                         <div className="flex-shrink-0">
                           <div
-                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${event.documentHash === "DocumentUploaded"
-                                ? "from-blue-100 to-blue-200 text-blue-600"
-                                : event.documentHash === "RoleGranted"
-                                  ? "from-green-100 to-green-200 text-green-600"
-                                  : "from-yellow-100 to-yellow-200 text-yellow-600"
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${event.eventName === "DocumentUploaded"
+                              ? "from-blue-100 to-blue-200 text-blue-600"
+                              : event.eventName === "RoleGranted"
+                                ? "from-green-100 to-green-200 text-green-600"
+                                : "from-yellow-100 to-yellow-200 text-yellow-600"
                               }`}
                           >
-                            {getEventIcon(event.documentHash)}
+                            {getEventIcon(event.eventName)}
                           </div>
                         </div>
 
@@ -380,11 +422,11 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                           {/* Main Description */}
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
                             <h4 className={`font-semibold text-sm ${color}`}>
-                              {event.documentHash === "DocumentUploaded" &&
-                                "Name Registered"}
-                              {event.documentHash === "RoleGranted" &&
+                              {event.eventName === "DocumentUploaded" &&
+                                "Document Uploaded"}
+                              {event.eventName === "RoleGranted" &&
                                 "Role Granted"}
-                              {event.documentHash === "RoleRevoked" &&
+                              {event.eventName === "RoleRevoked" &&
                                 "Role Revoked"}
                             </h4>
                             <Badge variant="outline" className="text-xs w-fit">
@@ -394,26 +436,25 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
                           {/* Event Details - Stack on mobile */}
                           <div className="space-y-2">
-                            {event.documentHash === "DocumentUploaded" && (
+                            {event.eventName === "DocumentUploaded" && (
                               <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 text-sm">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                    Name:
+                                    IPFS CID:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {event.documentHash.length >
-                                      (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${event.documentHash.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : event.documentHash}
+                                    {(event as DocumentUploadedEventData).cid.length > (window.innerWidth < 640 ? 15 : 20)
+                                      ? `${(event as DocumentUploadedEventData).cid.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
+                                      : (event as DocumentUploadedEventData).cid}
                                   </code>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                    Owner:
+                                    User:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                     {truncateAddress(
-                                      event.uploader,
+                                      (event as DocumentUploadedEventData).user,
                                       window.innerWidth < 640 ? 4 : 6,
                                     )}
                                   </code>
@@ -421,82 +462,87 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                               </div>
                             )}
 
-                            {event.documentHash === "RoleGranted" && (
-                              <div className="space-y-2 text-sm">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                    Name:
-                                  </span>
-                                  <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {event.role.length >
-                                      (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${event.role.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : event.role}
-                                  </code>
-                                </div>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                      From:
-                                    </span>
-                                    <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                      {truncateAddress(
-                                          event.sender,
-                                        window.innerWidth < 640 ? 4 : 6,
-                                      )}
-                                    </code>
-                                  </div>
-                                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground hidden sm:block" />
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                      To:
-                                    </span>
-                                    <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                      {truncateAddress(
-                                        event.account,
-                                        window.innerWidth < 640 ? 4 : 6,
-                                      )}
-                                    </code>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                            {event.eventName === "RoleGranted" && (() => {
+                              const roleEvent = event as RoleGrantedEventData;
+                              const isSelfGrant = roleEvent.sender === roleEvent.account;
 
-                            {event.documentHash === "RoleRevoked" && (
+                              return (
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                      Role:
+                                    </span>
+                                    <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
+                                      {formatRoleDisplay(roleEvent.role)}
+                                    </code>
+                                  </div>
+
+                                  {!isSelfGrant ? (
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                          From:
+                                        </span>
+                                        <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                                          {truncateAddress(roleEvent.sender, window.innerWidth < 640 ? 4 : 6)}
+                                        </code>
+                                      </div>
+                                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground hidden sm:block" />
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                          To:
+                                        </span>
+                                        <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                                          {truncateAddress(roleEvent.account, window.innerWidth < 640 ? 4 : 6)}
+                                        </code>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                        Account:
+                                      </span>
+                                      <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                                        {truncateAddress(roleEvent.account, window.innerWidth < 640 ? 4 : 6)}
+                                      </code>
+                                      <Badge variant="outline" className="text-xs">Self-granted</Badge>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()}
+
+                            {event.eventName === "RoleRevoked" && (
                               <div className="space-y-2 text-sm">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                    Name:
+                                    Role:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {event.documentHash.length >
-                                      (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${event.documentHash.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : event.documentHash}
+                                    {formatRoleDisplay((event as RoleRevokedEventData).role)}
                                   </code>
                                 </div>
                                 <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
                                   <div className="flex items-center gap-2">
                                     <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                      New Address:
+                                      Revoked by:
                                     </span>
                                     <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                       {truncateAddress(
-                                        event.sender,
+                                        (event as RoleRevokedEventData).sender,
                                         window.innerWidth < 640 ? 4 : 6,
                                       )}
                                     </code>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                      Image Hash:
+                                      Account:
                                     </span>
                                     <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                      {event.documentHash.slice(
-                                        0,
-                                        window.innerWidth < 640 ? 6 : 10,
+                                      {truncateAddress(
+                                        (event as RoleRevokedEventData).account,
+                                        window.innerWidth < 640 ? 4 : 6,
                                       )}
-                                      ...
                                     </code>
                                   </div>
                                 </div>
@@ -512,15 +558,15 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     Block #
                                   </span>
                                   <span className="sm:hidden">#</span>
-                                  {event.uploadTime.toString()}
+                                  {event.blockNumber.toString()}
                                 </div>
                                 <a
-                                  href={`https://blockdag.io/tx/${event.uploadTime.toString()}`}
+                                  href={`https://awakening.bdagscan.com/tx/${event.transactionHash}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-1 hover:text-primary transition-colors w-fit"
                                 >
-                                  <ExternalLink className="w-3 h-3" />  
+                                  <ExternalLink className="w-3 h-3" />
                                   <span className="hidden sm:inline">
                                     View on BlockDAG
                                   </span>
@@ -528,7 +574,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                 </a>
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                {formatRelativeTime(event.uploadTime)}
+                                {formatRelativeTime(event.timestamp)}
                               </div>
                             </div>
                           </div>
@@ -553,11 +599,11 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                 <CardContent className="p-3 sm:p-4 text-center">
                   <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                     Showing {displayLimit} of {filteredEvents.length} filtered
-                    activities
+                    events
                   </p>
                   <div className="flex items-center justify-center gap-2">
                     <Badge variant="outline" className="text-xs">
-                      {filteredEvents.length - displayLimit} more activities
+                      {filteredEvents.length - displayLimit} more events
                       available
                     </Badge>
                     <Button variant="ghost" size="sm" className="text-xs">

@@ -11,8 +11,8 @@ export interface proposalCountEventProps {
 }
 
 export function Dashboard() {
-  const { uploadDocument, isLoading, error } = useDocuments();
-  console.log("Upload Document: ", uploadDocument);
+  const { documents, isLoading, error } = useDocuments();
+  console.log("Documents: ", documents);
   const { address } = useAccount();
   console.log("Loading: ", isLoading);
   console.log("Error: ", error);
