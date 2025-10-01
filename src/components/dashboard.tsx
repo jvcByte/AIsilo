@@ -1,8 +1,7 @@
-import { useReadContract } from "wagmi";
+import { useReadContract, useAccount } from "wagmi";
 import contracts from "@/contracts/contracts";
-import { useNameServiceEvents } from "@/hooks/use-ens-events";
+import { useDocuments } from "@/hooks/use-documents";
 import { RecentActivity } from "@/components/RecentActivity";
-import { truncateAddress } from "@/lib/utils";
 // import { formatNumber } from "@/lib/utils";
 
 export interface proposalCountEventProps {
@@ -12,16 +11,25 @@ export interface proposalCountEventProps {
 }
 
 export function Dashboard() {
-  const { data: events, isLoading, error } = useNameServiceEvents();
-  console.log("Events: ", events);
+  const { uploadDocument, isLoading, error } = useDocuments();
+  console.log("Upload Document: ", uploadDocument);
+  const { address } = useAccount();
   console.log("Loading: ", isLoading);
   console.log("Error: ", error);
-  const { data: contractOwner } = useReadContract({
-    ...contracts.ENS,
-    functionName: "contractOwner",
+
+  const { data: documentCount } = useReadContract({
+    ...contracts.DocumentRegistry,
+    functionName: "getDocumentCount",
   });
 
-  console.log("Contract Owner: ", contractOwner);
+  const {data: user } = useReadContract({
+    ...contracts.DocumentRegistry,
+    functionName: "isUser",
+    args: [address as `0x${string}`],
+  });
+  console.log("User: ", user);
+
+  console.log("Contract Owner: ", documentCount);
   return (
     <div className="flex flex-col gap-2 md:gap-6 p-4 max-w-[1500px] mx-auto bg-gradient-to-tl from-muted to-background">
       <div className="flex items-center justify-between">
@@ -32,7 +40,7 @@ export function Dashboard() {
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
             Total Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">{truncateAddress(contractOwner) || "0"}</div>
+          <div className="text-base sm:text-2xl font-bold">{documentCount || "0"}</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -55,7 +63,7 @@ export function Dashboard() {
       </div>
       <div className="rounded-lg border bg-card p-6 bg-gradient-to-tl from-muted to-background">
         <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-        <RecentAct                                                                                              ivity limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
+        <RecentActivity limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
       </div>
     </div>
   );

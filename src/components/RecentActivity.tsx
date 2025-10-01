@@ -1,4 +1,4 @@
-import { useNameServiceEvents, getEventStyle } from "@/hooks/use-ens-events";
+import { useDocuments, getEventStyle, type DocumentRegistryEventData } from "@/hooks/use-documents";
 import { formatRelativeTime, truncateAddress } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { CHAIN_IDS } from "@/lib/chain-utils";
@@ -49,7 +49,7 @@ interface RecentActivityProps {
 }
 
 export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps) {
-  const { data: events, isLoading, error } = useNameServiceEvents();
+  const { uploadDocument, isLoading, error } = useDocuments();
   const { address, chainId } = useAccount();
 
   // Search and filter states
@@ -59,9 +59,9 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
   // Filter and search events
   const filteredEvents = useMemo(() => {
-    if (!events) return [];
+    if (!Array.isArray(uploadDocument)) return [];
 
-    return events.filter((event) => {
+    return uploadDocument.filter((event: { eventName: string; documentHash: string; uploadTime: { toString: () => any; }; uploader: any; sender: any; }) => {
       // Event type filter
       if (eventTypeFilter !== "all" && event.eventName !== eventTypeFilter) {
         return false;
@@ -74,18 +74,18 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
       // Search in various fields based on event type
       const searchableFields = [
-        event.name,
-        event.transactionHash,
-        event.blockNumber.toString(),
+        event.documentHash,
+        event.uploadTime.toString(),
       ];
 
       // Add event-specific fields
-      if (event.eventName === "NameRegistered") {
-        searchableFields.push(event.owner);
-      } else if (event.eventName === "NameTransferred") {
-        searchableFields.push(event.oldOwner, event.newOwner);
-      } else if (event.eventName === "NameUpdated") {
-        searchableFields.push(event.newAddress);
+      if (event.documentHash === "DocumentUploaded") {
+        searchableFields.push(event.documentHash);
+        searchableFields.push(event.uploader);
+      } else if (event.documentHash === "RoleGranted") {
+        searchableFields.push(event.documentHash, event.uploader);
+      } else if (event.documentHash === "RoleRevoked") {
+        searchableFields.push(event.documentHash, event.sender);
       }
 
       const searchableText = searchableFields
@@ -95,7 +95,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
       return searchableText.includes(query);
     });
-  }, [events, searchQuery, eventTypeFilter]);
+  }, [uploadDocument, searchQuery, eventTypeFilter]);
 
   // Clear all filters
   const clearFilters = () => {
@@ -127,7 +127,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
   }
 
   // Wrong network state
-  if (chainId !== CHAIN_IDS.CELO_ALFAJORES) {
+  if (chainId !== CHAIN_IDS.BLOCKDAG) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
@@ -137,7 +137,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           Wrong Network
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          Please switch to the Celo Alfajores network to view recent activities.
+          Please switch to the BlockDAG network to view recent activities.
         </p>
         <Badge variant="outline" className="mt-3 text-xs">
           Current: {chainId ? `Chain ${chainId}` : "Unknown"}
@@ -194,7 +194,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
   }
 
   // No events state
-  if (!events || events.length === 0) {
+  if (!uploadDocument || uploadDocument.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -304,7 +304,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
             variant="secondary"
             className="px-2 py-1 text-xs sm:px-3 sm:text-sm"
           >
-            {events.length} Total Activities
+            {uploadDocument.length} Total Activities
           </Badge>
           {hasActiveFilters && (
             <Badge
@@ -353,10 +353,10 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
             {/* Events List */}
             <div className="grid gap-3 sm:gap-4">
               {displayEvents.map((event, index) => {
-                const { color } = getEventStyle(event);
+                const { color } = getEventStyle(event as DocumentRegistryEventData);
                 return (
                   <Card
-                    key={`${event.transactionHash}-${event.logIndex}`}
+                    key={`${event.documentHash}-${event.uploadTime}`}
                     className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary"
                   >
                     <CardContent className="p-3 sm:p-4">
@@ -364,14 +364,14 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                         {/* Event Icon - Smaller on mobile */}
                         <div className="flex-shrink-0">
                           <div
-                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${event.eventName === "NameRegistered"
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${event.documentHash === "DocumentUploaded"
                                 ? "from-blue-100 to-blue-200 text-blue-600"
-                                : event.eventName === "NameTransferred"
+                                : event.documentHash === "RoleGranted"
                                   ? "from-green-100 to-green-200 text-green-600"
                                   : "from-yellow-100 to-yellow-200 text-yellow-600"
                               }`}
                           >
-                            {getEventIcon(event.eventName)}
+                            {getEventIcon(event.documentHash)}
                           </div>
                         </div>
 
@@ -380,12 +380,12 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                           {/* Main Description */}
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
                             <h4 className={`font-semibold text-sm ${color}`}>
-                              {event.eventName === "NameRegistered" &&
+                              {event.documentHash === "DocumentUploaded" &&
                                 "Name Registered"}
-                              {event.eventName === "NameTransferred" &&
-                                "Name Transferred"}
-                              {event.eventName === "NameUpdated" &&
-                                "Name Updated"}
+                              {event.documentHash === "RoleGranted" &&
+                                "Role Granted"}
+                              {event.documentHash === "RoleRevoked" &&
+                                "Role Revoked"}
                             </h4>
                             <Badge variant="outline" className="text-xs w-fit">
                               #{index + 1}
@@ -394,17 +394,17 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
                           {/* Event Details - Stack on mobile */}
                           <div className="space-y-2">
-                            {event.eventName === "NameRegistered" && (
+                            {event.documentHash === "DocumentUploaded" && (
                               <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 text-sm">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
                                     Name:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {event.name.length >
+                                    {event.documentHash.length >
                                       (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${event.name.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : event.name}
+                                      ? `${event.documentHash.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
+                                      : event.documentHash}
                                   </code>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -413,7 +413,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                     {truncateAddress(
-                                      event.owner,
+                                      event.uploader,
                                       window.innerWidth < 640 ? 4 : 6,
                                     )}
                                   </code>
@@ -421,17 +421,17 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                               </div>
                             )}
 
-                            {event.eventName === "NameTransferred" && (
+                            {event.documentHash === "RoleGranted" && (
                               <div className="space-y-2 text-sm">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
                                     Name:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {event.name.length >
+                                    {event.role.length >
                                       (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${event.name.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : event.name}
+                                      ? `${event.role.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
+                                      : event.role}
                                   </code>
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -441,7 +441,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     </span>
                                     <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                       {truncateAddress(
-                                        event.oldOwner,
+                                          event.sender,
                                         window.innerWidth < 640 ? 4 : 6,
                                       )}
                                     </code>
@@ -453,7 +453,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     </span>
                                     <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                       {truncateAddress(
-                                        event.newOwner,
+                                        event.account,
                                         window.innerWidth < 640 ? 4 : 6,
                                       )}
                                     </code>
@@ -462,17 +462,17 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                               </div>
                             )}
 
-                            {event.eventName === "NameUpdated" && (
+                            {event.documentHash === "RoleRevoked" && (
                               <div className="space-y-2 text-sm">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
                                     Name:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {event.name.length >
+                                    {event.documentHash.length >
                                       (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${event.name.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : event.name}
+                                      ? `${event.documentHash.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
+                                      : event.documentHash}
                                   </code>
                                 </div>
                                 <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
@@ -482,7 +482,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     </span>
                                     <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                       {truncateAddress(
-                                        event.newAddress,
+                                        event.sender,
                                         window.innerWidth < 640 ? 4 : 6,
                                       )}
                                     </code>
@@ -492,7 +492,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                       Image Hash:
                                     </span>
                                     <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                      {event.newImageHash.slice(
+                                      {event.documentHash.slice(
                                         0,
                                         window.innerWidth < 640 ? 6 : 10,
                                       )}
@@ -512,23 +512,23 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     Block #
                                   </span>
                                   <span className="sm:hidden">#</span>
-                                  {event.blockNumber.toString()}
+                                  {event.uploadTime.toString()}
                                 </div>
                                 <a
-                                  href={`https://alfajores.celoscan.io/tx/${event.transactionHash}`}
+                                  href={`https://blockdag.io/tx/${event.uploadTime.toString()}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-1 hover:text-primary transition-colors w-fit"
                                 >
-                                  <ExternalLink className="w-3 h-3" />
+                                  <ExternalLink className="w-3 h-3" />  
                                   <span className="hidden sm:inline">
-                                    View on Celoscan
+                                    View on BlockDAG
                                   </span>
-                                  <span className="sm:hidden">Celoscan</span>
+                                  <span className="sm:hidden">BlockDAG</span>
                                 </a>
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                {formatRelativeTime(event.timestamp)}
+                                {formatRelativeTime(event.uploadTime)}
                               </div>
                             </div>
                           </div>

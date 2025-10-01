@@ -25,6 +25,7 @@ export const formatChainName = (chainName: string): string => {
 
 // Popular chain IDs for reference
 export const CHAIN_IDS = {
+  BLOCKDAG: 1043,
   ETHEREUM_MAINNET: 1,
   SEPOLIA: 11155111,
   CELO_MAINNET: 42220,
@@ -34,6 +35,7 @@ export const CHAIN_IDS = {
 // Chain priority for sorting (mainnet chains first, then testnets)
 export const getChainPriority = (chainId: number): number => {
   const priorities: Record<number, number> = {
+    [CHAIN_IDS.BLOCKDAG]: 0, // Highest priority for BlockDAG
     [CHAIN_IDS.ETHEREUM_MAINNET]: 1,
     [CHAIN_IDS.CELO_MAINNET]: 2,
     [CHAIN_IDS.SEPOLIA]: 10,
@@ -52,6 +54,10 @@ export const sortChainsByPriority = <T extends { id: number }>(
 
 export const getChainIcon = (chainId: number) => {
   switch (chainId) {
+    case 1043: // BlockDAG
+      return (
+        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-red-500 to-orange-600" />
+      );
     case 1: // Ethereum Mainnet
       return (
         <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-400 to-purple-600" />

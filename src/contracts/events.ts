@@ -1,49 +1,59 @@
 // contracts/events.ts
 import { parseAbiItem } from "viem";
 
-export interface NameRegisteredEvent {
-  name: string;
-  owner: `0x${string}`;
-  imageHash: string;
+export interface DocumentUploadedEvent {
+  user: `0x${string}`;
+  docHash: `0x${string}`;
+  cid: string;
 }
 
-export interface NameTransferredEvent {
-  name: string;
-  oldOwner: `0x${string}`;
-  newOwner: `0x${string}`;
+export interface RoleGrantedEvent {
+  role: `0x${string}`;
+  account: `0x${string}`;
+  sender: `0x${string}`;
 }
 
-export interface NameUpdatedEvent {
-  name: string;
-  newAddress: `0x${string}`;
-  newImageHash: string;
+export interface RoleRevokedEvent {
+  role: `0x${string}`;
+  account: `0x${string}`;
+  sender: `0x${string}`;
 }
 
-// Union type for all Name Service events
-export type NameServiceEvent =
-  | (NameRegisteredEvent & { eventName: "NameRegistered" })
-  | (NameTransferredEvent & { eventName: "NameTransferred" })
-  | (NameUpdatedEvent & { eventName: "NameUpdated" });
+export interface RoleAdminChangedEvent {
+  role: `0x${string}`;
+  previousAdminRole: `0x${string}`;
+  newAdminRole: `0x${string}`;
+}
 
-export const NAME_SERVICE_EVENTS = {
-  NameRegistered: parseAbiItem(
-    "event NameRegistered(string indexed name, address indexed owner, string imageHash)",
+// Union type for all Document Registry events
+export type DocumentRegistryEvent =
+  | (DocumentUploadedEvent & { eventName: "DocumentUploaded" })
+  | (RoleGrantedEvent & { eventName: "RoleGranted" })
+  | (RoleRevokedEvent & { eventName: "RoleRevoked" })
+  | (RoleAdminChangedEvent & { eventName: "RoleAdminChanged" });
+
+export const DOCUMENT_REGISTRY_EVENTS = {
+  DocumentUploaded: parseAbiItem(
+    "event DocumentUploaded(address indexed user, bytes32 docHash, string cid)",
   ),
-  NameTransferred: parseAbiItem(
-    "event NameTransferred(string indexed name, address indexed oldOwner, address indexed newOwner)",
+  RoleGranted: parseAbiItem(
+    "event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)",
   ),
-  NameUpdated: parseAbiItem(
-    "event NameUpdated(string indexed name, address indexed newAddress, string newImageHash)",
+  RoleRevoked: parseAbiItem(
+    "event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)",
+  ),
+  RoleAdminChanged: parseAbiItem(
+    "event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)",
   ),
 } as const;
 
 // Event names array for easier iteration
-export const NAME_SERVICE_EVENT_NAMES = Object.keys(
-  NAME_SERVICE_EVENTS,
-) as Array<keyof typeof NAME_SERVICE_EVENTS>;
+export const DOCUMENT_REGISTRY_EVENT_NAMES = Object.keys(
+  DOCUMENT_REGISTRY_EVENTS,
+) as Array<keyof typeof DOCUMENT_REGISTRY_EVENTS>;
 
 // Helper type for decoded events with metadata
-export type DecodedNameServiceEvent = NameServiceEvent & {
+export type DecodedDocumentRegistryEvent = DocumentRegistryEvent & {
   blockNumber: bigint;
   transactionHash: `0x${string}`;
   logIndex: number;
