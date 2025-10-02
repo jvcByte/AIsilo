@@ -29,7 +29,6 @@ dist-ssr
 .env.production
 
 # File Routes
-src/hooks/use-documents.ts
 src/components/EmergencyAccess.tsx
 src/contracts/abis/SecureDataAccess.ts
 src/contracts/contracts.ts

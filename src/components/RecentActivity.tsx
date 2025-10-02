@@ -467,7 +467,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                               const isSelfGrant = roleEvent.sender === roleEvent.account;
 
                               return (
-                                <div className="space-y-2 text-sm">
+                                <div className="flex flex-col gap-4 md:flex-row md:items-center text-sm">
                                   <div className="flex items-center gap-2">
                                     <span className="text-muted-foreground font-medium text-xs sm:text-sm">
                                       Role:
@@ -505,7 +505,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                       <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                         {truncateAddress(roleEvent.account, window.innerWidth < 640 ? 4 : 6)}
                                       </code>
-                                      <Badge variant="outline" className="text-xs">Self-granted</Badge>
+                                      <Badge variant="outline" className="text-xs hidden md:inline-flex">Self-granted</Badge>
                                     </div>
                                   )}
                                 </div>
@@ -550,7 +550,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                             )}
 
                             {/* Transaction Details - Stack on mobile */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-border/50 gap-2 sm:gap-4">
+                            <div className="flex flex-row items-center justify-between pt-3 border-t border-border/50 gap-4">
                               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <Clock className="w-3 h-3" />
