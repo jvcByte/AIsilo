@@ -3,6 +3,7 @@ import { FileText, FileLock, Shield, FileCheck, Cloud, type LucideIcon, Boxes, S
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { ConnectKitButton } from "connectkit";
+import { Link } from "@tanstack/react-router";
 
 interface FloatingIconProps {
   icon: LucideIcon;
@@ -163,9 +164,11 @@ export default function HeroSection() {
                   )}
                 </ConnectKitButton.Custom>
 
-                <Button variant="outline" className="md:px-8 py-4 bg-card border-2 border-border rounded-lg font-semibold md:text-lg hover:border-primary transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                  Learn More
+
+                <Button asChild variant="outline" className="md:px-8 py-4 bg-card border-2 border-border rounded-lg font-semibold md:text-lg hover:border-primary transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                  <Link to="/docs"> Learn More</Link>
                 </Button>
+
               </div>
 
               {/* Stats */}

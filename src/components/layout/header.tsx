@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "./theme-switcher";
 import { WalletConnectionButton } from "@/components/wallet/wallet-connection-button";
 const menuItems = [
-  { name: "Docs", to: "#link" },
+  { name: "Docs", to: "/docs" },
   // { name: "Join", to: "#link" },
   // { name: "About", to  : "#link" },
 ];
