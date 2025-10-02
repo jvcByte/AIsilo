@@ -3,7 +3,7 @@ import { useAccount, useWriteContract, useReadContract, usePublicClient } from '
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import contracts from '@/contracts/contracts';
 import { encryptFile } from '@/lib/encryption';
-import { uploadToIPFS, generateEmergencyQR } from '@/lib/ipfs';
+import { uploadToIPFS } from '@/lib/ipfs';
 import { toast } from 'react-hot-toast';
 import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
 
@@ -53,10 +53,6 @@ export interface EmergencyAccess {
 
 export interface UploadDocumentParams {
   file: File;
-  accessLevel: 'private' | 'shared' | 'emergency';
-  emergencyCode?: string;
-  expirationTime?: number;
-  allowedUsers?: string[];
 }
 
 export interface DocumentRegistryEventBase {
@@ -300,7 +296,7 @@ export function useDocuments() {
     setError(null);
 
     try {
-      const { file, accessLevel, emergencyCode, expirationTime, allowedUsers } = params;
+      const { file } = params;
 
       // Generate unique document ID
       const documentId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -326,24 +322,7 @@ export function useDocuments() {
         encryptionMetadata: metadata
       });
 
-      // Generate emergency access if needed
-      let emergencyAccess: EmergencyAccess | undefined;
-      if (accessLevel === 'emergency' && emergencyCode) {
-        const qrCode = generateEmergencyQR(
-          documentId,
-          emergencyCode,
-          expirationTime || Date.now() + 24 * 60 * 60 * 1000 // 24 hours default
-        );
 
-        emergencyAccess = {
-          documentId,
-          emergencyCode,
-          qrCode,
-          expirationTime: expirationTime || Date.now() + 24 * 60 * 60 * 1000,
-          createdBy: address,
-          createdAt: Date.now()
-        };
-      }
 
       // Upload to blockchain
       const hashBytes = new TextEncoder().encode(hash);
@@ -355,34 +334,26 @@ export function useDocuments() {
         args: [hashHex, ipfsResult.cid],
       });
 
-      // Grant access to allowed users if specified
-      if (allowedUsers && allowedUsers.length > 0) {
-        for (const userAddress of allowedUsers) {
-          await writeContract({
-            ...contracts.DocumentRegistry,
-            functionName: "grantRole",
-            args: [contracts.DocumentRegistry.abi.find(item => item.name === "USER_ROLE")?.outputs?.[0]?.name || "0x0", userAddress as `0x${string}`],
-          });
-        }
-      }
-
       // Invalidate queries to refresh data
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
       await queryClient.invalidateQueries({ queryKey: ["document-registry-events"] });
 
-      toast.success('Document uploaded successfully');
+      toast.success('Document uploaded successfully', {
+        className: "toast-success"
+      });
 
       return {
         documentId,
         cid: ipfsResult.cid,
         hash: hash,
-        emergencyAccess
       };
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Upload failed';
       setError(errorMessage);
-      toast.error(`Upload failed: ${errorMessage}`);
+      toast.error(`Upload failed: ${errorMessage}`, {
+        className: "toast-error"
+      });
       throw err;
     } finally {
       setIsLoading(false);

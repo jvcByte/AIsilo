@@ -6,28 +6,18 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
-import { EmergencyAccess } from './EmergencyAccess';
-import { 
-  Upload, 
-  Shield, 
-  AlertTriangle, 
-  Users,
+import {
+  Upload,
   FileText,
-  Lock
+  Lock,
+  AlertTriangle
 } from 'lucide-react';
 
 export function UploadFile() {
   const { address, isConnected } = useAccount();
   const [file, setFile] = useState<File | null>(null);
-  const [accessLevel, setAccessLevel] = useState<'private' | 'shared' | 'emergency'>('private');
-  const [emergencyCode, setEmergencyCode] = useState('');
-  const [expirationHours, setExpirationHours] = useState(24);
-  const [allowedUsers, setAllowedUsers] = useState('');
-  const [showEmergencyAccess, setShowEmergencyAccess] = useState(false);
-  const [documentId, setDocumentId] = useState<string | null>(null);
 
   const {
     isLoading,
@@ -46,18 +36,9 @@ export function UploadFile() {
     if (!file || !address) return;
 
     try {
-      const result = await uploadDocument({
-        file,
-        accessLevel,
-        emergencyCode: accessLevel === 'emergency' ? emergencyCode : undefined,
-        expirationTime: accessLevel === 'emergency' ? Date.now() + (expirationHours * 60 * 60 * 1000) : undefined,
-        allowedUsers: allowedUsers ? allowedUsers.split(',').map(addr => addr.trim()) : undefined
+      await uploadDocument({
+        file
       });
-
-      if (result.emergencyAccess) {
-        setDocumentId(result.documentId);
-        setShowEmergencyAccess(true);
-      }
     } catch (error) {
       console.error('Upload failed:', error);
     }
@@ -120,97 +101,6 @@ export function UploadFile() {
           </CardContent>
         </Card>
 
-        {/* Access Control */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              Access Control
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="accessLevel">Access Level</Label>
-              <Select value={accessLevel} onValueChange={(value: any) => setAccessLevel(value)}>
-                <SelectTrigger className="w-full mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="private">
-                    <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4" />
-                      Private - Only you can access
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="shared">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      Shared - Grant access to specific users
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="emergency">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" />
-                      Emergency - Medical/emergency access
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {accessLevel === 'shared' && (
-              <div>
-                <Label htmlFor="allowedUsers">Allowed Users (comma-separated addresses)</Label>
-                <Input
-                  id="allowedUsers"
-                  value={allowedUsers}
-                  onChange={(e) => setAllowedUsers(e.target.value)}
-                  placeholder="0x1234..., 0x5678..."
-                  className="mt-2"
-                />
-              </div>
-            )}
-
-            {accessLevel === 'emergency' && (
-              <div className="space-y-4">
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    Emergency access creates a time-limited QR code for medical emergencies.
-                    This should only be used for critical medical documents.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="emergencyCode">Emergency Code</Label>
-                    <Input
-                      id="emergencyCode"
-                      value={emergencyCode}
-                      onChange={(e) => setEmergencyCode(e.target.value)}
-                      placeholder="EMG-ABC123"
-                      className="mt-2"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="expirationHours">Expiration (hours)</Label>
-                    <Input
-                      id="expirationHours"
-                      type="number"
-                      value={expirationHours}
-                      onChange={(e) => setExpirationHours(Number(e.target.value))}
-                      min="1"
-                      max="168"
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Upload Button */}
         <Card>
           <CardContent className="p-6">
@@ -227,7 +117,7 @@ export function UploadFile() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Upload className="w-5 h-5" />
-                  Encrypt & Upload to BlockDAG
+                  Encrypt & Upload to IPFS
                 </div>
               )}
             </Button>
@@ -241,17 +131,6 @@ export function UploadFile() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Emergency Access Modal */}
-      {showEmergencyAccess && documentId && (
-        <EmergencyAccess
-          documentId={documentId}
-          onClose={() => {
-            setShowEmergencyAccess(false);
-            setDocumentId(null);
-          }}
-        />
-      )}
     </div>
   );
 }

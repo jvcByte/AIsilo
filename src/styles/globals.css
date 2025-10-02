@@ -12,17 +12,17 @@ html, body {
    LIGHT THEME COLORS (default)
    ================================= */
 :root {
-    /* Base background and text */
-    --background: oklch(1 0 0); /* White */
-    --foreground: oklch(0.145 0 0); /* Almost black */
+    /* Base background - Soft warm white */
+    --background: oklch(0.99 0.002 90); /* Subtle warm tint */
+    --foreground: oklch(0.15 0.01 270); /* Deep indigo-black */
 
-    /* Cards */
-    --card: oklch(1 0 0); /* White */
-    --card-foreground: oklch(0.145 0 0); /* Almost black */
+    /* Cards - Pure white with subtle elevation */
+    --card: oklch(0.93 0 0); /* Pure white */
+    --card-foreground: oklch(0.15 0.01 270); /* Deep indigo-black */
 
     /* Popovers / tooltips */
-    --popover: oklch(1 0 0); /* White */
-    --popover-foreground: oklch(0.145 0 0); /* Almost black */
+    --popover: oklch(0.9 0 0); /* Pure white */
+    --popover-foreground: oklch(0.15 0.01 270); /* Deep indigo-black */
 
     /* Primary branding */
     --primary: oklch(0.205 0 0); /* Very dark (near black) */
