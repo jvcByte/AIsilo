@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { getCookie, setCookie, removeCookie } from "typescript-cookie";
 import { ConnectKitButton } from "connectkit";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -38,6 +39,7 @@ import {
   getChainStatus,
   sortChainsByPriority,
 } from "@/lib/chain-utils";
+import { CHAIN_IDS } from "@/lib/chain-utils";
 
 interface WalletConnectionButtonProps {
   size?: "sm" | "default" | "lg";
@@ -77,30 +79,57 @@ export function WalletConnectionButton({
     if (address) {
       await navigator.clipboard.writeText(address);
       setCopied(true);
-      toast.success("Address copied!");
+      toast.success("Address copied!", {
+        className: "toast-success",
+      });
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const handleSwitchChain = async (chainId: number) => {
-    if (chain?.id === chainId) return;
+  const handleSwitchChain = useCallback(
+    async (chainId: number) => {
+      if (chain?.id === chainId) return;
 
-    setChainSwitchState({ isLoading: true, targetChainId: chainId });
+      setChainSwitchState({ isLoading: true, targetChainId: chainId });
 
-    try {
-      toast.promise(switchChainAsync({ chainId }), {
-        loading: "Switching network...",
-        success: `Switched to ${chains.find((c) => c.id === chainId)?.name
-          } successfully!`,
-        error: "Failed to switch network",
-      });
-    } catch (error) {
-      toast.error("Failed to switch network");
-      console.error("Chain switch error:", error);
-    } finally {
-      setChainSwitchState({ isLoading: false });
+      try {
+        toast.promise(
+          switchChainAsync({ chainId }),
+          {
+            loading: "Switching network...",
+            success: `Switched to ${chains.find((c) => c.id === chainId)?.name}`,
+            error: "Failed to switch network",
+          },
+          {
+            className: "toast-loading",
+          },
+        );
+      } catch (error) {
+        toast.error("Failed to switch network", {
+          className: "toast-error",
+        });
+        console.error("Chain switch error:", error);
+      } finally {
+        setChainSwitchState({ isLoading: false });
+      }
+    },
+    [chain, chains, switchChainAsync],
+  );
+
+  // Automatically switch to blockdag once upon initial connect
+  useEffect(() => {
+    if (isConnected) {
+      const switched = getCookie("initialSwitchToBlockdag");
+      if (!switched) {
+        const isBlockdag = chain?.id === CHAIN_IDS.BLOCKDAG;
+        if (!isBlockdag) {
+          const blockdag = CHAIN_IDS.BLOCKDAG;
+          handleSwitchChain(blockdag);
+        }
+        setCookie("initialSwitchToBlockdag", "true");
+      }
     }
-  };
+  }, [isConnected, chain, handleSwitchChain]);
 
   const openEtherscan = () => {
     if (address && chain) {
@@ -312,7 +341,10 @@ export function WalletConnectionButton({
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
-                onClick={() => disconnect()}
+                onClick={() => {
+                  disconnect();
+                  removeCookie("initialSwitchToBlockdag");
+                }}
                 className="cursor-pointer text-destructive focus:text-destructive"
               >
                 <LogOut className="h-4 w-4 mr-2" />

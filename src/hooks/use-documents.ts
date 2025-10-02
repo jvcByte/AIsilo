@@ -5,6 +5,7 @@ import contracts from '@/contracts/contracts';
 import { encryptFile } from '@/lib/encryption';
 import { uploadToIPFS, generateEmergencyQR } from '@/lib/ipfs';
 import { toast } from 'react-hot-toast';
+import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
 
 export interface ContractDocument {
   documentHash: string;
@@ -145,46 +146,28 @@ export function useDocuments() {
         console.log('🔄 Fetching document registry events...');
 
         // Fetch all event types in parallel
-        const [documentUploadedLogs, roleGrantedLogs, roleRevokedLogs] = await Promise.all([
+        const [documentUploadedLogs, roleGrantedLogs, roleRevokedLogs, roleAdminChangedLogs] = await Promise.all([
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
-            event: {
-              type: 'event',
-              name: 'DocumentUploaded',
-              inputs: [
-                { type: 'address', name: 'user', indexed: true },
-                { type: 'bytes32', name: 'docHash', indexed: false },
-                { type: 'string', name: 'cid', indexed: false },
-              ],
-            },
+            event: DOCUMENT_REGISTRY_EVENTS.DocumentUploaded,
             fromBlock: "earliest",
             toBlock: "latest",
           }),
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
-            event: {
-              type: 'event',
-              name: 'RoleGranted',
-              inputs: [
-                { type: 'bytes32', name: 'role', indexed: true },
-                { type: 'address', name: 'account', indexed: true },
-                { type: 'address', name: 'sender', indexed: true },
-              ],
-            },
+            event: DOCUMENT_REGISTRY_EVENTS.RoleGranted,
             fromBlock: "earliest",
             toBlock: "latest",
           }),
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
-            event: {
-              type: 'event',
-              name: 'RoleRevoked',
-              inputs: [
-                { type: 'bytes32', name: 'role', indexed: true },
-                { type: 'address', name: 'account', indexed: true },
-                { type: 'address', name: 'sender', indexed: true },
-              ],
-            },
+            event: DOCUMENT_REGISTRY_EVENTS.RoleRevoked,
+            fromBlock: "earliest",
+            toBlock: "latest",
+          }),
+          publicClient.getLogs({
+            address: contracts.DocumentRegistry.address,
+            event: DOCUMENT_REGISTRY_EVENTS.RoleAdminChanged,
             fromBlock: "earliest",
             toBlock: "latest",
           }),
@@ -194,6 +177,7 @@ export function useDocuments() {
           documentUploaded: documentUploadedLogs.length,
           roleGranted: roleGrantedLogs.length,
           roleRevoked: roleRevokedLogs.length,
+          roleAdminChanged: roleAdminChangedLogs.length,
         });
 
         // Get unique block numbers for batch fetching timestamps
@@ -201,6 +185,7 @@ export function useDocuments() {
           ...documentUploadedLogs,
           ...roleGrantedLogs,
           ...roleRevokedLogs,
+          ...roleAdminChangedLogs,
         ];
         const uniqueBlockNumbers = [
           ...new Set(allLogs.map((log) => log.blockNumber)),
@@ -279,7 +264,7 @@ export function useDocuments() {
     },
     enabled: !!publicClient,
     staleTime: 50000, // Cache for 50 seconds
-    refetchInterval: 100000, // Refetch every 100 seconds
+    refetchInterval: 20000, // Refetch every 20 seconds
   });
 
   // Transform contract data to our Document interface
