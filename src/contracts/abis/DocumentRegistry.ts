@@ -370,6 +370,52 @@ export default [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "getDocumentsByOwner",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "string",
+            name: "documentId",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "cId",
+            type: "string",
+          },
+          {
+            internalType: "address",
+            name: "uploader",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "uploadTime",
+            type: "uint256",
+          },
+          {
+            internalType: "bool",
+            name: "archived",
+            type: "bool",
+          },
+        ],
+        internalType: "struct DocumentRegistry.Documents[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_start",
         type: "uint256",

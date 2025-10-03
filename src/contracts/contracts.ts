@@ -11,7 +11,7 @@ type TContracts = Record<
 
 const contracts = {
     DocumentRegistry: {
-        address: "0xA125622Fd6da9C8FBdd623766e6984A6f79F0909",
+        address: "0x45638861C0b9dd4464360b6b32fCaA69E5d572D5",
         abi: DOCREG_ABI,
     },
 } as const satisfies TContracts;

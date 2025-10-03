@@ -16,8 +16,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedUploadFileRouteImport } from './routes/_authenticated/upload-file'
 import { Route as AuthenticatedTypeFileRouteImport } from './routes/_authenticated/type-file'
 import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
+import { Route as AuthenticatedDownloadFileRouteImport } from './routes/_authenticated/download-file'
 import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
@@ -53,6 +55,12 @@ const AuthenticatedTempRouteRoute = AuthenticatedTempRouteRouteImport.update({
   path: '/temp-route',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDownloadFileRoute =
+  AuthenticatedDownloadFileRouteImport.update({
+    id: '/download-file',
+    path: '/download-file',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDecryptRoute = AuthenticatedDecryptRouteImport.update({
   id: '/decrypt',
   path: '/decrypt',
@@ -63,13 +71,20 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/docs': typeof DocsRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
+  '/download-file': typeof AuthenticatedDownloadFileRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/type-file': typeof AuthenticatedTypeFileRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
@@ -78,8 +93,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/docs': typeof DocsRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
+  '/download-file': typeof AuthenticatedDownloadFileRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/type-file': typeof AuthenticatedTypeFileRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
@@ -90,8 +107,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/docs': typeof DocsRoute
+  '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
+  '/_authenticated/download-file': typeof AuthenticatedDownloadFileRoute
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
   '/_authenticated/type-file': typeof AuthenticatedTypeFileRoute
   '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
@@ -102,8 +121,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/docs'
+    | '/activities'
     | '/dashboard'
     | '/decrypt'
+    | '/download-file'
     | '/temp-route'
     | '/type-file'
     | '/upload-file'
@@ -112,8 +133,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/docs'
+    | '/activities'
     | '/dashboard'
     | '/decrypt'
+    | '/download-file'
     | '/temp-route'
     | '/type-file'
     | '/upload-file'
@@ -123,8 +146,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/docs'
+    | '/_authenticated/activities'
     | '/_authenticated/dashboard'
     | '/_authenticated/decrypt'
+    | '/_authenticated/download-file'
     | '/_authenticated/temp-route'
     | '/_authenticated/type-file'
     | '/_authenticated/upload-file'
@@ -188,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTempRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/download-file': {
+      id: '/_authenticated/download-file'
+      path: '/download-file'
+      fullPath: '/download-file'
+      preLoaderRoute: typeof AuthenticatedDownloadFileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/decrypt': {
       id: '/_authenticated/decrypt'
       path: '/decrypt'
@@ -202,20 +234,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/activities': {
+      id: '/_authenticated/activities'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute
+  AuthenticatedDownloadFileRoute: typeof AuthenticatedDownloadFileRoute
   AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute
   AuthenticatedTypeFileRoute: typeof AuthenticatedTypeFileRoute
   AuthenticatedUploadFileRoute: typeof AuthenticatedUploadFileRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDecryptRoute: AuthenticatedDecryptRoute,
+  AuthenticatedDownloadFileRoute: AuthenticatedDownloadFileRoute,
   AuthenticatedTempRouteRoute: AuthenticatedTempRouteRoute,
   AuthenticatedTypeFileRoute: AuthenticatedTypeFileRoute,
   AuthenticatedUploadFileRoute: AuthenticatedUploadFileRoute,

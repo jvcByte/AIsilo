@@ -2,6 +2,7 @@ import { type Address } from "viem";
 import { getRandomBytes } from "ethereum-cryptography/random";
 import { keccak256 } from "ethereum-cryptography/keccak";
 import { utf8ToBytes, bytesToHex, hexToBytes } from "ethereum-cryptography/utils";
+export { bytesToHex } from "ethereum-cryptography/utils";
 
 
 function deriveEncryptionKey(signature: Address): Uint8Array {

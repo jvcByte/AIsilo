@@ -1,13 +1,13 @@
 import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import contracts from "@/contracts/contracts";
 import { useDocuments } from "@/hooks/use-documents";
-import { RecentActivity } from "@/components/RecentActivity";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { FilesByOwner } from "./files-by-owner";
 
 // import { formatNumber } from "@/lib/utils";
 
@@ -175,9 +175,9 @@ export function Dashboard() {
           <div className="text-base md:text-2xl font-bold">0</div>
         </div>
       </div>
-      <div className="rounded-lg border bg-card p-6 bg-gradient-to-tl from-muted to-background">
-        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-        <RecentActivity limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
+      <div className="rounded-lg border bg-card p-6 bg-gradient-to-t from-muted to-background">
+        <h3 className="text-xl font-semibold mb-4">My Documents</h3>
+        <FilesByOwner limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
       </div>
     </div>
   );

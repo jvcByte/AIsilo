@@ -1,16 +1,10 @@
 import {
   LayoutDashboard,
-  Monitor,
-  HelpCircle,
-  Bell,
-  Palette,
-  Settings,
-  Wrench,
-  UserCog,
   Key,
   FileUp,
   FilePenLine,
   FileDown,
+  Clock10,
 } from "lucide-react";
 import { type SidebarData } from "@/lib/types";
 
@@ -46,7 +40,7 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: "Get File",
-          url: "/temp-route",
+          url: "/download-file",
           icon: FileDown,
         },
         {
@@ -60,40 +54,16 @@ export const sidebarData: SidebarData = {
       title: "Other",
       items: [
         {
-          title: "Settings",
-          icon: Settings,
-          items: [
-            {
-              title: "Profile",
-              url: "/temp-route",
-              icon: UserCog,
-            },
-            {
-              title: "Account",
-              url: "/temp-route",
-              icon: Wrench,
-            },
-            {
-              title: "Appearance",
-              url: "/temp-route",
-              icon: Palette,
-            },
-            {
-              title: "Notifications",
-              url: "/temp-route",
-              icon: Bell,
-            },
-            {
-              title: "Display",
-              url: "/temp-route",
-              icon: Monitor,
-            },
-          ],
-        },
-        {
-          title: "Help Center",
-          url: "/temp-route",
-          icon: HelpCircle,
+          title: "View Activities",
+          url: "/activities",
+          icon: Clock10,
+          // items: [
+          //   {
+          //     title: "View Activities",
+          //     url: "/activities",
+          //     icon: Clock10,
+          //   }
+          // ]
         },
       ],
     },

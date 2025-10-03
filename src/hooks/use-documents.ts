@@ -4,11 +4,12 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import contracts from '@/contracts/contracts';
 import { toast } from 'react-hot-toast';
 import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
+import type { Address } from 'viem';
 
 export interface ContractDocument {
   documentId: string;
   cId: string;
-  uploader: string;
+  uploader: `0x${string}`;
   uploadTime: bigint;
   archived: boolean;
 }
@@ -126,6 +127,15 @@ export function useDocuments() {
   const { data: documentCount } = useReadContract({
     ...contracts.DocumentRegistry,
     functionName: "getDocumentCount",
+    query: {
+      enabled: true,
+    },
+  });
+
+  const { data: getDocumentsByOwner } = useReadContract({
+    ...contracts.DocumentRegistry,
+    functionName: "getDocumentsByOwner",
+    args: [address as Address],
     query: {
       enabled: true,
     },
@@ -277,11 +287,11 @@ export function useDocuments() {
   })) || [];
 
   // Debug logging
-  console.log("Contract documents:", contractDocuments);
-  console.log("Transformed documents:", documents);
-  console.log("Document count:", documentCount);
-  console.log("Loading state:", isLoadingDocuments);
-  console.log("Events:", events);
+  // console.log("Contract documents:", contractDocuments);
+  // console.log("Transformed documents:", documents);
+  // console.log("Document count:", documentCount);
+  // console.log("Loading state:", isLoadingDocuments);
+  // console.log("Events:", events);
 
   /**
    * Upload a document with encryption and IPFS storage
@@ -330,6 +340,7 @@ export function useDocuments() {
     documentCount: documentCount || 0,
     isLoading: isLoading || isLoadingDocuments,
     error,
+    getDocumentsByOwner,
 
     // Actions
     uploadDocument,
