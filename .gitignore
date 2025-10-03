@@ -32,5 +32,4 @@ dist-ssr
 src/components/EmergencyAccess.tsx
 src/contracts/abis/SecureDataAccess.ts
 src/contracts/contracts.ts
-src/lib/encryption.ts
 src/lib/ipfs.ts
