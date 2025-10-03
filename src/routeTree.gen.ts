@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as DecryptRouteImport } from './routes/decrypt'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,6 +22,11 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DecryptRoute = DecryptRouteImport.update({
+  id: '/decrypt',
+  path: '/decrypt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -61,6 +67,7 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/decrypt': typeof DecryptRoute
   '/docs': typeof DocsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/decrypt': typeof DecryptRoute
   '/docs': typeof DocsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
+  '/decrypt': typeof DecryptRoute
   '/docs': typeof DocsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
@@ -92,6 +101,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/decrypt'
     | '/docs'
     | '/dashboard'
     | '/temp-route'
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/decrypt'
     | '/docs'
     | '/dashboard'
     | '/temp-route'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
+    | '/decrypt'
     | '/docs'
     | '/_authenticated/dashboard'
     | '/_authenticated/temp-route'
@@ -122,6 +134,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
+  DecryptRoute: typeof DecryptRoute
   DocsRoute: typeof DocsRoute
 }
 
@@ -132,6 +145,13 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decrypt': {
+      id: '/decrypt'
+      path: '/decrypt'
+      fullPath: '/decrypt'
+      preLoaderRoute: typeof DecryptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -207,6 +227,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
+  DecryptRoute: DecryptRoute,
   DocsRoute: DocsRoute,
 }
 export const routeTree = rootRouteImport

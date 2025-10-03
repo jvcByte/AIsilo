@@ -7,6 +7,7 @@ import { ThemeSwitcher } from "./theme-switcher";
 import { WalletConnectionButton } from "@/components/wallet/wallet-connection-button";
 const menuItems = [
   { name: "Docs", to: "/docs" },
+  { name: "Decrypt", to: "/decrypt" },
   // { name: "Join", to: "#link" },
   // { name: "About", to  : "#link" },
 ];
