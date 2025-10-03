@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   FileText,
-  Download,
   Unplug,
   Hash,
   Clock,
@@ -52,6 +51,16 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
   }, [getDocumentsByOwner]);
 
   // Copy CID to clipboard
+  // Sort documents by upload time (most recent first)
+  const sortedDocuments = useMemo(() => {
+    if (!documents.length) return documents;
+
+    return [...documents].sort((a, b) => {
+      const timeA = BigInt(a.uploadTime);
+      const timeB = BigInt(b.uploadTime);
+      return timeB > timeA ? 1 : timeB < timeA ? -1 : 0; // Descending order (most recent first)
+    });
+  }, [documents]);
   const copyToClipboard = async (cid: string) => {
     try {
       await navigator.clipboard.writeText(cid);
@@ -59,14 +68,6 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
     } catch (err) {
       toast.error(`Failed to copy CID ${err}`);
     }
-  };
-
-  // Navigate to download page with CID
-  const handleDownload = (cid: string) => {
-    navigate({
-      to: '/download-file',
-      search: { cid }
-    });
   };
 
   // Navigate to document details (could be same as download for now)
@@ -177,7 +178,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
     );
   }
 
-  const displayDocuments = documents.slice(0, displayLimit);
+  const displayDocuments = sortedDocuments.slice(0, displayLimit);
 
   return (
     <div className="space-y-4">
@@ -185,7 +186,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 ">
         <div>
           <p className="text-sm text-muted-foreground">
-            {documents.length} document{documents.length !== 1 ? 's' : ''} uploaded
+            {documents.length} document{documents.length > 1 ? 's' : ''} uploaded
           </p>
         </div>
         {documents.length > displayLimit && (
@@ -201,8 +202,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
           {displayDocuments.map((document, index) => (
             <Card
               key={document.id}
-              className="group hover:shadow-md transition-all duration-200 cursor-pointer bg-gradient-to-br from-muted to-background"
-              onClick={() => handleViewDetails(document.cid)}
+              className="group hover:shadow-md transition-all duration-200 bg-gradient-to-br from-muted to-background"
             >
               <CardContent className="p-4 sm:p-6">
                 <div className="flex items-start gap-3 sm:gap-4">
@@ -279,7 +279,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         <span>
-                          Uploaded {formatRelativeTime(BigInt(document.uploadTime * 1000))}
+                          Uploaded {formatRelativeTime(BigInt(document.uploadTime))}
                         </span>
                       </div>
 
@@ -291,21 +291,10 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                             e.stopPropagation();
                             handleViewDetails(document.cid);
                           }}
-                          className="text-xs"
+                          className="text-xs cursor-pointer"
                         >
                           <Eye className="w-3 h-3 mr-1" />
                           View
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDownload(document.cid);
-                          }}
-                          className="text-xs"
-                        >
-                          <Download className="w-3 h-3 mr-1" />
-                          Download
                         </Button>
                       </div>
                     </div>

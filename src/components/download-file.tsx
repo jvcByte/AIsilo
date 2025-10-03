@@ -11,6 +11,7 @@ import { decryptFile } from '../lib/encryption';
 import { pinata } from '@/lib/ipfs';
 import { toast } from 'react-hot-toast';
 import { Alert, AlertDescription } from './ui/alert';
+import { useSearch } from '@tanstack/react-router';
 
 type DownloadStep = 'input' | 'download' | 'complete';
 
@@ -29,10 +30,11 @@ interface DownloadState {
 export function DownloadFile() {
     const { address, isConnected } = useAccount();
     const { signMessageAsync } = useSignMessage();
+    const { cid: urlCid } = useSearch({ from: '/_authenticated/download-file' });
 
     const [state, setState] = useState<DownloadState>({
         step: 'input',
-        cid: '',
+        cid: urlCid || '',
         iv: null,
         signature: null,
         decryptedFile: null,
@@ -58,7 +60,6 @@ export function DownloadFile() {
         }
 
         setState(prev => ({ ...prev, error: null }));
-
         try {
             const signature = await signMessageAsync({
                 message: 'Encrypt My File'
@@ -301,7 +302,7 @@ export function DownloadFile() {
                                     {(state.isDownloading || state.isDecrypting) ? (
                                         <div className="flex items-center gap-2">
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            {state.isDownloading ? 'Downloading...' : 'Decrypting...'}
+                                            {state.isDownloading ? 'Processing...' : 'Decrypting...'}
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2">
@@ -334,7 +335,7 @@ export function DownloadFile() {
                             <div className="space-y-2">
                                 <Label>File Name:</Label>
                                 <div className="p-3 bg-muted rounded-lg">
-                                    <span className="text-sm font-medium">{state.fileName || 'decrypted-file'}</span>
+                                    <span className="text-sm font-medium">{state.fileName || 'FileIt'}</span>
                                 </div>
                             </div>
                             <div className="flex gap-2">
