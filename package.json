@@ -34,6 +34,7 @@
     "lucide-react": "^0.544.0",
     "motion": "^12.23.12",
     "motion-primitives": "^0.1.0",
+    "pinata": "^2.5.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",

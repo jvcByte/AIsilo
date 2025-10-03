@@ -3,7 +3,7 @@ import { useAccount, useWriteContract, useReadContract, usePublicClient } from '
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import contracts from '@/contracts/contracts';
 import { encryptFile } from '@/lib/encryption';
-import { uploadToIPFS } from '@/lib/ipfs';
+import { pinata } from '@/lib/ipfs';
 import { toast } from 'react-hot-toast';
 import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
 
@@ -302,30 +302,23 @@ export function useDocuments() {
       const documentId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       // Get user's private key (in production, this would be handled securely)
-      const privateKey = new Uint8Array(32); // Placeholder - in production, get from wallet
 
       // Encrypt the file
-      const { encryptedData, metadata, hash } = await encryptFile(
+      const { encrypted } = await encryptFile(
         file,
         address,
-        documentId,
-        privateKey
+
       );
 
-      // Upload to IPFS
-      const ipfsResult = await uploadToIPFS(encryptedData, {
-        fileName: file.name,
-        fileType: file.type,
-        fileSize: file.size,
-        documentId: documentId,
-        walletAddress: address,
-        encryptionMetadata: metadata
-      });
+      // Upload to IPFS using Pinata
+      const fileToUpload = new File([encrypted], file.name, { type: file.type });
+      const upload = await pinata.upload.public.file(fileToUpload);
+      const ipfsResult = { cid: upload.cid };
 
 
 
       // Upload to blockchain
-      const hashBytes = new TextEncoder().encode(hash);
+      const hashBytes = new TextEncoder().encode(encrypted);
       const hashHex = `0x${Array.from(hashBytes).map(b => b.toString(16).padStart(2, '0')).join('')}` as `0x${string}`;
 
       await writeContract({
@@ -345,7 +338,6 @@ export function useDocuments() {
       return {
         documentId,
         cid: ipfsResult.cid,
-        hash: hash,
       };
 
     } catch (err) {

@@ -13,72 +13,214 @@ import {
   Upload,
   FileText,
   Lock,
-  AlertTriangle,
-  PenTool
+  PenTool,
+  CheckCircle2
 } from 'lucide-react';
 import { encryptFile } from '../lib/encryption';
+import { pinata } from '@/lib/ipfs';
+import { toast } from 'react-hot-toast';
+
+type UploadStep = 'file' | 'sign' | 'upload' | 'complete';
+
+interface UploadState {
+  step: UploadStep;
+  file: File | null;
+  signature: Address | null;
+  cid: string | null;
+  iv: string | null;
+}
 
 export function UploadFile() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const [file, setFile] = useState<File | null>(null);
-  const [signature, setSignature] = useState<Address | null>(null);
-  const [isSigning, setIsSigning] = useState(false);
-  const [step, setStep] = useState<'file' | 'sign' | 'upload'>('file');
+  const { /* uploadDocument, */ isLoading: isContractLoading } = useDocuments();
 
-  const {
-    isLoading,
-    error,
-    // uploadDocument
-  } = useDocuments();
+  const [state, setState] = useState<UploadState>({
+    step: 'file',
+    file: null,
+    signature: null,
+    cid: null,
+    iv: null
+  });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setStep('sign'); // Move to signature step after file selection
-    }
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Reset function
+  const resetUpload = () => {
+    setState({
+      step: 'file',
+      file: null,
+      signature: null,
+      cid: null,
+      iv: null
+    });
   };
 
-  const handleSignMessage = async () => {
-    if (!address) return;
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
 
-    setIsSigning(true);
+    if (!selectedFile) return;
+
+    // Validate file size (max 100MB)
+    const maxSize = 100 * 1024 * 1024;
+    if (selectedFile.size > maxSize) {
+      toast.error('File size must be less than 100MB', { className: "toast-error" });
+      return;
+    }
+
+    setState(prev => ({
+      ...prev,
+      file: selectedFile,
+      step: 'sign'
+    }));
+
+    toast.success('File selected successfully', { className: "toast-success" });
+  };
+
+  // Handle message signing
+  const handleSignMessage = async () => {
+    if (!address) {
+      toast.error('Wallet not connected', { className: "toast-error" });
+      return;
+    }
+
+    setIsProcessing(true);
+    const signingToast = toast.loading('Waiting for signature...', { className: "toast-loading" });
+
     try {
       const signature = await signMessageAsync({
-        message: "Encrypt My File"
+        message: 'Encrypt My File'
       });
-      setSignature(signature);
-      setStep('upload'); // Move to upload step after signing
+
+      setState(prev => ({
+        ...prev,
+        signature,
+        step: 'upload'
+      }));
+
+      toast.success('Message signed successfully', { id: signingToast, className: "toast-success" });
     } catch (error) {
       console.error('Signing failed:', error);
+      toast.error('Failed to sign message. Please try again.', { id: signingToast, className: "toast-error" });
     } finally {
-      setIsSigning(false);
+      setIsProcessing(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file || !signature || !address) return;
+  // Handle file upload to IPFS
+  const handleUpload = async () => {
+    if (!state.file || !state.signature || !address) {
+      toast.error('Missing required data for upload');
+      return;
+    }
+
+    setIsProcessing(true);
+    const uploadToast = toast.loading('Encrypting file...', { className: "toast-loading" });
 
     try {
-      // Encrypt file with signature
-      const { encrypted, iv } = await encryptFile(file, signature);
+      // Step 1: Encrypt file
+      toast.loading('Encrypting file...', { id: uploadToast, className: "toast-loading" });
+      const { encrypted, iv } = await encryptFile(state.file, state.signature);
 
-      // Upload encrypted data to IPFS
-      // await uploadDocument({
-      //   file,
-      //   encryptedData: encrypted,
-      //   iv,
-      //   signature
-      // });
+      const encryptedFile = new File([encrypted], state.file.name, {
+        type: state.file.type
+      });
 
-      console.log("encrypted File: ", encrypted)
-      console.log("iv: ", iv)
+      // Step 2: Get presigned URL
+      toast.loading('Getting upload URL...', { id: uploadToast, className: "toast-loading" });
+      const serverUrl = import.meta.env.VITE_SERVER_URL;
+
+      if (!serverUrl) {
+        throw new Error('Server URL not configured');
+      }
+
+      const urlResponse = await fetch(`${serverUrl}/presigned_url`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!urlResponse.ok) {
+        const errorText = await urlResponse.text();
+        throw new Error(`Server error: ${urlResponse.status} - ${errorText}`);
+      }
+
+      const contentType = urlResponse.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        throw new Error('Invalid server response format');
+      }
+
+      const { url: presignedUrl } = await urlResponse.json();
+
+      // Step 3: Upload to IPFS
+      toast.loading('Uploading to IPFS...', { id: uploadToast, className: "toast-loading" });
+      const upload = await pinata.upload
+        .public.file(encryptedFile)
+        .url(presignedUrl)
+        .keyvalues({
+          iv,
+          user: address
+        });
+
+      if (!upload.cid) {
+        throw new Error('Failed to get CID from upload');
+      }
+
+      // Update state with upload results
+      setState(prev => ({
+        ...prev,
+        cid: upload.cid,
+        iv,
+        step: 'complete'
+      }));
+
+      toast.success('File uploaded to IPFS successfully!', { id: uploadToast, className: "toast-success" });
+
+      // Step 4: Call smart contract
+      // await handleContractWrite(upload.cid, iv);
+
     } catch (error) {
       console.error('Upload failed:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'An unknown error occurred';
+      toast.error(`Upload failed: ${errorMessage}`, { id: uploadToast, className: "toast-error" });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
+  // Handle smart contract write
+  // const handleContractWrite = async (cid: string, iv: string) => {
+  //   if (!uploadDocument) {
+  //     toast.error('Contract write function not available', { className: "toast-error" });
+  //     return;
+  //   }
+
+  //   const contractToast = toast.loading('Writing to blockchain...', { className: "toast-loading" });
+
+  //   try {
+  //     await uploadDocument({
+  //       cid,
+  //       iv
+  //     });
+
+  //     toast.success('Document registered on blockchain!', { id: contractToast, className: "toast-success" });
+  //   } catch (error) {
+  //     console.error('Contract write failed:', error);
+  //     const errorMessage = error instanceof Error
+  //       ? error.message
+  //       : 'Transaction failed';
+  //     toast.error(`Blockchain registration failed: ${errorMessage}`, {
+  //       id: contractToast,
+  //       className: "toast-error"
+  //     });
+  //   }
+  // };
+
+  // Render: Not connected state
   if (!isConnected) {
     return (
       <div className="container mx-auto p-4">
@@ -95,6 +237,8 @@ export function UploadFile() {
     );
   }
 
+  const isLoading = isProcessing || isContractLoading;
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center gap-2 mb-6">
@@ -103,7 +247,7 @@ export function UploadFile() {
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* File Selection */}
+        {/* File Selection Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -114,21 +258,25 @@ export function UploadFile() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="file" className="text-foreground">Select File</Label>
+                <Label htmlFor="file" className="text-foreground">
+                  Select File
+                </Label>
                 <Input
                   id="file"
                   type="file"
                   onChange={handleFileChange}
                   className="w-full mt-2"
-                  disabled={step !== 'file'}
+                  disabled={state.step !== 'file' || isLoading}
                 />
-                {file && (
+                {state.file && (
                   <div className="mt-2 p-3 bg-muted rounded-lg">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <FileText className="w-4 h-4" />
-                      <span className="font-medium">{file.name}</span>
-                      <Badge variant="outline">{file.type}</Badge>
-                      <Badge variant="secondary">{(file.size / 1024 / 1024).toFixed(2)} MB</Badge>
+                      <span className="font-medium">{state.file.name}</span>
+                      <Badge variant="outline">{state.file.type || 'unknown'}</Badge>
+                      <Badge variant="secondary">
+                        {(state.file.size / 1024 / 1024).toFixed(2)} MB
+                      </Badge>
                     </div>
                   </div>
                 )}
@@ -137,8 +285,8 @@ export function UploadFile() {
           </CardContent>
         </Card>
 
-        {/* Signature Step */}
-        {step === 'sign' && file && (
+        {/* Signature Card */}
+        {state.step === 'sign' && state.file && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -148,20 +296,24 @@ export function UploadFile() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  To encrypt your file securely, please sign this message with your wallet:
-                </p>
+                <Alert>
+                  <Lock className="h-4 w-4" />
+                  <AlertDescription>
+                    To encrypt your file securely, please sign this message with your wallet.
+                    Your signature will be used to generate a unique encryption key.
+                  </AlertDescription>
+                </Alert>
                 <div className="p-3 bg-muted rounded-lg">
-                  <code className="text-sm">"Encrypt My File"</code>
+                  <code className="text-sm font-mono">"Encrypt My File"</code>
                 </div>
                 <Button
                   onClick={handleSignMessage}
-                  disabled={isSigning}
+                  disabled={isLoading}
                   className="w-full"
                 >
-                  {isSigning ? (
+                  {isLoading ? (
                     <div className="flex items-center gap-2">
-                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
                       Signing Message...
                     </div>
                   ) : (
@@ -176,19 +328,31 @@ export function UploadFile() {
           </Card>
         )}
 
-        {/* Upload Button */}
-        {step === 'upload' && signature && (
+        {/* Upload Card */}
+        {state.step === 'upload' && state.signature && (
           <Card>
-            <CardContent className="p-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Upload to IPFS
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertDescription>
+                  Your file is ready to be encrypted and uploaded to IPFS.
+                </AlertDescription>
+              </Alert>
               <Button
-                onClick={handleSubmit}
-                disabled={!file || !signature || isLoading}
+                onClick={handleUpload}
+                disabled={isLoading}
                 className="w-full h-12 text-lg"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                    Encrypting & Uploading...
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    Processing...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
@@ -197,13 +361,39 @@ export function UploadFile() {
                   </div>
                 )}
               </Button>
+            </CardContent>
+          </Card>
+        )}
 
-              {error && (
-                <Alert className="mt-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+        {/* Success Card */}
+        {state.step === 'complete' && state.cid && (
+          <Card className="border-green-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-600">
+                <CheckCircle2 className="w-5 h-5" />
+                Upload Complete
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert className="border-green-500">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <AlertDescription>
+                  Your file has been successfully encrypted, uploaded to IPFS, and registered on the blockchain.
+                </AlertDescription>
+              </Alert>
+              <div className="space-y-2">
+                <Label>IPFS CID:</Label>
+                <div className="p-3 bg-muted rounded-lg">
+                  <code className="text-sm break-all">{state.cid}</code>
+                </div>
+              </div>
+              <Button
+                onClick={resetUpload}
+                variant="outline"
+                className="w-full"
+              >
+                Upload Another File
+              </Button>
             </CardContent>
           </Card>
         )}
