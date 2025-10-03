@@ -57,9 +57,9 @@ export default [
       },
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "docHash",
-        type: "bytes32",
+        internalType: "string",
+        name: "docID",
+        type: "string",
       },
       {
         indexed: false,
@@ -240,9 +240,9 @@ export default [
     name: "documents",
     outputs: [
       {
-        internalType: "bytes32",
-        name: "documentHash",
-        type: "bytes32",
+        internalType: "string",
+        name: "documentId",
+        type: "string",
       },
       {
         internalType: "string",
@@ -275,9 +275,9 @@ export default [
       {
         components: [
           {
-            internalType: "bytes32",
-            name: "documentHash",
-            type: "bytes32",
+            internalType: "string",
+            name: "documentId",
+            type: "string",
           },
           {
             internalType: "string",
@@ -321,9 +321,9 @@ export default [
       {
         components: [
           {
-            internalType: "bytes32",
-            name: "documentHash",
-            type: "bytes32",
+            internalType: "string",
+            name: "documentId",
+            type: "string",
           },
           {
             internalType: "string",
@@ -385,9 +385,9 @@ export default [
       {
         components: [
           {
-            internalType: "bytes32",
-            name: "documentHash",
-            type: "bytes32",
+            internalType: "string",
+            name: "documentId",
+            type: "string",
           },
           {
             internalType: "string",
@@ -563,9 +563,9 @@ export default [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "_documentHash",
-        type: "bytes32",
+        internalType: "string",
+        name: "_documentID",
+        type: "string",
       },
       {
         internalType: "string",

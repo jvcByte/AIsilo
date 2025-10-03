@@ -367,7 +367,7 @@ export function UploadFile() {
 
         {/* Success Card */}
         {state.step === 'complete' && state.cid && (
-          <Card className="border-green-500">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-600">
                 <CheckCircle2 className="w-5 h-5" />

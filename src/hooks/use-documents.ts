@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
 
 export interface ContractDocument {
-  documentHash: string;
+  documentId: string;
   cId: string;
   uploader: string;
   uploadTime: bigint;
@@ -17,7 +17,7 @@ export interface ContractDocument {
 
 export interface DocumentUploadedLog {
   user?: `0x${string}`;
-  docHash?: `0x${string}`;
+  documentId?: string;
   cid?: string;
 }
 
@@ -66,7 +66,7 @@ export interface DocumentRegistryEventBase {
 export interface DocumentUploadedEventData extends DocumentRegistryEventBase {
   eventName: "DocumentUploaded";
   user: `0x${string}`;
-  docHash: `0x${string}`;
+  documentId: string;
   cid: string;
 }
 
@@ -96,7 +96,7 @@ export interface Document {
   fileType: string;
   fileSize: number;
   cid: string;
-  documentHash: string;
+  documentId: string;
   uploader: string;
   uploadTime: number;
   archived: boolean;
@@ -211,7 +211,7 @@ export function useDocuments() {
               logIndex: log.logIndex,
               timestamp: blockTimestamps.get(log.blockNumber) || 0n,
               user: (log.args as DocumentUploadedLog).user || '0x',
-              docHash: (log.args as DocumentUploadedLog).docHash || '0x',
+              documentId: (log.args as DocumentUploadedLog).documentId || '',
               cid: (log.args as DocumentUploadedLog).cid || '',
             }),
           ),
@@ -270,7 +270,7 @@ export function useDocuments() {
     fileType: 'unknown',
     fileSize: 0,
     cid: doc.cId,
-    documentHash: doc.documentHash,
+    documentId: doc.documentId,
     uploader: doc.uploader,
     uploadTime: Number(doc.uploadTime),
     archived: doc.archived,
