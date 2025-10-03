@@ -33,7 +33,7 @@ interface UploadState {
 export function UploadFile() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const { /* uploadDocument, */ isLoading: isContractLoading } = useDocuments();
+  const { uploadDocument, isLoading: isContractLoading } = useDocuments();
 
   const [state, setState] = useState<UploadState>({
     step: 'file',
@@ -179,7 +179,7 @@ export function UploadFile() {
       toast.success('File uploaded to IPFS successfully!', { id: uploadToast, className: "toast-success" });
 
       // Step 4: Call smart contract
-      // await handleContractWrite(upload.cid, iv);
+      await handleContractWrite(upload.id, upload.cid);
 
     } catch (error) {
       console.error('Upload failed:', error);
@@ -193,32 +193,32 @@ export function UploadFile() {
   };
 
   // Handle smart contract write
-  // const handleContractWrite = async (cid: string, iv: string) => {
-  //   if (!uploadDocument) {
-  //     toast.error('Contract write function not available', { className: "toast-error" });
-  //     return;
-  //   }
+  const handleContractWrite = async (docId: string, cid: string) => {
+    if (!uploadDocument) {
+      toast.error('Contract write function not available', { className: "toast-error" });
+      return;
+    }
 
-  //   const contractToast = toast.loading('Writing to blockchain...', { className: "toast-loading" });
+    const contractToast = toast.loading('Writing to blockchain...', { className: "toast-loading" });
 
-  //   try {
-  //     await uploadDocument({
-  //       cid,
-  //       iv
-  //     });
+    try {
+      await uploadDocument({
+        docId: docId,
+        cId: cid,
+      });
 
-  //     toast.success('Document registered on blockchain!', { id: contractToast, className: "toast-success" });
-  //   } catch (error) {
-  //     console.error('Contract write failed:', error);
-  //     const errorMessage = error instanceof Error
-  //       ? error.message
-  //       : 'Transaction failed';
-  //     toast.error(`Blockchain registration failed: ${errorMessage}`, {
-  //       id: contractToast,
-  //       className: "toast-error"
-  //     });
-  //   }
-  // };
+      toast.success('Document registered on blockchain!', { id: contractToast, className: "toast-success" });
+    } catch (error) {
+      console.error('Contract write failed:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Transaction failed';
+      toast.error(`Blockchain registration failed: ${errorMessage}`, {
+        id: contractToast,
+        className: "toast-error"
+      });
+    }
+  };
 
   // Render: Not connected state
   if (!isConnected) {

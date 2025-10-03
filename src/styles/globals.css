@@ -3,9 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-html, body {
+html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 /* ================================

@@ -3,7 +3,7 @@ import { parseAbiItem } from "viem";
 
 export interface DocumentUploadedEvent {
   user: `0x${string}`;
-  docHash: `0x${string}`;
+  docID: string;
   cid: string;
 }
 
@@ -34,7 +34,7 @@ export type DocumentRegistryEvent =
 
 export const DOCUMENT_REGISTRY_EVENTS = {
   DocumentUploaded: parseAbiItem(
-    "event DocumentUploaded(address indexed user, bytes32 docHash, string cid)",
+    "event DocumentUploaded(address indexed user, string docID, string cid)",
   ),
   RoleGranted: parseAbiItem(
     "event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)",

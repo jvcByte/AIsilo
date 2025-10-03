@@ -30,6 +30,3 @@ dist-ssr
 
 # File Routes
 src/components/EmergencyAccess.tsx
-src/contracts/abis/SecureDataAccess.ts
-src/contracts/contracts.ts
-# src/lib/ipfs.ts

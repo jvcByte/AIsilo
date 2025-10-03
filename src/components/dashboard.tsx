@@ -75,7 +75,7 @@ export function Dashboard() {
   useEffect(() => {
 
     if (user === false) {
-        setShowRegisterModal(true);
+      setShowRegisterModal(true);
     } else if (user === true) {
       setShowRegisterModal(false);
     }
@@ -160,7 +160,7 @@ export function Dashboard() {
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
             Protected Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">0</div>
+          <div className="text-base sm:text-2xl font-bold">{documentCount || "0"}</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">

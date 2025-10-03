@@ -2,8 +2,6 @@ import { useState, useCallback } from 'react';
 import { useAccount, useWriteContract, useReadContract, usePublicClient } from 'wagmi';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import contracts from '@/contracts/contracts';
-import { encryptFile } from '@/lib/encryption';
-import { pinata } from '@/lib/ipfs';
 import { toast } from 'react-hot-toast';
 import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
 
@@ -17,7 +15,7 @@ export interface ContractDocument {
 
 export interface DocumentUploadedLog {
   user?: `0x${string}`;
-  documentId?: string;
+  docID?: string;
   cid?: string;
 }
 
@@ -52,7 +50,8 @@ export interface EmergencyAccess {
 }
 
 export interface UploadDocumentParams {
-  file: File;
+  docId: string;
+  cId: string;
 }
 
 export interface DocumentRegistryEventBase {
@@ -211,7 +210,7 @@ export function useDocuments() {
               logIndex: log.logIndex,
               timestamp: blockTimestamps.get(log.blockNumber) || 0n,
               user: (log.args as DocumentUploadedLog).user || '0x',
-              documentId: (log.args as DocumentUploadedLog).documentId || '',
+              documentId: (log.args as DocumentUploadedLog).docID || '',
               cid: (log.args as DocumentUploadedLog).cid || '',
             }),
           ),
@@ -296,35 +295,12 @@ export function useDocuments() {
     setError(null);
 
     try {
-      const { file } = params;
-
-      // Generate unique document ID
-      const documentId = `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-      // Get user's private key (in production, this would be handled securely)
-
-      // Encrypt the file
-      const { encrypted } = await encryptFile(
-        file,
-        address,
-
-      );
-
-      // Upload to IPFS using Pinata
-      const fileToUpload = new File([encrypted], file.name, { type: file.type });
-      const upload = await pinata.upload.public.file(fileToUpload);
-      const ipfsResult = { cid: upload.cid };
-
-
-
+      const { docId, cId } = params;
       // Upload to blockchain
-      const hashBytes = new TextEncoder().encode(encrypted);
-      const hashHex = `0x${Array.from(hashBytes).map(b => b.toString(16).padStart(2, '0')).join('')}` as `0x${string}`;
-
       await writeContract({
         ...contracts.DocumentRegistry,
         functionName: "uploadDocument",
-        args: [hashHex, ipfsResult.cid],
+        args: [docId, cId],
       });
 
       // Invalidate queries to refresh data
@@ -334,11 +310,6 @@ export function useDocuments() {
       toast.success('Document uploaded successfully', {
         className: "toast-success"
       });
-
-      return {
-        documentId,
-        cid: ipfsResult.cid,
-      };
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Upload failed';

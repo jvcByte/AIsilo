@@ -114,7 +114,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
         searchableFields.push(
           (event as DocumentUploadedEventData).cid,
           (event as DocumentUploadedEventData).user,
-          (event as DocumentUploadedEventData).docHash,
+          (event as DocumentUploadedEventData).documentId,
         );
       } else if (event.eventName === "RoleGranted") {
         searchableFields.push(
