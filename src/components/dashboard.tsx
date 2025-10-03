@@ -1,6 +1,5 @@
 import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import contracts from "@/contracts/contracts";
-import { useDocuments } from "@/hooks/use-documents";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { UserPlus, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { FilesByOwner } from "./files-by-owner";
+import type { Address } from "viem";
 
 // import { formatNumber } from "@/lib/utils";
 
@@ -18,17 +18,14 @@ export interface proposalCountEventProps {
 }
 
 export function Dashboard() {
-  const { documents, isLoading, error } = useDocuments();
-  console.log("Documents: ", documents);
   const { address } = useAccount();
-  console.log("Loading: ", isLoading);
-  console.log("Error: ", error);
 
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  const { data: documentCount } = useReadContract({
+  const { data: docCountPerAddr } = useReadContract({
     ...contracts.DocumentRegistry,
-    functionName: "getDocumentCount",
+    functionName: "_docCountPerAddr",
+    args: [address as Address]
   });
 
   const { data: user, refetch: refetchUser } = useReadContract({
@@ -69,8 +66,6 @@ export function Dashboard() {
       refetchUser();
     }
   }, [isConfirmed, refetchUser]);
-
-  console.log("Contract Owner: ", documentCount);
 
   useEffect(() => {
 
@@ -154,13 +149,13 @@ export function Dashboard() {
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
             Total Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">{documentCount || "0"}</div>
+          <div className="text-base sm:text-2xl font-bold">{docCountPerAddr || "0"}</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
             Protected Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">{documentCount || "0"}</div>
+          <div className="text-base sm:text-2xl font-bold">{docCountPerAddr || "0"}</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">

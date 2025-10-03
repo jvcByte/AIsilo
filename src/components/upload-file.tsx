@@ -65,7 +65,9 @@ export function UploadFile() {
     // Validate file size (max 100MB)
     const maxSize = 100 * 1024 * 1024;
     if (selectedFile.size > maxSize) {
-      toast.error('File size must be less than 100MB', { className: "toast-error" });
+      toast.error('File size must be less than 100MB', {
+        className: "toast-error"
+      });
       return;
     }
 
@@ -74,19 +76,21 @@ export function UploadFile() {
       file: selectedFile,
       step: 'sign'
     }));
-
-    toast.success('File selected successfully', { className: "toast-success" });
   };
 
   // Handle message signing
   const handleSignMessage = async () => {
     if (!address) {
-      toast.error('Wallet not connected', { className: "toast-error" });
+      toast.error('Wallet not connected', {
+        className: "toast-error"
+      });
       return;
     }
 
     setIsProcessing(true);
-    const signingToast = toast.loading('Waiting for signature...', { className: "toast-loading" });
+    const signingToast = toast.loading('Waiting for signature...', {
+      className: "toast-loading"
+    });
 
     try {
       const signature = await signMessageAsync({
@@ -99,10 +103,15 @@ export function UploadFile() {
         step: 'upload'
       }));
 
-      toast.success('Message signed successfully', { id: signingToast, className: "toast-success" });
+      toast.success('Message signed successfully', {
+        id: signingToast,
+        className: "toast-success"
+      });
     } catch (error) {
-      console.error('Signing failed:', error);
-      toast.error('Failed to sign message. Please try again.', { id: signingToast, className: "toast-error" });
+      toast.error(`Failed to sign message: ${error}`, {
+        id: signingToast,
+        className: "toast-error"
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -111,7 +120,9 @@ export function UploadFile() {
   // Handle file upload to IPFS
   const handleUpload = async () => {
     if (!state.file || !state.signature || !address) {
-      toast.error('Missing required data for upload');
+      toast.error('Missing required data for upload', {
+        className: "toast-error"
+      });
       return;
     }
 
@@ -132,7 +143,10 @@ export function UploadFile() {
       const serverUrl = import.meta.env.VITE_SERVER_URL;
 
       if (!serverUrl) {
-        throw new Error('Server URL not configured');
+        toast.error('Server URL not configured', {
+          className: "toast-error"
+        });
+        return;
       }
 
       const urlResponse = await fetch(`${serverUrl}/presigned_url`, {
@@ -144,12 +158,18 @@ export function UploadFile() {
 
       if (!urlResponse.ok) {
         const errorText = await urlResponse.text();
-        throw new Error(`Server error: ${urlResponse.status} - ${errorText}`);
+        toast.error(`Server error: ${urlResponse.status} - ${errorText}`, {
+          className: "toast-error"
+        });
+        return;
       }
 
       const contentType = urlResponse.headers.get('content-type');
       if (!contentType?.includes('application/json')) {
-        throw new Error('Invalid server response format');
+        toast.error('Invalid server response format', {
+          className: "toast-error"
+        });
+        return;
       }
 
       const { url: presignedUrl } = await urlResponse.json();
@@ -160,12 +180,15 @@ export function UploadFile() {
         .public.file(encryptedFile)
         .url(presignedUrl)
         .keyvalues({
-          iv,
+          iv: iv,
           user: address
         });
 
       if (!upload.cid) {
-        throw new Error('Failed to get CID from upload');
+        toast.error('Failed to get CID from upload', {
+          className: "toast-error"
+        });
+        return;
       }
 
       // Update state with upload results
@@ -176,13 +199,15 @@ export function UploadFile() {
         step: 'complete'
       }));
 
-      toast.success('File uploaded to IPFS successfully!', { id: uploadToast, className: "toast-success" });
+      toast.success('File uploaded to IPFS successfully!', {
+        id: uploadToast,
+        className: "toast-success"
+      });
 
       // Step 4: Call smart contract
       await handleContractWrite(upload.id, upload.cid);
 
     } catch (error) {
-      console.error('Upload failed:', error);
       const errorMessage = error instanceof Error
         ? error.message
         : 'An unknown error occurred';
@@ -195,11 +220,15 @@ export function UploadFile() {
   // Handle smart contract write
   const handleContractWrite = async (docId: string, cid: string) => {
     if (!uploadDocument) {
-      toast.error('Contract write function not available', { className: "toast-error" });
+      toast.error('Contract write function not available', {
+        className: "toast-error"
+      });
       return;
     }
 
-    const contractToast = toast.loading('Writing to blockchain...', { className: "toast-loading" });
+    const contractToast = toast.loading('Writing to blockchain...', {
+      className: "toast-loading"
+    });
 
     try {
       await uploadDocument({
@@ -207,9 +236,11 @@ export function UploadFile() {
         cId: cid,
       });
 
-      toast.success('Document registered on blockchain!', { id: contractToast, className: "toast-success" });
+      toast.success('Document registered on blockchain!', {
+        id: contractToast,
+        className: "toast-success"
+      });
     } catch (error) {
-      console.error('Contract write failed:', error);
       const errorMessage = error instanceof Error
         ? error.message
         : 'Transaction failed';
@@ -224,7 +255,7 @@ export function UploadFile() {
   if (!isConnected) {
     return (
       <div className="container mx-auto p-4">
-        <Card className="max-w-2xl mx-auto">
+        <Card className="max-w-2xl mx-auto bg-gradient-to-tl from-muted to-background">
           <CardContent className="p-8 text-center">
             <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-xl font-semibold mb-2">Wallet Not Connected</h2>
@@ -248,7 +279,7 @@ export function UploadFile() {
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* File Selection Card */}
-        <Card>
+        <Card className='bg-gradient-to-br from-muted to-background'>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />

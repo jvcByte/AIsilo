@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
-import { useAccount, useWriteContract, useReadContract, usePublicClient } from 'wagmi';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useAccount, useReadContract } from 'wagmi';
+import { publicClient, getWagmiWalletClient } from "@/lib/viem";
+import { useQuery } from '@tanstack/react-query';
 import contracts from '@/contracts/contracts';
 import { toast } from 'react-hot-toast';
 import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
-import type { Address } from 'viem';
+import { BaseError, ContractFunctionRevertedError, UserRejectedRequestError, type Address } from 'viem';
 
 export interface ContractDocument {
   documentId: string;
@@ -108,9 +109,6 @@ export interface Document {
  */
 export function useDocuments() {
   const { address, isConnected } = useAccount();
-  const { writeContract } = useWriteContract();
-  const queryClient = useQueryClient();
-  const publicClient = usePublicClient();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -148,7 +146,6 @@ export function useDocuments() {
       if (!publicClient) return [];
 
       try {
-        console.log('🔄 Fetching document registry events...');
 
         // Fetch all event types in parallel
         const [documentUploadedLogs, roleGrantedLogs, roleRevokedLogs, roleAdminChangedLogs] = await Promise.all([
@@ -177,13 +174,6 @@ export function useDocuments() {
             toBlock: "latest",
           }),
         ]);
-
-        console.log('📨 Fetched events:', {
-          documentUploaded: documentUploadedLogs.length,
-          roleGranted: roleGrantedLogs.length,
-          roleRevoked: roleRevokedLogs.length,
-          roleAdminChanged: roleAdminChangedLogs.length,
-        });
 
         // Get unique block numbers for batch fetching timestamps
         const allLogs = [
@@ -263,7 +253,9 @@ export function useDocuments() {
           return b.logIndex - a.logIndex;
         }).slice(0, 100); // Limit to 100 most recent events
       } catch (error) {
-        console.error("❌ Error fetching Document Registry events:", error);
+        toast.error(`Failed to fetch Document Registry events: ${error}`, {
+          className: "toast-error"
+        });
         return [];
       }
     },
@@ -286,13 +278,6 @@ export function useDocuments() {
     accessLevel: 'private' as const,
   })) || [];
 
-  // Debug logging
-  // console.log("Contract documents:", contractDocuments);
-  // console.log("Transformed documents:", documents);
-  // console.log("Document count:", documentCount);
-  // console.log("Loading state:", isLoadingDocuments);
-  // console.log("Events:", events);
-
   /**
    * Upload a document with encryption and IPFS storage
    */
@@ -307,31 +292,80 @@ export function useDocuments() {
     try {
       const { docId, cId } = params;
       // Upload to blockchain
-      await writeContract({
-        ...contracts.DocumentRegistry,
+      // writeContract({
+      //   ...contracts.DocumentRegistry,
+      //   functionName: "uploadDocument",
+      //   args: [docId, cId],
+      // })
+
+      const walletClient = await getWagmiWalletClient();
+      if (!walletClient) {
+        toast.error("No connected wallet found. Please connect your wallet.", {
+          className: "toast-error",
+        });
+        return;
+      }
+
+      const { request } = await publicClient.simulateContract({
+        account: walletClient.account,
+        address: contracts.DocumentRegistry.address,
+        abi: contracts.DocumentRegistry.abi,
         functionName: "uploadDocument",
         args: [docId, cId],
       });
-
-      // Invalidate queries to refresh data
-      await queryClient.invalidateQueries({ queryKey: ["documents"] });
-      await queryClient.invalidateQueries({ queryKey: ["document-registry-events"] });
-
-      toast.success('Document uploaded successfully', {
-        className: "toast-success"
-      });
+      await walletClient.writeContract(request);
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Upload failed';
-      setError(errorMessage);
-      toast.error(`Upload failed: ${errorMessage}`, {
-        className: "toast-error"
-      });
-      throw err;
+      if (err instanceof UserRejectedRequestError) {
+        toast.error("Transaction cancelled by user", {
+          className: "toast-error",
+        });
+        return;
+      }
+
+      if (err instanceof BaseError) {
+        const revertError = err.walk(
+          (err) => err instanceof ContractFunctionRevertedError,
+        );
+        if (revertError instanceof ContractFunctionRevertedError) {
+          const errorName = revertError.reason ?? "Unknown Error Occurred";
+          toast.error(`Blockchain write failed: ${errorName}`, {
+            className: "toast-error",
+          });
+          setError(`Blockchain write failed: ${errorName}`);
+        } else {
+          // Handle chain mismatch errors specifically
+          if (err.message.includes("chain") || err.message.includes("Chain")) {
+            toast.error(
+              "Chain mismatch error. Switch to BlockDag(id:1043)",
+              {
+                className: "toast-error",
+              },
+            );
+            setError(
+              "Chain mismatch error. Switch to BlockDag(id:1043)",
+            );
+          } else {
+            const errorMessage =
+              err.shortMessage || err.message || "Unknown error occurred";
+            toast.error(`Blockchain write failed: ${errorMessage}`, {
+              className: "toast-error",
+            });
+            setError(`Blockchain write failed: ${errorMessage}`);
+          }
+        }
+      } else {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
+        toast.error(`Blockchain write failed: ${errorMessage}`, {
+          className: "toast-error",
+        });
+        setError(`Blockchain write failed: ${errorMessage}`);
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [address, isConnected, writeContract, queryClient]);
+  }, [address, isConnected]);
 
   return {
     // State

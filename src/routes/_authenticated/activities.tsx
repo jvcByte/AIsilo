@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RecentActivity } from "@/components/RecentActivity";
+import { RecentActivity } from "@/components/recent-activity";
 
 export const Route = createFileRoute("/_authenticated/activities")({
   component: Activities,
@@ -22,7 +22,7 @@ function Activities() {
           {/* Content area with fixed height */}
           <div className="p-4 sm:p-6">
             <div className="h-[calc(100vh-16rem)] sm:h-[calc(90vh-10rem)]">
-              <RecentActivity limit={5} />
+              <RecentActivity limit={3} />
             </div>
           </div>
         </div>

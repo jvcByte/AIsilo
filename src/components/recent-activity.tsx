@@ -399,7 +399,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                 return (
                   <Card
                     key={`${event.transactionHash}-${event.logIndex}`}
-                    className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary"
+                    className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary bg-gradient-to-tl from-muted to-background"
                   >
                     <CardContent className="p-3 sm:p-4">
                       <div className="flex items-start gap-3 sm:gap-4">

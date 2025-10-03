@@ -113,7 +113,7 @@ export function DecryptFile() {
 
                 <div className="max-w-4xl mx-auto space-y-6">
                     {/* Input Data */}
-                    <Card>
+                    <Card className='bg-gradient-to-br from-muted to-background'>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <FileText className="w-5 h-5" />
@@ -168,7 +168,7 @@ export function DecryptFile() {
 
                     {/* Signature Step - Show when any data is entered */}
                     {(encryptedData || iv || fileName || mimeType) && !signature && (
-                        <Card>
+                        <Card className='bg-gradient-to-br from-muted to-background'>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <PenTool className="w-5 h-5" />
@@ -207,7 +207,7 @@ export function DecryptFile() {
 
                     {/* Decrypt Button - Show when all data is entered and signature is available */}
                     {(encryptedData && iv && fileName && mimeType && signature) && (
-                        <Card>
+                        <Card className='bg-gradient-to-br from-muted to-background'>
                             <CardContent className="p-6">
                                 <Button
                                     onClick={handleDecrypt}
@@ -239,7 +239,7 @@ export function DecryptFile() {
 
                     {/* Decrypted File */}
                     {decryptedFile && (
-                        <Card>
+                        <Card className='bg-gradient-to-br from-muted to-background'>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <FileText className="w-5 h-5" />
