@@ -11,6 +11,8 @@ export default defineConfig([
     "!node_modules/",
     "src/routeTree.gen.ts",
     "src/**/routeTree.gen.ts",
+    "node_modules/",
+    " .vite/",
   ]),
   {
     files: ["**/*.{ts,tsx}"],
