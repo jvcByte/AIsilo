@@ -13,8 +13,8 @@ import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedUploadTextRouteImport } from './routes/_authenticated/upload-text'
 import { Route as AuthenticatedUploadFileRouteImport } from './routes/_authenticated/upload-file'
-import { Route as AuthenticatedTypeFileRouteImport } from './routes/_authenticated/type-file'
 import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
 import { Route as AuthenticatedDownloadFileRouteImport } from './routes/_authenticated/download-file'
 import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
@@ -40,14 +40,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedUploadTextRoute = AuthenticatedUploadTextRouteImport.update({
+  id: '/upload-text',
+  path: '/upload-text',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUploadFileRoute = AuthenticatedUploadFileRouteImport.update({
   id: '/upload-file',
   path: '/upload-file',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTypeFileRoute = AuthenticatedTypeFileRouteImport.update({
-  id: '/type-file',
-  path: '/type-file',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTempRouteRoute = AuthenticatedTempRouteRouteImport.update({
@@ -86,8 +86,8 @@ export interface FileRoutesByFullPath {
   '/decrypt': typeof AuthenticatedDecryptRoute
   '/download-file': typeof AuthenticatedDownloadFileRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
-  '/type-file': typeof AuthenticatedTypeFileRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
+  '/upload-text': typeof AuthenticatedUploadTextRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,8 +98,8 @@ export interface FileRoutesByTo {
   '/decrypt': typeof AuthenticatedDecryptRoute
   '/download-file': typeof AuthenticatedDownloadFileRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
-  '/type-file': typeof AuthenticatedTypeFileRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
+  '/upload-text': typeof AuthenticatedUploadTextRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,8 +112,8 @@ export interface FileRoutesById {
   '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
   '/_authenticated/download-file': typeof AuthenticatedDownloadFileRoute
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
-  '/_authenticated/type-file': typeof AuthenticatedTypeFileRoute
   '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
+  '/_authenticated/upload-text': typeof AuthenticatedUploadTextRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,8 +126,8 @@ export interface FileRouteTypes {
     | '/decrypt'
     | '/download-file'
     | '/temp-route'
-    | '/type-file'
     | '/upload-file'
+    | '/upload-text'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,8 +138,8 @@ export interface FileRouteTypes {
     | '/decrypt'
     | '/download-file'
     | '/temp-route'
-    | '/type-file'
     | '/upload-file'
+    | '/upload-text'
   id:
     | '__root__'
     | '/'
@@ -151,8 +151,8 @@ export interface FileRouteTypes {
     | '/_authenticated/decrypt'
     | '/_authenticated/download-file'
     | '/_authenticated/temp-route'
-    | '/_authenticated/type-file'
     | '/_authenticated/upload-file'
+    | '/_authenticated/upload-text'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -192,18 +192,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/upload-text': {
+      id: '/_authenticated/upload-text'
+      path: '/upload-text'
+      fullPath: '/upload-text'
+      preLoaderRoute: typeof AuthenticatedUploadTextRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/upload-file': {
       id: '/_authenticated/upload-file'
       path: '/upload-file'
       fullPath: '/upload-file'
       preLoaderRoute: typeof AuthenticatedUploadFileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/type-file': {
-      id: '/_authenticated/type-file'
-      path: '/type-file'
-      fullPath: '/type-file'
-      preLoaderRoute: typeof AuthenticatedTypeFileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/temp-route': {
@@ -250,8 +250,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute
   AuthenticatedDownloadFileRoute: typeof AuthenticatedDownloadFileRoute
   AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute
-  AuthenticatedTypeFileRoute: typeof AuthenticatedTypeFileRoute
   AuthenticatedUploadFileRoute: typeof AuthenticatedUploadFileRoute
+  AuthenticatedUploadTextRoute: typeof AuthenticatedUploadTextRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -260,8 +260,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDecryptRoute: AuthenticatedDecryptRoute,
   AuthenticatedDownloadFileRoute: AuthenticatedDownloadFileRoute,
   AuthenticatedTempRouteRoute: AuthenticatedTempRouteRoute,
-  AuthenticatedTypeFileRoute: AuthenticatedTypeFileRoute,
   AuthenticatedUploadFileRoute: AuthenticatedUploadFileRoute,
+  AuthenticatedUploadTextRoute: AuthenticatedUploadTextRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

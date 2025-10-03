@@ -30,7 +30,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: "Type It",
-          url: "/type-file",
+          url: "/upload-text",
           icon: FilePenLine,
         },
       ],

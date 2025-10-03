@@ -37,6 +37,31 @@ export async function encryptFile(fileContent: File, signature: Address) {
   };
 }
 
+export async function encryptText(text: string, signature: Address) {
+  const iv = await getRandomBytes(16);
+
+  const textBytes = utf8ToBytes(text);
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    deriveEncryptionKey(signature),
+    { name: "AES-GCM" },
+    false,
+    ["encrypt", "decrypt"]
+  );
+
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    textBytes
+  );
+
+  return {
+    encrypted: bytesToHex(new Uint8Array(encrypted)),
+    iv: bytesToHex(iv),
+  };
+}
+
 export async function decryptFile(
   encryptedHex: string,
   ivHex: string,
