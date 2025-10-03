@@ -50,8 +50,8 @@ export const sidebarData: SidebarData = {
           icon: FileDown,
         },
         {
-          title: "Grants",
-          url: "/temp-route",
+          title: "Decrypt File",
+          url: "/decrypt",
           icon: Key,
         },
       ],

@@ -10,23 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
-import { Route as DecryptRouteImport } from './routes/decrypt'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedUploadFileRouteImport } from './routes/_authenticated/upload-file'
 import { Route as AuthenticatedTypeFileRouteImport } from './routes/_authenticated/type-file'
 import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
+import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DecryptRoute = DecryptRouteImport.update({
-  id: '/decrypt',
-  path: '/decrypt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -58,6 +53,11 @@ const AuthenticatedTempRouteRoute = AuthenticatedTempRouteRouteImport.update({
   path: '/temp-route',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDecryptRoute = AuthenticatedDecryptRouteImport.update({
+  id: '/decrypt',
+  path: '/decrypt',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -67,9 +67,9 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/decrypt': typeof DecryptRoute
   '/docs': typeof DocsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/decrypt': typeof AuthenticatedDecryptRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/type-file': typeof AuthenticatedTypeFileRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
@@ -77,9 +77,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/decrypt': typeof DecryptRoute
   '/docs': typeof DocsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/decrypt': typeof AuthenticatedDecryptRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/type-file': typeof AuthenticatedTypeFileRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
@@ -89,9 +89,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/decrypt': typeof DecryptRoute
   '/docs': typeof DocsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
   '/_authenticated/type-file': typeof AuthenticatedTypeFileRoute
   '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
@@ -101,9 +101,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/decrypt'
     | '/docs'
     | '/dashboard'
+    | '/decrypt'
     | '/temp-route'
     | '/type-file'
     | '/upload-file'
@@ -111,9 +111,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/decrypt'
     | '/docs'
     | '/dashboard'
+    | '/decrypt'
     | '/temp-route'
     | '/type-file'
     | '/upload-file'
@@ -122,9 +122,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
-    | '/decrypt'
     | '/docs'
     | '/_authenticated/dashboard'
+    | '/_authenticated/decrypt'
     | '/_authenticated/temp-route'
     | '/_authenticated/type-file'
     | '/_authenticated/upload-file'
@@ -134,7 +134,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  DecryptRoute: typeof DecryptRoute
   DocsRoute: typeof DocsRoute
 }
 
@@ -145,13 +144,6 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/decrypt': {
-      id: '/decrypt'
-      path: '/decrypt'
-      fullPath: '/decrypt'
-      preLoaderRoute: typeof DecryptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -196,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTempRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/decrypt': {
+      id: '/_authenticated/decrypt'
+      path: '/decrypt'
+      fullPath: '/decrypt'
+      preLoaderRoute: typeof AuthenticatedDecryptRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -208,6 +207,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute
   AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute
   AuthenticatedTypeFileRoute: typeof AuthenticatedTypeFileRoute
   AuthenticatedUploadFileRoute: typeof AuthenticatedUploadFileRoute
@@ -215,6 +215,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDecryptRoute: AuthenticatedDecryptRoute,
   AuthenticatedTempRouteRoute: AuthenticatedTempRouteRoute,
   AuthenticatedTypeFileRoute: AuthenticatedTypeFileRoute,
   AuthenticatedUploadFileRoute: AuthenticatedUploadFileRoute,
@@ -227,7 +228,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  DecryptRoute: DecryptRoute,
   DocsRoute: DocsRoute,
 }
 export const routeTree = rootRouteImport

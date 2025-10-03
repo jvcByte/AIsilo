@@ -17,7 +17,6 @@ import {
     Key
 } from 'lucide-react';
 import { decryptFile } from '../lib/encryption';
-import { HeroHeader } from './layout/header';
 
 export function DecryptFile() {
     const { address, isConnected } = useAccount();
@@ -89,7 +88,6 @@ export function DecryptFile() {
     if (!isConnected) {
         return (
             <>
-                <HeroHeader />
                 <div className="container mx-auto p-4">
                     <Card className="max-w-2xl mx-auto">
                         <CardContent className="p-8 text-center">
@@ -107,7 +105,6 @@ export function DecryptFile() {
 
     return (
         <>
-            <HeroHeader />
             <div className="container mx-auto p-4">
                 <div className="flex items-center gap-2 mb-6">
                     <Key className="w-6 h-6" />
@@ -146,10 +143,10 @@ export function DecryptFile() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="fileName" className="text-foreground">Original File Name</Label>
+                                    <Label htmlFor="fileName" className="text-foreground">Output File Name</Label>
                                     <Input
                                         id="fileName"
-                                        placeholder="Enter original file name (e.g., document.pdf)..."
+                                        placeholder="Enter file name (e.g., document.pdf)..."
                                         value={fileName}
                                         onChange={(e) => setFileName(e.target.value)}
                                         className="w-full mt-2"
