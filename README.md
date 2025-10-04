@@ -9,6 +9,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Hedera](https://img.shields.io/badge/Hedera-Testnet-purple.svg)](https://hedera.com)
 [![IPFS](https://img.shields.io/badge/IPFS-Pinata-cyan.svg)](https://pinata.cloud)
+[![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com)
 
 </div>
 
