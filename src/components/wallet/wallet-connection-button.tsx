@@ -18,8 +18,8 @@ import {
   LogOut,
   Wallet,
   ChevronDown,
-  User,
   Check,
+  User,
   User2,
 } from "lucide-react";
 import { generateColorFromAddress } from "@/lib/utils";
@@ -163,8 +163,8 @@ export function WalletConnectionButton({
                 disabled={isConnecting}
                 className="gap-2 md:hidden"
               >
-                <Wallet className="h-4 w-4" />
-                {isConnecting ? "..." : <User2 className="h-4 w-4" />}
+                <User2 className="h-4 w-4" />
+                {isConnecting ? "..." : "Sign In"}
               </Button>
             </div>
           );

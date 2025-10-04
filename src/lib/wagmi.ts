@@ -8,11 +8,9 @@ const wagmiConfig = createConfig(
     getDefaultConfig({
         chains: [mainnet, sepolia, blockdag],
         transports: {
-            [blockdag.id]: http ('https://rpc.awakening.bdagscan.com/'),
+            [blockdag.id]: http('https://rpc.awakening.bdagscan.com/'),
             [mainnet.id]: http(),
-            [sepolia.id]: http(
-                `https://sepolia.infura.io/v3/${import.meta.env.VITE_INFURA_API_KEY}`,
-            ),
+            [sepolia.id]: http(`https://sepolia.infura.io/v3/${import.meta.env.VITE_INFURA_API_KEY}`),
         },
         enableFamily: false,
         // Required API Keys
