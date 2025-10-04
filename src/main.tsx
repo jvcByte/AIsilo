@@ -1,3 +1,4 @@
+// src/main.tsx
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "./context/theme-provider";
@@ -20,5 +21,5 @@ if (!rootElement.innerHTML) {
       </Web3Provider>
     </StrictMode>,
   );
-  
+
 }

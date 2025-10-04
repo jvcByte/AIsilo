@@ -1,3 +1,4 @@
+// src/lib/web3Config.tsx
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";

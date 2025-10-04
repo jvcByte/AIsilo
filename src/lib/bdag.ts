@@ -11,16 +11,16 @@ const blockdag = {
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc.awakening.bdagscan.com/'],
+      http: ['https://rpc.awakening.bdagscan.com'],
     },
     public: {
-      http: ['https://rpc.awakening.bdagscan.com/'],
+      http: ['https://rpc.awakening.bdagscan.com'],
     },
   },
   blockExplorers: {
     default: {
       name: 'BlockDAG Explorer',
-      url: 'https://awakening.bdagscan.com/',
+      url: 'https://awakening.bdagscan.com',
     },
   },
   testnet: true,
