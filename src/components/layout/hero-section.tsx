@@ -128,7 +128,7 @@ export default function HeroSection() {
           <div className="relative z-10 mx-auto w-full max-w-6xl px-6 text-center">
             <div className="items-center space-y-8">
               {/* Badge */}
-              <div className="animate-scale-in inline-flex items-center gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
+              <div className="hidden md:block animate-scale-in inline-flex items-center gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <Shield className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-primary">Decentralized & Secure</span>
               </div>
