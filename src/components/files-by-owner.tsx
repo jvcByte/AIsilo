@@ -96,7 +96,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
   }
 
   // Wrong network state
-  if (chainId !== CHAIN_IDS.BLOCKDAG) {
+  if (chainId !== CHAIN_IDS.HEDERATESTNET) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6 bg-gradient-to-br from-muted to-background">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
@@ -106,7 +106,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
           Wrong Network
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          Please switch to the BlockDAG network to view your documents.
+          Please switch to the Hedera Testnet network to view your documents.
         </p>
         <Badge variant="outline" className="mt-3 text-xs">
           Current: {chainId ? `Chain ${chainId}` : "Unknown"}

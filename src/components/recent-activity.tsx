@@ -177,7 +177,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
   }
 
   // Wrong network state
-  if (chainId !== CHAIN_IDS.BLOCKDAG) {
+  if (chainId !== CHAIN_IDS.HEDERATESTNET) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
@@ -187,7 +187,7 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           Wrong Network
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          Please switch to the BlockDAG network to view recent activities.
+          Please switch to the Hedera Testnet network to view recent activities.
         </p>
         <Badge variant="outline" className="mt-3 text-xs">
           Current: {chainId ? `Chain ${chainId}` : "Unknown"}
@@ -561,16 +561,16 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                   {event.blockNumber.toString()}
                                 </div>
                                 <a
-                                  href={`https://awakening.bdagscan.com/tx/${event.transactionHash}`}
+                                  href={`https://hashscan.io/testnet/transaction/${event.transactionHash}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-1 hover:text-primary transition-colors w-fit"
                                 >
                                   <ExternalLink className="w-3 h-3" />
                                   <span className="hidden sm:inline">
-                                    View on BlockDAG
+                                    View on Hedera Testnet
                                   </span>
-                                  <span className="sm:hidden">BlockDAG</span>
+                                  <span className="sm:hidden">Hedera Testnet</span>
                                 </a>
                               </div>
                               <div className="text-xs text-muted-foreground">

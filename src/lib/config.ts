@@ -19,16 +19,8 @@ export const APP_URL = isDevelopment()
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      gcTime: 1_000 * 60 * 60 * 24, // 24 hours
-      staleTime: 1_000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: 1, // Only retry once
-      retryDelay: 1000 // 1 second between retries
+      staleTime: 0,
     },
-    mutations: {
-      retry: 1
-    }
   }
 });
 

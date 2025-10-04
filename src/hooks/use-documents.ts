@@ -146,31 +146,40 @@ export function useDocuments() {
       if (!publicClient) return [];
 
       try {
+        // Get current block number
+        const currentBlock = await publicClient.getBlockNumber();
+        
+        // Calculate blocks for approximately 6 days (to stay under 7-day limit)
+        // Hedera produces ~1 block every 2 seconds, so 6 days = ~259,200 blocks
+        const BLOCKS_PER_6_DAYS = 259_200n;
+        const fromBlock = currentBlock > BLOCKS_PER_6_DAYS 
+          ? currentBlock - BLOCKS_PER_6_DAYS 
+          : 0n;
 
         // Fetch all event types in parallel
         const [documentUploadedLogs, roleGrantedLogs, roleRevokedLogs, roleAdminChangedLogs] = await Promise.all([
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
             event: DOCUMENT_REGISTRY_EVENTS.DocumentUploaded,
-            fromBlock: "earliest",
+            fromBlock: fromBlock,
             toBlock: "latest",
           }),
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
             event: DOCUMENT_REGISTRY_EVENTS.RoleGranted,
-            fromBlock: "earliest",
+            fromBlock: fromBlock,
             toBlock: "latest",
           }),
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
             event: DOCUMENT_REGISTRY_EVENTS.RoleRevoked,
-            fromBlock: "earliest",
+            fromBlock: fromBlock,
             toBlock: "latest",
           }),
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
             event: DOCUMENT_REGISTRY_EVENTS.RoleAdminChanged,
-            fromBlock: "earliest",
+            fromBlock: fromBlock,
             toBlock: "latest",
           }),
         ]);
@@ -337,13 +346,13 @@ export function useDocuments() {
           // Handle chain mismatch errors specifically
           if (err.message.includes("chain") || err.message.includes("Chain")) {
             toast.error(
-              "Chain mismatch error. Switch to BlockDag(id:1043)",
+              "Chain mismatch error. Switch to Hedera Testnet(id:296)",
               {
                 className: "toast-error",
               },
             );
             setError(
-              "Chain mismatch error. Switch to BlockDag(id:1043)",
+              "Chain mismatch error. Switch to Hedera Testnet(id:296)",
             );
           } else {
             const errorMessage =

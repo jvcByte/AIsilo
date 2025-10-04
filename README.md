@@ -1,6 +1,6 @@
 # FileIt
 
-A decentralized, blockchain-based secure data encrypting and storage platform built on BlockDAG.
+A decentralized, blockchain-based secure data encrypting and storage platform built on Hedera network.
 
 ## 🎯 Mission
 
@@ -34,7 +34,7 @@ Create a secure data encrypting and storage platform that inherently meets NIST 
 ## 🛠 Technical Implementation
 
 ### **Blockchain Integration**
-- **BlockDAG Network**: Primary blockchain for data integrity
+- **Hedera Network**: Primary blockchain for data integrity
 - **Smart Contracts**: DocumentRegistry for access control
 - **IPFS Storage**: Decentralized file storage
 - **Hash Verification**: Blockchain-stored integrity hashes
@@ -61,8 +61,8 @@ pnpm run dev
 
 ## 🔧 Chain info
 
-### **BlockDAG Network**
+### **Hedera Network**
 ```env
-BLOCKDAG_RPC_URL=https://rpc.awakening.bdagscan.com/
-CHAIN_ID=1043
+HEDERA_RPC_URL=https://testnet.hashio.io/api
+HEDERA_CHAIN_ID=296
 ```

@@ -116,17 +116,17 @@ export function WalletConnectionButton({
     [chain, chains, switchChainAsync],
   );
 
-  // Automatically switch to blockdag once upon initial connect
+  // Automatically switch to Hedera Testnet once upon initial connect
   useEffect(() => {
     if (isConnected) {
-      const switched = getCookie("initialSwitchToBlockdag");
+      const switched = getCookie("initialSwitchToHederaTestnet");
       if (!switched) {
-        const isBlockdag = chain?.id === CHAIN_IDS.BLOCKDAG;
-        if (!isBlockdag) {
-          const blockdag = CHAIN_IDS.BLOCKDAG;
-          handleSwitchChain(blockdag);
+        const isHederaTestnet = chain?.id === CHAIN_IDS.HEDERATESTNET;
+        if (!isHederaTestnet) {
+          const hederaTestnet = CHAIN_IDS.HEDERATESTNET;
+          handleSwitchChain(hederaTestnet);
         }
-        setCookie("initialSwitchToBlockdag", "true");
+        setCookie("initialSwitchToHederaTestnet", "true");
       }
     }
   }, [isConnected, chain, handleSwitchChain]);
@@ -343,7 +343,7 @@ export function WalletConnectionButton({
               <DropdownMenuItem
                 onClick={() => {
                   disconnect();
-                  removeCookie("initialSwitchToBlockdag");
+                  removeCookie("initialSwitchToHederaTestnet");
                 }}
                 className="cursor-pointer text-destructive focus:text-destructive"
               >

@@ -1,40 +1,25 @@
 // src/lib/wagmi.ts
-import { createConfig, http, fallback } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
+import { createConfig, http } from "wagmi";
+import { hedera, hederaTestnet } from "wagmi/chains";
 import { getDefaultConfig } from "connectkit";
 import { APP_NAME, APP_DESCRIPTION, APP_URL, APP_ICON } from "./config";
-import { blockdag } from "./bdag";
 
 const wagmiConfig = createConfig(
     getDefaultConfig({
-        chains: [blockdag, sepolia, mainnet],
+        chains: [hedera, hederaTestnet],
         transports: {
-            // BlockDAG - primary chain
-            [blockdag.id]: http('https://rpc.awakening.bdagscan.com/', {
+            // Hedera - primary chain
+            [hedera.id]: http('https://mainnet.hashio.io/api', {
                 timeout: 3_000, // 3 seconds
                 retryCount: 3,
                 batch: true
             }),
-
-            // Sepolia - with Infura
-            [sepolia.id]: fallback([
-                http(`https://sepolia.infura.io/v3/${import.meta.env.VITE_INFURA_API_KEY}`, {
-                    timeout: 3_000,
-                    retryCount: 3,
-                    batch: true
-                }),
-                http() // Fallback to public RPC
-            ]),
-
-            // Mainnet - add Infura or Alchemy (IMPORTANT!)
-            [mainnet.id]: fallback([
-                http(`https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_API_KEY}`, {
-                    timeout: 3_000,
-                    retryCount: 3,
-                    batch: true
-                }),
-                http() // Fallback to public RPC
-            ])
+            // Hedera Testnet - primary chain
+            [hederaTestnet.id]: http('https://testnet.hashio.io/api', {
+                timeout: 3_000, // 3 seconds
+                retryCount: 3,
+                batch: true
+            }),
         },
 
         // Performance optimizations
