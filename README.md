@@ -107,8 +107,8 @@ Create a secure data encryption and storage platform designed with **NIST** and 
 #### Upload Process
 
 1. **File Selection**: User selects file in browser
-2. **Wallet Signature**: User signs message "Encrypt My File"
-3. **Key Derivation**: Keccak256 hash of signature → AES-256 key
+2. **Wallet Signature**: User signs message
+3. **Key Derivation**: Keccak256 hash of signature
 4. **Encryption**: File encrypted with AES-256-GCM (generates IV)
 5. **Presigned URL Request**: Frontend requests presigned URL from Cloudflare Worker
 6. **Server Authentication**: Cloudflare Worker authenticates with Pinata using secure JWT
@@ -118,11 +118,11 @@ Create a secure data encryption and storage platform designed with **NIST** and 
 
 #### Download Process
 
-1. **CID Input**: User provides IPFS CID
-2. **Wallet Signature**: User signs same message "Encrypt My File"
+1. **CID Input**: User selects IPFS CID from list of files on the dashboard
+2. **Wallet Signature**: User signs message
 3. **Key Derivation**: Same signature → same AES-256 key
 4. **IPFS Retrieval**: Encrypted file fetched from Pinata gateway
-5. **Decryption**: File decrypted using derived key + stored IV
+5. **Decryption**: File decrypted using derived key + IV
 6. **File Download**: Decrypted file saved to user's device
 
 ---
@@ -137,7 +137,6 @@ Create a secure data encryption and storage platform designed with **NIST** and 
 - **IV Generation**: Cryptographically secure random 16-byte IV per file
 - **Key Length**: 256-bit (32-byte) encryption keys
 - **Security Level**: Enterprise-grade encryption suitable for sensitive business and personal data
-- **Note**: Implementation is not FIPS 140-2/3 validated
 
 ### 2. Blockchain Integration
 
@@ -206,29 +205,6 @@ Create a secure data encryption and storage platform designed with **NIST** and 
 - **No Single Point of Failure**: Decentralized architecture
 - **Global CDN**: Pinata provides worldwide access
 - **Blockchain Persistence**: Metadata permanently stored on-chain
-
-### Encryption Technical Details
-
-```typescript
-// Key Derivation Process
-function deriveEncryptionKey(signature: Address): Uint8Array {
-  const keyMaterial = keccak256(utf8ToBytes(signature)); // 32-byte hash
-  return keyMaterial.slice(0, 32); // AES-256 key
-}
-
-// Encryption Process
-1. Generate random 16-byte IV
-2. Import key into WebCrypto API
-3. Encrypt file with AES-GCM
-4. Return: { encrypted: hex, iv: hex }
-
-// Decryption Process
-1. Derive same key from signature
-2. Import key into WebCrypto API
-3. Decrypt with stored IV
-4. Verify authentication tag
-5. Return original file
-```
 
 ### Security Best Practices
 
@@ -717,6 +693,7 @@ For questions, issues, or feature requests:
 
 - **Hedera Hashgraph** for the fast, secure blockchain infrastructure
 - **IPFS** for decentralized storage protocol
+- **Cloudflare** for Workers platform enabling secure and free server actions
 - **OpenZeppelin** for secure smart contract libraries
 - **Pinata** for IPFS pinning services
 - **shadcn/ui** for beautiful UI components
