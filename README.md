@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![FileIt Logo](public/logo.png)
+![FileIt Logo](public/logo.svg)
 
 **A decentralized, blockchain-based secure data encryption and storage platform built on Hedera Network**
 
