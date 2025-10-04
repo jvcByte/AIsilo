@@ -302,12 +302,12 @@ export function DownloadFile() {
                                     {(state.isDownloading || state.isDecrypting) ? (
                                         <div className="flex items-center gap-2">
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            {state.isDownloading ? 'Processing...' : 'Decrypting...'}
+                                            {state.isDownloading ? 'Decrypting...' : 'Decrypting...'}
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2">
                                             <Download className="w-5 h-5" />
-                                            Decrypt & Download File
+                                            Decrypt File
                                         </div>
                                     )}
                                 </Button>
