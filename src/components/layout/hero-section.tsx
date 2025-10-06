@@ -1,5 +1,16 @@
 import { HeroTextLoop } from "./hero-text-loop";
-import { FileText, FileLock, Shield, FileCheck, Cloud, type LucideIcon, Boxes, Server, FileBox, FileCode } from "lucide-react";
+import {
+  FileText,
+  FileLock,
+  Shield,
+  FileCheck,
+  Cloud,
+  type LucideIcon,
+  Boxes,
+  Server,
+  FileBox,
+  FileCode,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { ConnectKitButton } from "connectkit";
@@ -16,17 +27,27 @@ interface FloatingIconProps {
 }
 
 // Floating file icon component
-function FloatingIcon({ icon: Icon, delay, duration, startX, startY, endX, endY }: FloatingIconProps) {
+function FloatingIcon({
+  icon: Icon,
+  delay,
+  duration,
+  startX,
+  startY,
+  endX,
+  endY,
+}: FloatingIconProps) {
   return (
     <div
       className="absolute opacity-20 dark:opacity-10"
-      style={{
-        animation: `float ${duration}s ease-in-out ${delay}s infinite`,
-        left: `${startX}%`,
-        top: `${startY}%`,
-        '--end-x': `${endX}%`,
-        '--end-y': `${endY}%`,
-      } as React.CSSProperties}
+      style={
+        {
+          animation: `float ${duration}s ease-in-out ${delay}s infinite`,
+          left: `${startX}%`,
+          top: `${startY}%`,
+          "--end-x": `${endX}%`,
+          "--end-y": `${endY}%`,
+        } as React.CSSProperties
+      }
     >
       <Icon className="w-8 h-8 md:w-12 md:h-12 text-primary" />
     </div>
@@ -41,14 +62,78 @@ export default function HeroSection() {
   }, []);
 
   const floatingIcons = [
-    { icon: FileText, delay: 0, duration: 8, startX: 10, startY: 20, endX: 15, endY: 80 },
-    { icon: FileLock, delay: 1, duration: 10, startX: 85, startY: 15, endX: 80, endY: 75 },
-    { icon: FileBox, delay: 2, duration: 9, startX: 5, startY: 60, endX: 10, endY: 30 },
-    { icon: Boxes, delay: 0.5, duration: 11, startX: 90, startY: 50, endX: 88, endY: 20 },
-    { icon: FileCode, delay: 1.5, duration: 7, startX: 15, startY: 80, endX: 20, endY: 25 },
-    { icon: FileCheck, delay: 2.5, duration: 9, startX: 88, startY: 80, endX: 85, endY: 35 },
-    { icon: Cloud, delay: 3, duration: 10, startX: 8, startY: 40, endX: 12, endY: 70 },
-    { icon: Server, delay: 1.8, duration: 8, startX: 92, startY: 35, endX: 90, endY: 65 },
+    {
+      icon: FileText,
+      delay: 0,
+      duration: 8,
+      startX: 10,
+      startY: 20,
+      endX: 15,
+      endY: 80,
+    },
+    {
+      icon: FileLock,
+      delay: 1,
+      duration: 10,
+      startX: 85,
+      startY: 15,
+      endX: 80,
+      endY: 75,
+    },
+    {
+      icon: FileBox,
+      delay: 2,
+      duration: 9,
+      startX: 5,
+      startY: 60,
+      endX: 10,
+      endY: 30,
+    },
+    {
+      icon: Boxes,
+      delay: 0.5,
+      duration: 11,
+      startX: 90,
+      startY: 50,
+      endX: 88,
+      endY: 20,
+    },
+    {
+      icon: FileCode,
+      delay: 1.5,
+      duration: 7,
+      startX: 15,
+      startY: 80,
+      endX: 20,
+      endY: 25,
+    },
+    {
+      icon: FileCheck,
+      delay: 2.5,
+      duration: 9,
+      startX: 88,
+      startY: 80,
+      endX: 85,
+      endY: 35,
+    },
+    {
+      icon: Cloud,
+      delay: 3,
+      duration: 10,
+      startX: 8,
+      startY: 40,
+      endX: 12,
+      endY: 70,
+    },
+    {
+      icon: Server,
+      delay: 1.8,
+      duration: 8,
+      startX: 92,
+      startY: 35,
+      endX: 90,
+      endY: 65,
+    },
   ];
 
   return (
@@ -120,9 +205,10 @@ export default function HeroSection() {
           <div className="absolute inset-0 hero-gradient pointer-events-none" />
 
           {/* Floating icons */}
-          {mounted && floatingIcons.map((props, index) => (
-            <FloatingIcon key={index} {...props} />
-          ))}
+          {mounted &&
+            floatingIcons.map((props, index) => (
+              <FloatingIcon key={index} {...props} />
+            ))}
 
           {/* Main content */}
           <div className="relative z-10 mx-auto w-full max-w-6xl px-6 text-center">
@@ -130,7 +216,9 @@ export default function HeroSection() {
               {/* Badge */}
               <div className="hidden md:inline-flex animate-scale-in items-center gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <Shield className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Decentralized & Secure</span>
+                <span className="text-sm font-medium text-primary">
+                  Decentralized & Secure
+                </span>
               </div>
 
               {/* Main heading */}
@@ -164,26 +252,40 @@ export default function HeroSection() {
                   )}
                 </ConnectKitButton.Custom>
 
-
-                <Button asChild variant="outline" className="md:px-8 py-4 bg-card border-2 border-border rounded-lg font-semibold md:text-lg hover:border-primary transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="md:px-8 py-4 bg-card border-2 border-border rounded-lg font-semibold md:text-lg hover:border-primary transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                >
                   <Link to="/docs"> Learn More</Link>
                 </Button>
-
               </div>
 
               {/* Stats */}
               <div className="animate-fade-in-up grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto [animation-delay:800ms]">
                 <div className="text-center">
-                  <div className="text-xl md:text-4xl font-bold text-primary">Private</div>
-                  <div className="text-sm text-muted-foreground mt-1">Encrypted Access</div>
+                  <div className="text-xl md:text-4xl font-bold text-primary">
+                    Private
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Encrypted Access
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl md:text-4xl font-bold text-primary">Integrity</div>
-                  <div className="text-sm text-muted-foreground mt-1">Blockchain Verified</div>
+                  <div className="text-xl md:text-4xl font-bold text-primary">
+                    Integrity
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Blockchain Verified
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl md:text-4xl font-bold text-primary">Access</div>
-                  <div className="text-sm text-muted-foreground mt-1">IPFS Network</div>
+                  <div className="text-xl md:text-4xl font-bold text-primary">
+                    Access
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    IPFS Network
+                  </div>
                 </div>
               </div>
             </div>

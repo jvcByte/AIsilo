@@ -29,7 +29,7 @@ export const HeroHeader = () => {
         className={cn(
           "fixed z-20 w-full transition-all duration-300",
           isScrolled &&
-          "bg-background/75 border-b border-black/5 backdrop-blur-lg",
+            "bg-background/75 border-b border-black/5 backdrop-blur-lg",
         )}
       >
         <div className="mx-auto max-w-5xl px-6">
@@ -40,12 +40,12 @@ export const HeroHeader = () => {
                 aria-label="home"
                 className="flex items-center space-x-2"
               >
-                <span className="text-2xl font-bold md:text-3xl flex"
-                  style={{ fontFamily: 'Georgia, serif' }}>
+                <span
+                  className="text-2xl font-bold md:text-3xl flex"
+                  style={{ fontFamily: "Georgia, serif" }}
+                >
                   <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded" />
-                  <span className="">
-                    leIt
-                  </span>
+                  <span className="">leIt</span>
                 </span>
               </Link>
 

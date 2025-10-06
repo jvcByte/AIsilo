@@ -5,23 +5,32 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SkipToMain } from "@/components/skip-to-main";
 import { AuthenticatedHeader } from "@/components/layout/authenticated-header";
 import { AuthGuard } from "@/components/auth/auth-guard";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Button } from "../ui/button";
 import { CheckCircle, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useReadContract,
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import contracts from "@/contracts/contracts";
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode;
 };
 
-
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const { address } = useAccount();
-
 
   const { data: user, refetch: refetchUser } = useReadContract({
     ...contracts.DocumentRegistry,
@@ -29,12 +38,17 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     args: [address as `0x${string}`],
   });
 
-  const { writeContract: registerUser, isPending: isRegistering, data: txHash } = useWriteContract();
+  const {
+    writeContract: registerUser,
+    isPending: isRegistering,
+    data: txHash,
+  } = useWriteContract();
 
   // Wait for transaction confirmation
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash: txHash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: txHash,
+    });
 
   const handleRegister = async () => {
     try {
@@ -88,9 +102,12 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
                       <UserPlus className="w-8 h-8 text-blue-600" />
                     </div>
-                    <CardTitle className="text-2xl">Welcome to Fileit!</CardTitle>
+                    <CardTitle className="text-2xl">
+                      Welcome to Fileit!
+                    </CardTitle>
                     <CardDescription className="text-base">
-                      You need to register to access your secure document storage
+                      You need to register to access your secure document
+                      storage
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -121,7 +138,9 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                       className="w-full cursor-pointer"
                       size="lg"
                     >
-                      {isRegistering || isConfirming ? "Processing..." : "Register Now"}
+                      {isRegistering || isConfirming
+                        ? "Processing..."
+                        : "Register Now"}
                     </Button>
                     {isConfirming && (
                       <p className="text-xs text-blue-600 text-center font-medium">
@@ -158,4 +177,3 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     </AuthGuard>
   );
 }
-
