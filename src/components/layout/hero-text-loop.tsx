@@ -8,14 +8,12 @@ const rotatingStatements = [
   "Decentralized. Secure. Simple.",
   "Upload once. Control access forever.",
   "Works with any EVM compatible wallet.",
-  "No central authority can block you."
+  "No central authority can block you.",
 ];
 
 export function HeroTextLoop() {
   return (
-    <TextLoop className="font-mono md:text-2xl text-xl"
-      interval={3}
-    >
+    <TextLoop className="font-mono md:text-2xl text-xl" interval={3}>
       {rotatingStatements.map((statement, index) => (
         <span key={index}>{statement}</span>
       ))}
