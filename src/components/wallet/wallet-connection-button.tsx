@@ -315,8 +315,9 @@ export function WalletConnectionButton({
                   <DropdownMenuItem
                     key={chainOption.id}
                     onClick={() => handleSwitchChain(chainOption.id)}
-                    className={`cursor-pointer flex items-center justify-between ${isCurrentChain ? "bg-primary/5" : ""
-                      } ${isSwitching ? "opacity-50" : ""}`}
+                    className={`cursor-pointer flex items-center justify-between ${
+                      isCurrentChain ? "bg-primary/5" : ""
+                    } ${isSwitching ? "opacity-50" : ""}`}
                     disabled={isCurrentChain || chainSwitchState.isLoading}
                   >
                     <div className="flex items-center gap-2">
