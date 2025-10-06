@@ -5,4 +5,4 @@ const pinata = new PinataSDK({
   pinataGateway: import.meta.env.VITE_PINATA_GATEWAY,
 });
 
-export { pinata }
+export { pinata };

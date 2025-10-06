@@ -8,7 +8,6 @@ export const Route = createFileRoute("/_authenticated/activities")({
 function Activities() {
   return (
     <div className="min-h-screen bg-background">
-
       {/* Main content area with proper height calculation */}
       <div className=" mx-auto px-2 sm:px-4 py-4 sm:py-6 fixed top-20 left-4 right-4 bottom-4">
         <div className="rounded-2xl sm:rounded-3xl border bg-card shadow-lg bg-gradient-to-tl from-muted to-background max-w-7xl mx-auto overflow-hidden">

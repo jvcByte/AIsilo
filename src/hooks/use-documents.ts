@@ -1,11 +1,16 @@
-import { useState, useCallback } from 'react';
-import { useAccount, useReadContract } from 'wagmi';
+import { useState, useCallback } from "react";
+import { useAccount, useReadContract } from "wagmi";
 import { publicClient, getWagmiWalletClient } from "@/lib/viem";
-import { useQuery } from '@tanstack/react-query';
-import contracts from '@/contracts/contracts';
-import { toast } from 'react-hot-toast';
-import { DOCUMENT_REGISTRY_EVENTS } from '@/contracts/events';
-import { BaseError, ContractFunctionRevertedError, UserRejectedRequestError, type Address } from 'viem';
+import { useQuery } from "@tanstack/react-query";
+import contracts from "@/contracts/contracts";
+import { toast } from "react-hot-toast";
+import { DOCUMENT_REGISTRY_EVENTS } from "@/contracts/events";
+import {
+  BaseError,
+  ContractFunctionRevertedError,
+  UserRejectedRequestError,
+  type Address,
+} from "viem";
 
 export interface ContractDocument {
   documentId: string;
@@ -36,7 +41,7 @@ export interface RoleRevokedLog {
 export interface DocumentAccess {
   documentId: string;
   userAddress: string;
-  accessLevel: 'read' | 'write' | 'emergency';
+  accessLevel: "read" | "write" | "emergency";
   grantedBy: string;
   grantedAt: number;
   expiresAt?: number;
@@ -101,7 +106,7 @@ export interface Document {
   uploader: string;
   uploadTime: number;
   archived: boolean;
-  accessLevel: 'private' | 'shared' | 'emergency';
+  accessLevel: "private" | "shared" | "emergency";
 }
 
 /**
@@ -113,13 +118,14 @@ export function useDocuments() {
   const [error, setError] = useState<string | null>(null);
 
   // Get all documents from the contract
-  const { data: contractDocuments, isLoading: isLoadingDocuments } = useReadContract({
-    ...contracts.DocumentRegistry,
-    functionName: "getAllDocuments",
-    query: {
-      enabled: true,
-    },
-  });
+  const { data: contractDocuments, isLoading: isLoadingDocuments } =
+    useReadContract({
+      ...contracts.DocumentRegistry,
+      functionName: "getAllDocuments",
+      query: {
+        enabled: true,
+      },
+    });
 
   // Get document count
   const { data: documentCount } = useReadContract({
@@ -148,16 +154,22 @@ export function useDocuments() {
       try {
         // Get current block number
         const currentBlock = await publicClient.getBlockNumber();
-        
+
         // Calculate blocks for approximately 6 days (to stay under 7-day limit)
         // Hedera produces ~1 block every 2 seconds, so 6 days = ~259,200 blocks
         const BLOCKS_PER_6_DAYS = 259_200n;
-        const fromBlock = currentBlock > BLOCKS_PER_6_DAYS 
-          ? currentBlock - BLOCKS_PER_6_DAYS 
-          : 0n;
+        const fromBlock =
+          currentBlock > BLOCKS_PER_6_DAYS
+            ? currentBlock - BLOCKS_PER_6_DAYS
+            : 0n;
 
         // Fetch all event types in parallel
-        const [documentUploadedLogs, roleGrantedLogs, roleRevokedLogs, roleAdminChangedLogs] = await Promise.all([
+        const [
+          documentUploadedLogs,
+          roleGrantedLogs,
+          roleRevokedLogs,
+          roleAdminChangedLogs,
+        ] = await Promise.all([
           publicClient.getLogs({
             address: contracts.DocumentRegistry.address,
             event: DOCUMENT_REGISTRY_EVENTS.DocumentUploaded,
@@ -218,9 +230,9 @@ export function useDocuments() {
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
               timestamp: blockTimestamps.get(log.blockNumber) || 0n,
-              user: (log.args as DocumentUploadedLog).user || '0x',
-              documentId: (log.args as DocumentUploadedLog).docID || '',
-              cid: (log.args as DocumentUploadedLog).cid || '',
+              user: (log.args as DocumentUploadedLog).user || "0x",
+              documentId: (log.args as DocumentUploadedLog).docID || "",
+              cid: (log.args as DocumentUploadedLog).cid || "",
             }),
           ),
 
@@ -232,9 +244,9 @@ export function useDocuments() {
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
               timestamp: blockTimestamps.get(log.blockNumber) || 0n,
-              role: (log.args as RoleGrantedLog).role || '0x',
-              account: (log.args as RoleGrantedLog).account || '0x',
-              sender: (log.args as RoleGrantedLog).sender || '0x',
+              role: (log.args as RoleGrantedLog).role || "0x",
+              account: (log.args as RoleGrantedLog).account || "0x",
+              sender: (log.args as RoleGrantedLog).sender || "0x",
             }),
           ),
 
@@ -246,24 +258,26 @@ export function useDocuments() {
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
               timestamp: blockTimestamps.get(log.blockNumber) || 0n,
-              role: (log.args as RoleRevokedLog).role || '0x',
-              account: (log.args as RoleRevokedLog).account || '0x',
-              sender: (log.args as RoleRevokedLog).sender || '0x',
+              role: (log.args as RoleRevokedLog).role || "0x",
+              account: (log.args as RoleRevokedLog).account || "0x",
+              sender: (log.args as RoleRevokedLog).sender || "0x",
             }),
           ),
         ];
 
         // Sort by timestamp (most recent first)
-        return allEvents.sort((a, b) => {
-          if (a.timestamp !== b.timestamp) {
-            return Number(b.timestamp - a.timestamp);
-          }
-          // If same timestamp, sort by log index
-          return b.logIndex - a.logIndex;
-        }).slice(0, 100); // Limit to 100 most recent events
+        return allEvents
+          .sort((a, b) => {
+            if (a.timestamp !== b.timestamp) {
+              return Number(b.timestamp - a.timestamp);
+            }
+            // If same timestamp, sort by log index
+            return b.logIndex - a.logIndex;
+          })
+          .slice(0, 100); // Limit to 100 most recent events
       } catch (error) {
         toast.error(`Failed to fetch Document Registry events: ${error}`, {
-          className: "toast-error"
+          className: "toast-error",
         });
         return [];
       }
@@ -274,107 +288,116 @@ export function useDocuments() {
   });
 
   // Transform contract data to our Document interface
-  const documents: Document[] = contractDocuments?.map((doc: ContractDocument, index: number) => ({
-    id: `doc-${index}`,
-    fileName: `Document ${index + 1}`, // This would come from IPFS metadata
-    fileType: 'unknown',
-    fileSize: 0,
-    cid: doc.cId,
-    documentId: doc.documentId,
-    uploader: doc.uploader,
-    uploadTime: Number(doc.uploadTime),
-    archived: doc.archived,
-    accessLevel: 'private' as const,
-  })) || [];
+  const documents: Document[] =
+    contractDocuments?.map((doc: ContractDocument, index: number) => ({
+      id: `doc-${index}`,
+      fileName: `Document ${index + 1}`, // This would come from IPFS metadata
+      fileType: "unknown",
+      fileSize: 0,
+      cid: doc.cId,
+      documentId: doc.documentId,
+      uploader: doc.uploader,
+      uploadTime: Number(doc.uploadTime),
+      archived: doc.archived,
+      accessLevel: "private" as const,
+    })) || [];
 
   /**
    * Upload a document with encryption and IPFS storage
    */
-  const uploadDocument = useCallback(async (params: UploadDocumentParams) => {
-    if (!address || !isConnected) {
-      throw new Error('Wallet not connected');
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { docId, cId } = params;
-      // Upload to blockchain
-      // writeContract({
-      //   ...contracts.DocumentRegistry,
-      //   functionName: "uploadDocument",
-      //   args: [docId, cId],
-      // })
-
-      const walletClient = await getWagmiWalletClient();
-      if (!walletClient) {
-        toast.error("No connected wallet found. Please connect your wallet.", {
-          className: "toast-error",
-        });
-        return;
+  const uploadDocument = useCallback(
+    async (params: UploadDocumentParams) => {
+      if (!address || !isConnected) {
+        throw new Error("Wallet not connected");
       }
 
-      const { request } = await publicClient.simulateContract({
-        account: walletClient.account,
-        address: contracts.DocumentRegistry.address,
-        abi: contracts.DocumentRegistry.abi,
-        functionName: "uploadDocument",
-        args: [docId, cId],
-      });
-      await walletClient.writeContract(request);
+      setIsLoading(true);
+      setError(null);
 
-    } catch (err) {
-      if (err instanceof UserRejectedRequestError) {
-        toast.error("Transaction cancelled by user", {
-          className: "toast-error",
+      try {
+        const { docId, cId } = params;
+        // Upload to blockchain
+        // writeContract({
+        //   ...contracts.DocumentRegistry,
+        //   functionName: "uploadDocument",
+        //   args: [docId, cId],
+        // })
+
+        const walletClient = await getWagmiWalletClient();
+        if (!walletClient) {
+          toast.error(
+            "No connected wallet found. Please connect your wallet.",
+            {
+              className: "toast-error",
+            },
+          );
+          return;
+        }
+
+        const { request } = await publicClient.simulateContract({
+          account: walletClient.account,
+          address: contracts.DocumentRegistry.address,
+          abi: contracts.DocumentRegistry.abi,
+          functionName: "uploadDocument",
+          args: [docId, cId],
         });
-        return;
-      }
-
-      if (err instanceof BaseError) {
-        const revertError = err.walk(
-          (err) => err instanceof ContractFunctionRevertedError,
-        );
-        if (revertError instanceof ContractFunctionRevertedError) {
-          const errorName = revertError.reason ?? "Unknown Error Occurred";
-          toast.error(`Blockchain write failed: ${errorName}`, {
+        await walletClient.writeContract(request);
+      } catch (err) {
+        if (err instanceof UserRejectedRequestError) {
+          toast.error("Transaction cancelled by user", {
             className: "toast-error",
           });
-          setError(`Blockchain write failed: ${errorName}`);
-        } else {
-          // Handle chain mismatch errors specifically
-          if (err.message.includes("chain") || err.message.includes("Chain")) {
-            toast.error(
-              "Chain mismatch error. Switch to Hedera Testnet(id:296)",
-              {
-                className: "toast-error",
-              },
-            );
-            setError(
-              "Chain mismatch error. Switch to Hedera Testnet(id:296)",
-            );
-          } else {
-            const errorMessage =
-              err.shortMessage || err.message || "Unknown error occurred";
-            toast.error(`Blockchain write failed: ${errorMessage}`, {
+          return;
+        }
+
+        if (err instanceof BaseError) {
+          const revertError = err.walk(
+            (err) => err instanceof ContractFunctionRevertedError,
+          );
+          if (revertError instanceof ContractFunctionRevertedError) {
+            const errorName = revertError.reason ?? "Unknown Error Occurred";
+            toast.error(`Blockchain write failed: ${errorName}`, {
               className: "toast-error",
             });
-            setError(`Blockchain write failed: ${errorMessage}`);
+            setError(`Blockchain write failed: ${errorName}`);
+          } else {
+            // Handle chain mismatch errors specifically
+            if (
+              err.message.includes("chain") ||
+              err.message.includes("Chain")
+            ) {
+              toast.error(
+                "Chain mismatch error. Switch to Hedera Testnet(id:296)",
+                {
+                  className: "toast-error",
+                },
+              );
+              setError(
+                "Chain mismatch error. Switch to Hedera Testnet(id:296)",
+              );
+            } else {
+              const errorMessage =
+                err.shortMessage || err.message || "Unknown error occurred";
+              toast.error(`Blockchain write failed: ${errorMessage}`, {
+                className: "toast-error",
+              });
+              setError(`Blockchain write failed: ${errorMessage}`);
+            }
           }
+        } else {
+          const errorMessage =
+            err instanceof Error ? err.message : "Unknown error occurred";
+          toast.error(`Blockchain write failed: ${errorMessage}`, {
+            className: "toast-error",
+          });
+          setError(`Blockchain write failed: ${errorMessage}`);
         }
-      } else {
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error occurred";
-        toast.error(`Blockchain write failed: ${errorMessage}`, {
-          className: "toast-error",
-        });
-        setError(`Blockchain write failed: ${errorMessage}`);
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [address, isConnected]);
+    },
+    [address, isConnected],
+  );
 
   return {
     // State

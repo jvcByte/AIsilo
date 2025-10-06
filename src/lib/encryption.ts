@@ -1,9 +1,12 @@
 import { type Address } from "viem";
 import { getRandomBytes } from "ethereum-cryptography/random";
 import { keccak256 } from "ethereum-cryptography/keccak";
-import { utf8ToBytes, bytesToHex, hexToBytes } from "ethereum-cryptography/utils";
+import {
+  utf8ToBytes,
+  bytesToHex,
+  hexToBytes,
+} from "ethereum-cryptography/utils";
 export { bytesToHex } from "ethereum-cryptography/utils";
-
 
 function deriveEncryptionKey(signature: Address): Uint8Array {
   if (!signature) throw new Error("Invalid signature");
@@ -22,13 +25,13 @@ export async function encryptFile(fileContent: File, signature: Address) {
     deriveEncryptionKey(signature),
     { name: "AES-GCM" },
     false,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   const encrypted = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    fileBytes
+    fileBytes,
   );
 
   return {
@@ -47,13 +50,13 @@ export async function encryptText(text: string, signature: Address) {
     deriveEncryptionKey(signature),
     { name: "AES-GCM" },
     false,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   const encrypted = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    textBytes
+    textBytes,
   );
 
   return {
@@ -67,7 +70,7 @@ export async function decryptFile(
   ivHex: string,
   signature: Address,
   fileName: string,
-  mimeType: string
+  mimeType: string,
 ): Promise<File> {
   const encryptedBytes = hexToBytes(encryptedHex);
   const iv = hexToBytes(ivHex);
@@ -77,13 +80,13 @@ export async function decryptFile(
     deriveEncryptionKey(signature),
     { name: "AES-GCM" },
     false,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   const decrypted = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv },
     key,
-    encryptedBytes
+    encryptedBytes,
   );
 
   const decryptedBytes = new Uint8Array(decrypted);
@@ -113,7 +116,6 @@ export function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-
 // File -> Base64
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -122,7 +124,6 @@ const fileToBase64 = (file: File): Promise<string> =>
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = (error) => reject(error);
   });
-
 
 // Base64 -> File
 export const base64ToFile = (base64: string, fileName: string): File => {

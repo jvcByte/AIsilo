@@ -21,5 +21,4 @@ if (!rootElement.innerHTML) {
       </Web3Provider>
     </StrictMode>,
   );
-
 }
