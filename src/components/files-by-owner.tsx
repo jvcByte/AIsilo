@@ -5,15 +5,7 @@ import { CHAIN_IDS } from "@/lib/chain-utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  Unplug,
-  Hash,
-  Clock,
-  User,
-  Copy,
-  Eye,
-} from "lucide-react";
+import { FileText, Unplug, Hash, Clock, User, Copy, Eye } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
@@ -39,14 +31,14 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
     return getDocumentsByOwner.map((doc: ContractDocument, index: number) => ({
       id: `doc-${index}`,
       fileName: `Document ${index + 1}`,
-      fileType: 'unknown',
+      fileType: "unknown",
       fileSize: 0,
       cid: doc.cId,
       documentId: doc.documentId,
       uploader: doc.uploader,
       uploadTime: Number(doc.uploadTime),
       archived: doc.archived,
-      accessLevel: 'private' as const,
+      accessLevel: "private" as const,
     }));
   }, [getDocumentsByOwner]);
 
@@ -64,7 +56,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
   const copyToClipboard = async (cid: string) => {
     try {
       await navigator.clipboard.writeText(cid);
-      toast.success('CID copied to clipboard!');
+      toast.success("CID copied to clipboard!");
     } catch (err) {
       toast.error(`Failed to copy CID ${err}`);
     }
@@ -73,8 +65,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
   // Navigate to document details (could be same as download for now)
   const handleViewDetails = (cid: string) => {
     navigate({
-      to: '/download-file',
-      search: { cid }
+      to: "/download-file",
+      search: { cid },
     });
   };
 
@@ -152,7 +144,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
           Failed to Load Documents
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm mb-4">
-          Unable to fetch your documents. Please check your connection and try refreshing.
+          Unable to fetch your documents. Please check your connection and try
+          refreshing.
         </p>
         <Badge variant="destructive" className="text-xs">
           Error loading documents
@@ -172,7 +165,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
           No Documents Found
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          You haven't uploaded any documents yet. Upload your first document to see it here.
+          You haven't uploaded any documents yet. Upload your first document to
+          see it here.
         </p>
       </div>
     );
@@ -186,7 +180,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 ">
         <div>
           <p className="text-sm text-muted-foreground">
-            {documents.length} document{documents.length > 1 ? 's' : ''} uploaded
+            {documents.length} document{documents.length > 1 ? "s" : ""}{" "}
+            uploaded
           </p>
         </div>
         {documents.length > displayLimit && (
@@ -197,7 +192,9 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
       </div>
 
       {/* Documents List */}
-      <ScrollArea className={`${heightClass ?? "h-[60vh] sm:h-[calc(90vh-13rem)]"} w-full rounded-md`}>
+      <ScrollArea
+        className={`${heightClass ?? "h-[60vh] sm:h-[calc(90vh-13rem)]"} w-full rounded-md`}
+      >
         <div className="space-y-3 sm:space-y-4 pr-2 sm:pr-4">
           {displayDocuments.map((document, index) => (
             <Card
@@ -233,7 +230,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                           IPFS CID:
                         </span>
                         <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all flex-1">
-                          {document.cid.length > (window.innerWidth < 640 ? 15 : 25)
+                          {document.cid.length >
+                          (window.innerWidth < 640 ? 15 : 25)
                             ? `${document.cid.slice(0, window.innerWidth < 640 ? 15 : 25)}...`
                             : document.cid}
                         </code>
@@ -268,7 +266,10 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                             Uploader:
                           </span>
                           <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                            {truncateAddress(document.uploader, window.innerWidth < 640 ? 4 : 6)}
+                            {truncateAddress(
+                              document.uploader,
+                              window.innerWidth < 640 ? 4 : 6,
+                            )}
                           </code>
                         </div>
                       </div>
@@ -279,7 +280,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         <span>
-                          Uploaded {formatRelativeTime(BigInt(document.uploadTime))}
+                          Uploaded{" "}
+                          {formatRelativeTime(BigInt(document.uploadTime))}
                         </span>
                       </div>
 
@@ -309,7 +311,11 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
         {documents.length > displayLimit && (
           <Card
             className="bg-muted/50 mt-4 cursor-pointer hover:bg-muted/70 transition-colors"
-            onClick={() => setDisplayLimit((prev) => Math.min(prev + limit, documents.length))}
+            onClick={() =>
+              setDisplayLimit((prev) =>
+                Math.min(prev + limit, documents.length),
+              )
+            }
           >
             <CardContent className="p-3 sm:p-4 text-center">
               <p className="text-xs sm:text-sm text-muted-foreground mb-2">

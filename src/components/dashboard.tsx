@@ -1,8 +1,19 @@
-import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useReadContract,
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import contracts from "@/contracts/contracts";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
@@ -25,7 +36,7 @@ export function Dashboard() {
   const { data: docCountPerAddr } = useReadContract({
     ...contracts.DocumentRegistry,
     functionName: "_docCountPerAddr",
-    args: [address as Address]
+    args: [address as Address],
   });
 
   const { data: user, refetch: refetchUser } = useReadContract({
@@ -34,12 +45,17 @@ export function Dashboard() {
     args: [address as `0x${string}`],
   });
 
-  const { writeContract: registerUser, isPending: isRegistering, data: txHash } = useWriteContract();
+  const {
+    writeContract: registerUser,
+    isPending: isRegistering,
+    data: txHash,
+  } = useWriteContract();
 
   // Wait for transaction confirmation
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash: txHash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: txHash,
+    });
 
   const handleRegister = async () => {
     try {
@@ -68,7 +84,6 @@ export function Dashboard() {
   }, [isConfirmed, refetchUser]);
 
   useEffect(() => {
-
     if (user === false) {
       setShowRegisterModal(true);
     } else if (user === true) {
@@ -149,13 +164,17 @@ export function Dashboard() {
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
             Total Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">{docCountPerAddr || "0"}</div>
+          <div className="text-base sm:text-2xl font-bold">
+            {docCountPerAddr || "0"}
+          </div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
             Protected Files
           </h3>
-          <div className="text-base sm:text-2xl font-bold">{docCountPerAddr || "0"}</div>
+          <div className="text-base sm:text-2xl font-bold">
+            {docCountPerAddr || "0"}
+          </div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -172,7 +191,10 @@ export function Dashboard() {
       </div>
       <div className="rounded-lg border bg-card p-6 bg-gradient-to-t from-muted to-background">
         <h3 className="text-xl font-semibold mb-4">My Documents</h3>
-        <FilesByOwner limit={5} heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]" />
+        <FilesByOwner
+          limit={5}
+          heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]"
+        />
       </div>
     </div>
   );

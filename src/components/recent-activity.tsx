@@ -1,4 +1,11 @@
-import { useDocuments, getEventStyle, type DocumentRegistryEventData, type DocumentUploadedEventData, type RoleGrantedEventData, type RoleRevokedEventData } from "@/hooks/use-documents";
+import {
+  useDocuments,
+  getEventStyle,
+  type DocumentRegistryEventData,
+  type DocumentUploadedEventData,
+  type RoleGrantedEventData,
+  type RoleRevokedEventData,
+} from "@/hooks/use-documents";
 import { formatRelativeTime, truncateAddress } from "@/lib/utils";
 import { useAccount, useReadContract } from "wagmi";
 import contracts from "@/contracts/contracts";
@@ -49,7 +56,10 @@ interface RecentActivityProps {
   heightClass?: string;
 }
 
-export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps) {
+export function RecentActivity({
+  limit = 10,
+  heightClass,
+}: RecentActivityProps) {
   const { events, isLoading, error } = useDocuments();
   const { address, chainId } = useAccount();
 
@@ -254,8 +264,8 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
           No Recent Activity
         </h3>
         <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xs sm:max-w-sm">
-          No recent contract activities found. Activities will appear here
-          once transactions are made.
+          No recent contract activities found. Activities will appear here once
+          transactions are made.
         </p>
       </div>
     );
@@ -300,7 +310,9 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Events</SelectItem>
-                <SelectItem value="DocumentUploaded">Document Uploaded</SelectItem>
+                <SelectItem value="DocumentUploaded">
+                  Document Uploaded
+                </SelectItem>
                 <SelectItem value="RoleGranted">Role Granted</SelectItem>
                 <SelectItem value="RoleRevoked">Role Revoked</SelectItem>
               </SelectContent>
@@ -388,8 +400,9 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
 
       {filteredEvents.length > 0 && (
         <ScrollArea
-          className={`${heightClass ?? "h-[60vh] sm:h-[calc(90vh-13rem)]"
-            } w-full rounded-md`}
+          className={`${
+            heightClass ?? "h-[60vh] sm:h-[calc(90vh-13rem)]"
+          } w-full rounded-md`}
         >
           <div className="space-y-3 sm:space-y-4 pr-2 sm:pr-4">
             {/* Events List */}
@@ -406,12 +419,13 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                         {/* Event Icon - Smaller on mobile */}
                         <div className="flex-shrink-0">
                           <div
-                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${event.eventName === "DocumentUploaded"
-                              ? "from-blue-100 to-blue-200 text-blue-600"
-                              : event.eventName === "RoleGranted"
-                                ? "from-green-100 to-green-200 text-green-600"
-                                : "from-yellow-100 to-yellow-200 text-yellow-600"
-                              }`}
+                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${
+                              event.eventName === "DocumentUploaded"
+                                ? "from-blue-100 to-blue-200 text-blue-600"
+                                : event.eventName === "RoleGranted"
+                                  ? "from-green-100 to-green-200 text-green-600"
+                                  : "from-yellow-100 to-yellow-200 text-yellow-600"
+                            }`}
                           >
                             {getEventIcon(event.eventName)}
                           </div>
@@ -443,9 +457,12 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     IPFS CID:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {(event as DocumentUploadedEventData).cid.length > (window.innerWidth < 640 ? 15 : 20)
+                                    {(event as DocumentUploadedEventData).cid
+                                      .length >
+                                    (window.innerWidth < 640 ? 15 : 20)
                                       ? `${(event as DocumentUploadedEventData).cid.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : (event as DocumentUploadedEventData).cid}
+                                      : (event as DocumentUploadedEventData)
+                                          .cid}
                                   </code>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -462,55 +479,71 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                               </div>
                             )}
 
-                            {event.eventName === "RoleGranted" && (() => {
-                              const roleEvent = event as RoleGrantedEventData;
-                              const isSelfGrant = roleEvent.sender === roleEvent.account;
+                            {event.eventName === "RoleGranted" &&
+                              (() => {
+                                const roleEvent = event as RoleGrantedEventData;
+                                const isSelfGrant =
+                                  roleEvent.sender === roleEvent.account;
 
-                              return (
-                                <div className="flex flex-col gap-4 md:flex-row md:items-center text-sm">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                      Role:
-                                    </span>
-                                    <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                      {formatRoleDisplay(roleEvent.role)}
-                                    </code>
-                                  </div>
-
-                                  {!isSelfGrant ? (
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                          From:
-                                        </span>
-                                        <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                          {truncateAddress(roleEvent.sender, window.innerWidth < 640 ? 4 : 6)}
-                                        </code>
-                                      </div>
-                                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground hidden sm:block" />
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                          To:
-                                        </span>
-                                        <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                          {truncateAddress(roleEvent.account, window.innerWidth < 640 ? 4 : 6)}
-                                        </code>
-                                      </div>
-                                    </div>
-                                  ) : (
+                                return (
+                                  <div className="flex flex-col gap-4 md:flex-row md:items-center text-sm">
                                     <div className="flex items-center gap-2">
                                       <span className="text-muted-foreground font-medium text-xs sm:text-sm">
-                                        Account:
+                                        Role:
                                       </span>
-                                      <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                        {truncateAddress(roleEvent.account, window.innerWidth < 640 ? 4 : 6)}
+                                      <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
+                                        {formatRoleDisplay(roleEvent.role)}
                                       </code>
-                                      <Badge variant="outline" className="text-xs hidden md:inline-flex">Self-granted</Badge>
                                     </div>
-                                  )}
-                                </div>
-                              );
-                            })()}
+
+                                    {!isSelfGrant ? (
+                                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                            From:
+                                          </span>
+                                          <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                                            {truncateAddress(
+                                              roleEvent.sender,
+                                              window.innerWidth < 640 ? 4 : 6,
+                                            )}
+                                          </code>
+                                        </div>
+                                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground hidden sm:block" />
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                            To:
+                                          </span>
+                                          <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                                            {truncateAddress(
+                                              roleEvent.account,
+                                              window.innerWidth < 640 ? 4 : 6,
+                                            )}
+                                          </code>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-muted-foreground font-medium text-xs sm:text-sm">
+                                          Account:
+                                        </span>
+                                        <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
+                                          {truncateAddress(
+                                            roleEvent.account,
+                                            window.innerWidth < 640 ? 4 : 6,
+                                          )}
+                                        </code>
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs hidden md:inline-flex"
+                                        >
+                                          Self-granted
+                                        </Badge>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })()}
 
                             {event.eventName === "RoleRevoked" && (
                               <div className="space-y-2 text-sm">
@@ -519,7 +552,9 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                     Role:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {formatRoleDisplay((event as RoleRevokedEventData).role)}
+                                    {formatRoleDisplay(
+                                      (event as RoleRevokedEventData).role,
+                                    )}
                                   </code>
                                 </div>
                                 <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2">
@@ -570,7 +605,9 @@ export function RecentActivity({ limit = 10, heightClass }: RecentActivityProps)
                                   <span className="hidden sm:inline">
                                     View on Hedera Testnet
                                   </span>
-                                  <span className="sm:hidden">Hedera Testnet</span>
+                                  <span className="sm:hidden">
+                                    Hedera Testnet
+                                  </span>
                                 </a>
                               </div>
                               <div className="text-xs text-muted-foreground">

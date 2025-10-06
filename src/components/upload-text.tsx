@@ -1,26 +1,26 @@
 // src/components/TextUpload.tsx
-import { useState } from 'react';
-import { type Address } from 'viem';
-import { useAccount, useSignMessage } from 'wagmi';
-import { useDocuments } from '../hooks/use-documents';
-import { Button } from './ui/button';
-import { Label } from './ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Alert, AlertDescription } from './ui/alert';
+import { useState } from "react";
+import { type Address } from "viem";
+import { useAccount, useSignMessage } from "wagmi";
+import { useDocuments } from "../hooks/use-documents";
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Alert, AlertDescription } from "./ui/alert";
 import {
   Upload,
   FileText,
   Lock,
   PenTool,
   CheckCircle2,
-  Type
-} from 'lucide-react';
-import { encryptText } from '../lib/encryption';
-import { pinata } from '@/lib/ipfs';
-import { toast } from 'react-hot-toast';
+  Type,
+} from "lucide-react";
+import { encryptText } from "../lib/encryption";
+import { pinata } from "@/lib/ipfs";
+import { toast } from "react-hot-toast";
 
-type UploadStep = 'input' | 'sign' | 'upload' | 'complete';
+type UploadStep = "input" | "sign" | "upload" | "complete";
 
 interface UploadState {
   step: UploadStep;
@@ -36,11 +36,11 @@ export function UploadText() {
   const { uploadDocument, isLoading: isContractLoading } = useDocuments();
 
   const [state, setState] = useState<UploadState>({
-    step: 'input',
-    text: '',
+    step: "input",
+    text: "",
     signature: null,
     cid: null,
-    iv: null
+    iv: null,
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,11 +48,11 @@ export function UploadText() {
   // Reset function
   const resetUpload = () => {
     setState({
-      step: 'input',
-      text: '',
+      step: "input",
+      text: "",
       signature: null,
       cid: null,
-      iv: null
+      iv: null,
     });
   };
 
@@ -63,52 +63,52 @@ export function UploadText() {
     // Validate text length (max 10MB equivalent)
     const maxLength = 10 * 1024 * 1024; // 10MB in characters (rough estimate)
     if (text.length > maxLength) {
-      toast.error('Text is too long. Maximum size is approximately 10MB.', {
-        className: "toast-error"
+      toast.error("Text is too long. Maximum size is approximately 10MB.", {
+        className: "toast-error",
       });
       return;
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       text,
-      step: text.trim() ? 'sign' : 'input'
+      step: text.trim() ? "sign" : "input",
     }));
   };
 
   // Handle message signing
   const handleSignMessage = async () => {
     if (!address) {
-      toast.error('Wallet not connected', {
-        className: "toast-error"
+      toast.error("Wallet not connected", {
+        className: "toast-error",
       });
       return;
     }
 
     setIsProcessing(true);
-    const signingToast = toast.loading('Waiting for signature...', {
-      className: "toast-loading"
+    const signingToast = toast.loading("Waiting for signature...", {
+      className: "toast-loading",
     });
 
     try {
       const signature = await signMessageAsync({
-        message: 'Encrypt My Text'
+        message: "Encrypt My Text",
       });
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         signature,
-        step: 'upload'
+        step: "upload",
       }));
 
-      toast.success('Message signed successfully', {
+      toast.success("Message signed successfully", {
         id: signingToast,
-        className: "toast-success"
+        className: "toast-success",
       });
     } catch (error) {
       toast.error(`Failed to sign message: ${error}`, {
         id: signingToast,
-        className: "toast-error"
+        className: "toast-error",
       });
     } finally {
       setIsProcessing(false);
@@ -118,55 +118,63 @@ export function UploadText() {
   // Handle text upload to IPFS
   const handleUpload = async () => {
     if (!state.text.trim() || !state.signature || !address) {
-      toast.error('Please enter some text to upload', {
-        className: "toast-error"
+      toast.error("Please enter some text to upload", {
+        className: "toast-error",
       });
       return;
     }
 
     setIsProcessing(true);
-    const uploadToast = toast.loading('Encrypting text...', { className: "toast-loading" });
+    const uploadToast = toast.loading("Encrypting text...", {
+      className: "toast-loading",
+    });
 
     try {
       // Step 1: Encrypt text
-      toast.loading('Encrypting text...', { id: uploadToast, className: "toast-loading" });
+      toast.loading("Encrypting text...", {
+        id: uploadToast,
+        className: "toast-loading",
+      });
       const { encrypted, iv } = await encryptText(state.text, state.signature);
 
       // Convert encrypted data to file for IPFS upload
-      const encryptedFile = new File([encrypted], 'encrypted-text.txt', {
-        type: 'text/plain'
+      const encryptedFile = new File([encrypted], "encrypted-text.txt", {
+        type: "text/plain",
       });
 
       // Step 2: Get presigned URL
-      toast.loading('Getting upload URL...', { id: uploadToast, className: "toast-loading" });
+      toast.loading("Getting upload URL...", {
+        id: uploadToast,
+        className: "toast-loading",
+      });
       const serverUrl = import.meta.env.VITE_SERVER_URL;
 
       if (!serverUrl) {
-        toast.error('Server URL not configured', {
-          className: "toast-error"
+        toast.error("Server URL not configured", {
+          className: "toast-error",
         });
         return;
       }
 
       const urlResponse = await fetch(`${serverUrl}/presigned_url`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       if (!urlResponse.ok) {
         const errorText = await urlResponse.text();
         toast.error(`Server error: ${urlResponse.status} - ${errorText}`, {
-          className: "toast-error"
+          className: "toast-error",
         });
         return;
       }
 
-      const contentType = urlResponse.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        toast.error('Invalid server response format', {
-          className: "toast-error"
+      const contentType = urlResponse.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        toast.error("Invalid server response format", {
+          className: "toast-error",
         });
         return;
       }
@@ -174,43 +182,47 @@ export function UploadText() {
       const { url: presignedUrl } = await urlResponse.json();
 
       // Step 3: Upload to IPFS
-      toast.loading('Uploading to IPFS...', { id: uploadToast, className: "toast-loading" });
-      const upload = await pinata.upload
-        .public.file(encryptedFile)
+      toast.loading("Uploading to IPFS...", {
+        id: uploadToast,
+        className: "toast-loading",
+      });
+      const upload = await pinata.upload.public
+        .file(encryptedFile)
         .url(presignedUrl)
         .keyvalues({
           iv: iv,
-          user: address
+          user: address,
         });
 
       if (!upload.cid) {
-        toast.error('Failed to get CID from upload', {
-          className: "toast-error"
+        toast.error("Failed to get CID from upload", {
+          className: "toast-error",
         });
         return;
       }
 
       // Update state with upload results
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         cid: upload.cid,
         iv,
-        step: 'complete'
+        step: "complete",
       }));
 
-      toast.success('Text uploaded to IPFS successfully!', {
+      toast.success("Text uploaded to IPFS successfully!", {
         id: uploadToast,
-        className: "toast-success"
+        className: "toast-success",
       });
 
       // Step 4: Call smart contract
       await handleContractWrite(upload.id, upload.cid);
-
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'An unknown error occurred';
-      toast.error(`Upload failed: ${errorMessage}`, { id: uploadToast, className: "toast-error" });
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      toast.error(`Upload failed: ${errorMessage}`, {
+        id: uploadToast,
+        className: "toast-error",
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -219,14 +231,14 @@ export function UploadText() {
   // Handle smart contract write
   const handleContractWrite = async (docId: string, cid: string) => {
     if (!uploadDocument) {
-      toast.error('Contract write function not available', {
-        className: "toast-error"
+      toast.error("Contract write function not available", {
+        className: "toast-error",
       });
       return;
     }
 
-    const contractToast = toast.loading('Writing to blockchain...', {
-      className: "toast-loading"
+    const contractToast = toast.loading("Writing to blockchain...", {
+      className: "toast-loading",
     });
 
     try {
@@ -235,17 +247,16 @@ export function UploadText() {
         cId: cid,
       });
 
-      toast.success('Text registered on blockchain!', {
+      toast.success("Text registered on blockchain!", {
         id: contractToast,
-        className: "toast-success"
+        className: "toast-success",
       });
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Transaction failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Transaction failed";
       toast.error(`Blockchain registration failed: ${errorMessage}`, {
         id: contractToast,
-        className: "toast-error"
+        className: "toast-error",
       });
     }
   };
@@ -278,7 +289,7 @@ export function UploadText() {
 
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Text Input Card */}
-        <Card className='bg-gradient-to-br from-muted to-background'>
+        <Card className="bg-gradient-to-br from-muted to-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
@@ -320,7 +331,7 @@ export function UploadText() {
         </Card>
 
         {/* Signature Card */}
-        {state.step === 'sign' && state.text.trim() && (
+        {state.step === "sign" && state.text.trim() && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -333,8 +344,9 @@ export function UploadText() {
                 <Alert>
                   <Lock className="h-4 w-4" />
                   <AlertDescription>
-                    To encrypt your text securely, please sign this message with your wallet.
-                    Your signature will be used to generate a unique encryption key.
+                    To encrypt your text securely, please sign this message with
+                    your wallet. Your signature will be used to generate a
+                    unique encryption key.
                   </AlertDescription>
                 </Alert>
                 <div className="p-3 bg-muted rounded-lg">
@@ -363,7 +375,7 @@ export function UploadText() {
         )}
 
         {/* Upload Card */}
-        {state.step === 'upload' && state.signature && (
+        {state.step === "upload" && state.signature && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -400,7 +412,7 @@ export function UploadText() {
         )}
 
         {/* Success Card */}
-        {state.step === 'complete' && state.cid && (
+        {state.step === "complete" && state.cid && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-600">
@@ -412,7 +424,8 @@ export function UploadText() {
               <Alert className="border-green-500">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertDescription>
-                  Your text has been successfully encrypted, uploaded to IPFS, and registered on the blockchain.
+                  Your text has been successfully encrypted, uploaded to IPFS,
+                  and registered on the blockchain.
                 </AlertDescription>
               </Alert>
               <div className="space-y-2">
