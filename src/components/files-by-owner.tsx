@@ -223,7 +223,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                         </span>
                         <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all flex-1">
                           {document.cid.length >
-                            (window.innerWidth < 640 ? 15 : 25)
+                          (window.innerWidth < 640 ? 15 : 25)
                             ? `${document.cid.slice(0, window.innerWidth < 640 ? 15 : 25)}...`
                             : document.cid}
                         </code>

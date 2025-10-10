@@ -96,7 +96,7 @@ export function UploadText() {
     try {
       const signature = await signMessage({
         message: "Encrypt My Text",
-        account: activeAccount
+        account: activeAccount,
       });
 
       setState((prev) => ({
