@@ -44,7 +44,7 @@ const SignInButton: React.FC = () => {
         },
       })}
       connectButton={{
-        label: "Connect Wallet",
+        label: "Sign In",
         style: {
           fontSize: "0.875rem sm:text-base",
           fontWeight: "normal",
