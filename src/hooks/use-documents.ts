@@ -127,7 +127,7 @@ export function useDocuments() {
     args: address ? [address as Address] : undefined,
     query: {
       enabled: !!address,
-    }
+    },
   });
 
   // If document count is 0, user has no documents - skip the documents query
@@ -137,22 +137,33 @@ export function useDocuments() {
     data: getDocumentsByOwner,
     isLoading: isLoadingUserDocuments,
     // isError: isDocumentsError,
-    error: documentsError
+    error: documentsError,
   } = useReadContract({
     ...contracts.DocumentRegistry,
     functionName: "getDocumentsByOwner",
     chainId: CHAIN_IDS.HEDERATESTNET,
     args: address ? [address as Address] : undefined,
     query: {
-      enabled: !!address && (documentCount !== undefined && (documentCount as bigint) > 0n), // Only if has documents
+      enabled:
+        !!address &&
+        documentCount !== undefined &&
+        (documentCount as bigint) > 0n, // Only if has documents
       refetchInterval: 10000,
       staleTime: 5000,
-    }
+    },
   });
 
   // Fetch events using useQuery - only when wallet is connected
-  const { data: events = [], isLoading: isLoadingEvents, error: eventsError } = useQuery({
-    queryKey: ["document-registry-events", contracts.DocumentRegistry.address, address],
+  const {
+    data: events = [],
+    isLoading: isLoadingEvents,
+    error: eventsError,
+  } = useQuery({
+    queryKey: [
+      "document-registry-events",
+      contracts.DocumentRegistry.address,
+      address,
+    ],
     queryFn: async (): Promise<DocumentRegistryEventData[]> => {
       if (!publicClient || !address) return [];
 
@@ -291,36 +302,41 @@ export function useDocuments() {
   });
 
   // Fetch IPFS metadata for a document (memoized for performance)
-  const fetchIPFSMetadata = useCallback(async (cid: string): Promise<string> => {
-    try {
-      const url = `https://api.pinata.cloud/v3/files/public?cid=${cid}`;
-      const options = {
-        method: "GET",
-        headers: {
-          Authorization: import.meta.env.VITE_PINATA_AUTHORIZATION,
-        },
-      };
+  const fetchIPFSMetadata = useCallback(
+    async (cid: string): Promise<string> => {
+      try {
+        const url = `https://api.pinata.cloud/v3/files/public?cid=${cid}`;
+        const options = {
+          method: "GET",
+          headers: {
+            Authorization: import.meta.env.VITE_PINATA_AUTHORIZATION,
+          },
+        };
 
-      const response = await fetch(url, options);
+        const response = await fetch(url, options);
 
-      if (!response.ok) {
-        console.warn(`Failed to fetch IPFS metadata for CID ${cid}: ${response.status}`);
+        if (!response.ok) {
+          console.warn(
+            `Failed to fetch IPFS metadata for CID ${cid}: ${response.status}`,
+          );
+          return `Document`; // Fallback name
+        }
+
+        const result = await response.json();
+
+        if (!result.data?.files || result.data.files.length === 0) {
+          console.log("No files found in IPFS metadata for CID", cid);
+          return `Document`; // Fallback name
+        }
+
+        return result.data.files[0].name || `Document`;
+      } catch (error) {
+        console.error(`Error fetching IPFS metadata for CID ${cid}:`, error);
         return `Document`; // Fallback name
       }
-
-      const result = await response.json();
-
-      if (!result.data?.files || result.data.files.length === 0) {
-        console.log("No files found in IPFS metadata for CID", cid);
-        return `Document`; // Fallback name
-      }
-
-      return result.data.files[0].name || `Document`;
-    } catch (error) {
-      console.error(`Error fetching IPFS metadata for CID ${cid}:`, error);
-      return `Document`; // Fallback name
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Handle documents based on count - moved after queries are defined
   const processedDocuments = useMemo(() => {
@@ -366,23 +382,27 @@ export function useDocuments() {
   const hasUserData = processedDocuments !== undefined;
 
   // Fetch real filenames from IPFS metadata
-  const [documentNames, setDocumentNames] = useState<Map<string, string>>(new Map());
+  const [documentNames, setDocumentNames] = useState<Map<string, string>>(
+    new Map(),
+  );
 
   useMemo(() => {
     if (!processedDocuments || !Array.isArray(processedDocuments)) return;
 
     const fetchAllNames = async () => {
-      const namePromises = processedDocuments.map(async (doc: ContractDocument) => {
-        const name = await fetchIPFSMetadata(doc.cId);
-        return { cid: doc.cId, name };
-      });
+      const namePromises = processedDocuments.map(
+        async (doc: ContractDocument) => {
+          const name = await fetchIPFSMetadata(doc.cId);
+          return { cid: doc.cId, name };
+        },
+      );
 
       try {
         const results = await Promise.allSettled(namePromises);
         const nameMap = new Map<string, string>();
 
         results.forEach((result, index) => {
-          if (result.status === 'fulfilled') {
+          if (result.status === "fulfilled") {
             nameMap.set(processedDocuments[index].cId, result.value.name);
           } else {
             nameMap.set(processedDocuments[index].cId, `Document ${index + 1}`);
@@ -429,7 +449,7 @@ export function useDocuments() {
         console.log(
           "============================================\n useDocuments uploading at chainId: ",
           CHAIN_IDS.HEDERATESTNET,
-          "\n============================================"
+          "\n============================================",
         );
 
         // Define the chain
@@ -465,13 +485,16 @@ export function useDocuments() {
 
         console.log(
           "============================================\n useDocuments Upload Document Function Called ",
-          "\n============================================"
+          "\n============================================",
         );
       } catch (error) {
         console.error("Upload failed:", error);
-        toast.error(`Upload failed: ${error instanceof Error ? error.message : String(error)}`, {
-          className: "toast-error",
-        });
+        toast.error(
+          `Upload failed: ${error instanceof Error ? error.message : String(error)}`,
+          {
+            className: "toast-error",
+          },
+        );
       } finally {
         setIsLoading(false);
       }
@@ -485,7 +508,10 @@ export function useDocuments() {
     events,
     documentCount: documentCount || 0,
     isLoading: isLoading || isLoadingUserDocuments || isLoadingEvents,
-    error: error || (eventsError ? String(eventsError) : null) || (documentsError ? String(documentsError) : null),
+    error:
+      error ||
+      (eventsError ? String(eventsError) : null) ||
+      (documentsError ? String(documentsError) : null),
     getDocumentsByOwner,
     hasContractData: hasUserData,
 
