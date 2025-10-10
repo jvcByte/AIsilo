@@ -19,7 +19,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Check if connected via thirdweb (in-app wallet) or wagmi (external wallets)
   const isThirdwebConnected = !!activeAccount?.address && !!activeWallet?.id;
   const isAuthenticated = isWagmiConnected || isThirdwebConnected;
-  const address = (wagmiAddress || activeAccount?.address) as `0x${string}` | undefined;
+  const address = (wagmiAddress || activeAccount?.address) as
+    | `0x${string}`
+    | undefined;
 
   const contextValue = useMemo(
     () => ({
