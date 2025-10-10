@@ -1,7 +1,7 @@
 import { HeroHeader } from "@/components/layout/header";
 import { createFileRoute } from "@tanstack/react-router";
 import HeroSection from "@/components/layout/hero-section";
-import { useAccount } from "wagmi";
+import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { AuthenticatedLayout } from "@/components/layout/authed-layout";
 import { Dashboard } from "@/components/dashboard";
 
@@ -10,9 +10,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { address } = useAccount();
+  const activeAccount = useActiveAccount();
+  const activeWallet = useActiveWallet();
 
-  if (!address) {
+  const isAuthenticated = !!(
+    activeAccount?.address &&
+    activeWallet?.id
+  );
+
+  if (!isAuthenticated) {
     return (
       <div className="p-2">
         <HeroHeader />

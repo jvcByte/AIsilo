@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { WalletConnectionButton } from "@/components/wallet/wallet-connection-button";
 import { ThemeSwitcher } from "./theme-switcher";
 import { APP_NAME } from "@/lib/config";
+import SignInButton from "@/components/wallet/thirdweb-connect-btn";
 
 type AuthenticatedHeaderProps = {
   className?: string;
@@ -22,7 +22,9 @@ export function AuthenticatedHeader({ className }: AuthenticatedHeaderProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <WalletConnectionButton showBalance={true} />
+            <div>
+              <SignInButton />
+            </div>
             <div>
               <ThemeSwitcher />
             </div>

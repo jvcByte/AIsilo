@@ -1,7 +1,9 @@
 // src/components/UploadFile.tsx
 import { useState } from "react";
 import { type Address } from "viem";
-import { useAccount, useSignMessage } from "wagmi";
+import { useActiveAccount } from "thirdweb/react";
+// import { useSignMessage } from "wagmi";
+import { signMessage } from "thirdweb/utils";
 import { useDocuments } from "../hooks/use-documents";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -25,9 +27,12 @@ interface UploadState {
 }
 
 export function UploadFile() {
-  const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const activeAccount = useActiveAccount();
+  // const { signMessageAsync } = useSignMessage();
   const { uploadDocument, isLoading: isContractLoading } = useDocuments();
+
+  const address = activeAccount?.address;
+  const isConnected = !!activeAccount?.address;
 
   const [state, setState] = useState<UploadState>({
     step: "file",
@@ -87,13 +92,17 @@ export function UploadFile() {
     });
 
     try {
-      const signature = await signMessageAsync({
+      // const signature = await signMessageAsync({
+      //   message: "Encrypt My File",
+      // });
+      const signature = await signMessage({
         message: "Encrypt My File",
+        account: activeAccount,
       });
 
       setState((prev) => ({
         ...prev,
-        signature,
+        signature: signature as Address,
         step: "upload",
       }));
 

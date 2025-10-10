@@ -28,7 +28,7 @@ export function generateColorFromAddress(address?: string): string {
 }
 
 export function truncateAddress(
-  address: `0x${string}` | undefined,
+  address: `0x${string}` | string | undefined,
   chars = 4,
 ): string {
   if (!address) return "";

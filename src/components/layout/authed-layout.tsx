@@ -13,16 +13,16 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-import { CheckCircle, UserPlus } from "lucide-react";
+import { CheckCircle, UserPlus, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import {
-  useReadContract,
-  useAccount,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useReadContract } from "wagmi";
+import { useActiveAccount, useSendTransaction } from "thirdweb/react";
+import { prepareContractCall } from "thirdweb";
+import { thirdwebClient } from "@/lib/thirdweb/thirdweb-client"; // Import your thirdweb client
 import contracts from "@/contracts/contracts";
+import { CHAIN_IDS } from "@/lib/chain-utils";
+import { defineChain } from "thirdweb/chains";
 
 type AuthenticatedLayoutProps = {
   children?: React.ReactNode;
@@ -30,60 +30,169 @@ type AuthenticatedLayoutProps = {
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const { address } = useAccount();
+  const activeAccount = useActiveAccount();
+  const address = activeAccount?.address;
 
-  const { data: user, refetch: refetchUser } = useReadContract({
-    ...contracts.DocumentRegistry,
-    functionName: "isUser",
-    args: [address as `0x${string}`],
-  });
+  // Use thirdweb's useSendTransaction instead of wagmi's useWriteContract
+  const { mutate: sendTransaction, isPending: isRegistering } = useSendTransaction();
 
   const {
-    writeContract: registerUser,
-    isPending: isRegistering,
-    data: txHash,
-  } = useWriteContract();
-
-  // Wait for transaction confirmation
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash: txHash,
-    });
+    data: user,
+    refetch: refetchUser,
+    error: userError,
+    isError: isUserError,
+    isLoading: isCheckingUser,
+    isFetched: isUserFetched
+  } = useReadContract({
+    ...contracts.DocumentRegistry,
+    functionName: "isUser",
+    chainId: CHAIN_IDS.HEDERATESTNET,
+    args: address ? [address as `0x${string}`] : undefined,
+    query: {
+      enabled: !!address, // Only fetch when address exists
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    }
+  });
 
   const handleRegister = async () => {
-    try {
-      registerUser({
-        ...contracts.DocumentRegistry,
-        functionName: "register",
+    if (!activeAccount) {
+      toast.error("Please connect your wallet first", {
+        className: "toast-error",
       });
+      return;
+    }
+
+    try {
+      console.log(
+        "============================================\n Auth Layout Registering at chainId: ",
+        CHAIN_IDS.HEDERATESTNET,
+        "\n============================================"
+      );
+
+      // Define the chain
+      const hederaTestnet = defineChain(CHAIN_IDS.HEDERATESTNET);
+
+      // Prepare the contract call using thirdweb
+      const transaction = prepareContractCall({
+        contract: {
+          address: contracts.DocumentRegistry.address,
+          abi: contracts.DocumentRegistry.abi,
+          chain: hederaTestnet,
+          client: thirdwebClient,
+        },
+        method: "register",
+        params: [],
+      });
+
+      // Send transaction using thirdweb
+      sendTransaction(transaction, {
+        onSuccess: (result) => {
+          console.log("Transaction successful:", result);
+          toast.success("Registration successful!", {
+            className: "toast-success",
+          });
+          setShowRegisterModal(false);
+          // Refetch user status after a short delay
+          setTimeout(() => {
+            refetchUser();
+          }, 2000);
+        },
+        onError: (error) => {
+          console.error("Registration failed:", error);
+          toast.error(`Registration failed: ${error.message}`, {
+            className: "toast-error",
+          });
+        },
+      });
+
+      console.log(
+        "============================================\n Auth Layout Register User Function Called ",
+        "\n============================================"
+      );
     } catch (error) {
       console.error("Registration failed:", error);
-      toast.error(`Registration failed: ${error}`, {
+      toast.error(`Registration failed: ${error instanceof Error ? error.message : String(error)}`, {
         className: "toast-error",
       });
     }
   };
 
-  // Handle successful registration
+  // Handle user status changes - only update modal state when data is fetched
   useEffect(() => {
-    if (isConfirmed) {
-      toast.success("Registration successful!", {
-        className: "toast-success",
+    if (!address) {
+      console.log("No address connected");
+      setShowRegisterModal(false);
+      return;
+    }
+
+    if (isCheckingUser) {
+      console.log("Still checking user status...");
+      return;
+    }
+
+    if (isUserFetched) {
+      console.log("User status fetched:", user);
+      if (user === false) {
+        console.log("User not registered, showing modal");
+        setShowRegisterModal(true);
+      } else if (user === true) {
+        console.log("User is registered, hiding modal");
+        setShowRegisterModal(false);
+      } else {
+        console.log("Unexpected user status:", user);
+      }
+    }
+
+    if (isUserError) {
+      console.error("Error checking user status:", userError);
+      toast.error("Failed to check registration status. Please try again.", {
+        className: "toast-error",
       });
-      setShowRegisterModal(false);
-      // Refetch user status
-      refetchUser();
     }
-  }, [isConfirmed, refetchUser]);
+  }, [address, user, isCheckingUser, isUserFetched, isUserError, userError]);
 
-  useEffect(() => {
-    if (user === false) {
-      setShowRegisterModal(true);
-    } else if (user === true) {
-      setShowRegisterModal(false);
-    }
-  }, [user]);
+  // Debug logging
+  console.log("AuthenticatedLayout Debug:");
+  console.log("Active account:", activeAccount);
+  console.log("Address:", address);
+  console.log("User status:", user);
+  console.log("Is checking user:", isCheckingUser);
+  console.log("Is user fetched:", isUserFetched);
+  console.log("User error:", userError);
+  console.log("Is user error:", isUserError);
+  console.log("Contract address:", contracts.DocumentRegistry.address);
+  console.log("Show register modal:", showRegisterModal);
 
+  // Show loading state while checking user status
+  if (address && isCheckingUser && !isUserFetched) {
+    return (
+      <AuthGuard>
+        <SearchProvider>
+          <SidebarProvider defaultOpen={true}>
+            <SkipToMain />
+            <AppSidebar />
+            <main className="flex w-full flex-col bg-gradient-to-tl from-muted to-background">
+              <div className="flex items-center sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <SidebarTrigger className="mr-5" />
+                <AuthenticatedHeader className="mx-auto" />
+              </div>
+              <div className="flex w-full items-center justify-center min-h-screen p-4">
+                <Card className="w-full max-w-md bg-gradient-to-br from-muted to-background">
+                  <CardContent className="flex flex-col items-center justify-center py-12">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+                    <p className="text-muted-foreground">Checking registration status...</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </main>
+          </SidebarProvider>
+        </SearchProvider>
+      </AuthGuard>
+    );
+  }
+
+  // Show registration modal
   if (showRegisterModal) {
     return (
       <AuthGuard>
@@ -134,15 +243,20 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                     </div>
                     <Button
                       onClick={handleRegister}
-                      disabled={isRegistering || isConfirming}
+                      disabled={isRegistering}
                       className="w-full cursor-pointer"
                       size="lg"
                     >
-                      {isRegistering || isConfirming
-                        ? "Processing..."
-                        : "Register Now"}
+                      {isRegistering ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Register Now"
+                      )}
                     </Button>
-                    {isConfirming && (
+                    {isRegistering && (
                       <p className="text-xs text-blue-600 text-center font-medium">
                         Waiting for transaction confirmation...
                       </p>
@@ -159,6 +273,8 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       </AuthGuard>
     );
   }
+
+  // Main authenticated layout
   return (
     <AuthGuard>
       <SearchProvider>

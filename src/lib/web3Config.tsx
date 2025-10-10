@@ -5,6 +5,7 @@ import { ConnectKitProvider } from "connectkit";
 import { wagmiConfig } from "./wagmi";
 import { queryClient } from "./config";
 import { customeTheme } from "@/styles/connectkit-modal-theme";
+import { ThirdwebProvider } from "thirdweb/react";
 
 // Declare wagmi module for type safety
 declare module "wagmi" {
@@ -19,12 +20,14 @@ type Web3ProviderProps = {
 
 export const Web3Provider = ({ children }: Web3ProviderProps) => {
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider mode="auto" customTheme={customeTheme}>
-          {children}
-        </ConnectKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ThirdwebProvider>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <ConnectKitProvider mode="auto" customTheme={customeTheme}>
+            {children}
+          </ConnectKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ThirdwebProvider>
   );
 };

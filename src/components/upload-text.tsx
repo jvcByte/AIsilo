@@ -1,7 +1,8 @@
 // src/components/TextUpload.tsx
 import { useState } from "react";
 import { type Address } from "viem";
-import { useAccount, useSignMessage } from "wagmi";
+import { useActiveAccount } from "thirdweb/react";
+import { signMessage } from "thirdweb/utils";
 import { useDocuments } from "../hooks/use-documents";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -31,9 +32,11 @@ interface UploadState {
 }
 
 export function UploadText() {
-  const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const activeAccount = useActiveAccount();
   const { uploadDocument, isLoading: isContractLoading } = useDocuments();
+
+  const address = activeAccount?.address;
+  const isConnected = !!activeAccount?.address;
 
   const [state, setState] = useState<UploadState>({
     step: "input",
@@ -91,13 +94,14 @@ export function UploadText() {
     });
 
     try {
-      const signature = await signMessageAsync({
+      const signature = await signMessage({
         message: "Encrypt My Text",
+        account: activeAccount
       });
 
       setState((prev) => ({
         ...prev,
-        signature,
+        signature: signature as Address,
         step: "upload",
       }));
 

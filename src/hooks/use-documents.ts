@@ -1,16 +1,16 @@
-import { useState, useCallback } from "react";
-import { useAccount, useReadContract } from "wagmi";
-import { publicClient, getWagmiWalletClient } from "@/lib/viem";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useActiveAccount, useSendTransaction } from "thirdweb/react";
+import { useReadContract } from "wagmi";
+import { publicClient } from "@/lib/viem";
 import contracts from "@/contracts/contracts";
 import { toast } from "react-hot-toast";
+import type { Address } from "viem";
 import { DOCUMENT_REGISTRY_EVENTS } from "@/contracts/events";
-import {
-  BaseError,
-  ContractFunctionRevertedError,
-  UserRejectedRequestError,
-  type Address,
-} from "viem";
+import { CHAIN_IDS } from "@/lib/chain-utils";
+import { prepareContractCall } from "thirdweb";
+import { defineChain } from "thirdweb/chains";
+import { thirdwebClient } from "@/lib/thirdweb/thirdweb-client";
 
 export interface ContractDocument {
   documentId: string;
@@ -113,43 +113,48 @@ export interface Document {
  * Hook for managing documents and contract events with NIST/ISO compliant security
  */
 export function useDocuments() {
-  const { address, isConnected } = useAccount();
+  const activeAccount = useActiveAccount();
+  const { mutate: sendTransaction } = useSendTransaction();
+  const address = activeAccount?.address;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get all documents from the contract
-  const { data: contractDocuments, isLoading: isLoadingDocuments } =
-    useReadContract({
-      ...contracts.DocumentRegistry,
-      functionName: "getAllDocuments",
-      query: {
-        enabled: true,
-      },
-    });
-
-  // Get document count
+  // Get document count for the current address
   const { data: documentCount } = useReadContract({
     ...contracts.DocumentRegistry,
-    functionName: "getDocumentCount",
+    functionName: "_docCountPerAddr",
+    chainId: CHAIN_IDS.HEDERATESTNET,
+    args: address ? [address as Address] : undefined,
     query: {
-      enabled: true,
-    },
+      enabled: !!address,
+    }
   });
 
-  const { data: getDocumentsByOwner } = useReadContract({
+  // If document count is 0, user has no documents - skip the documents query
+
+  // Get documents belonging to the current user (only if they have documents)
+  const {
+    data: getDocumentsByOwner,
+    isLoading: isLoadingUserDocuments,
+    // isError: isDocumentsError,
+    error: documentsError
+  } = useReadContract({
     ...contracts.DocumentRegistry,
     functionName: "getDocumentsByOwner",
-    args: [address as Address],
+    chainId: CHAIN_IDS.HEDERATESTNET,
+    args: address ? [address as Address] : undefined,
     query: {
-      enabled: true,
-    },
+      enabled: !!address && (documentCount !== undefined && (documentCount as bigint) > 0n), // Only if has documents
+      refetchInterval: 10000,
+      staleTime: 5000,
+    }
   });
 
-  // Fetch events using useQuery
-  const { data: events = [] } = useQuery({
-    queryKey: ["document-registry-events", contracts.DocumentRegistry.address],
+  // Fetch events using useQuery - only when wallet is connected
+  const { data: events = [], isLoading: isLoadingEvents, error: eventsError } = useQuery({
+    queryKey: ["document-registry-events", contracts.DocumentRegistry.address, address],
     queryFn: async (): Promise<DocumentRegistryEventData[]> => {
-      if (!publicClient) return [];
+      if (!publicClient || !address) return [];
 
       try {
         // Get current block number
@@ -276,22 +281,76 @@ export function useDocuments() {
           })
           .slice(0, 100); // Limit to 100 most recent events
       } catch (error) {
-        toast.error(`Failed to fetch Document Registry events: ${error}`, {
-          className: "toast-error",
-        });
+        console.error("Failed to fetch Document Registry events:", error);
         return [];
       }
     },
-    enabled: !!publicClient,
+    enabled: !!address && !!publicClient, // Only run when wallet is connected
     staleTime: 50000, // Cache for 50 seconds
     refetchInterval: 20000, // Refetch every 20 seconds
   });
 
-  // Transform contract data to our Document interface
-  const documents: Document[] =
-    contractDocuments?.map((doc: ContractDocument, index: number) => ({
+  // Fetch IPFS metadata for a document (memoized for performance)
+  const fetchIPFSMetadata = useCallback(async (cid: string): Promise<string> => {
+    try {
+      const url = `https://api.pinata.cloud/v3/files/public?cid=${cid}`;
+      const options = {
+        method: "GET",
+        headers: {
+          Authorization: import.meta.env.VITE_PINATA_AUTHORIZATION,
+        },
+      };
+
+      const response = await fetch(url, options);
+
+      if (!response.ok) {
+        console.warn(`Failed to fetch IPFS metadata for CID ${cid}: ${response.status}`);
+        return `Document`; // Fallback name
+      }
+
+      const result = await response.json();
+
+      if (!result.data?.files || result.data.files.length === 0) {
+        console.log("No files found in IPFS metadata for CID", cid);
+        return `Document`; // Fallback name
+      }
+
+      return result.data.files[0].name || `Document`;
+    } catch (error) {
+      console.error(`Error fetching IPFS metadata for CID ${cid}:`, error);
+      return `Document`; // Fallback name
+    }
+  }, []);
+
+  // Handle documents based on count - moved after queries are defined
+  const processedDocuments = useMemo(() => {
+    const count = documentCount as bigint | undefined;
+    if (count === 0n || count === undefined) return []; // No documents or still loading
+    // If count > 0, return the actual documents (could be undefined if still loading)
+    return getDocumentsByOwner;
+  }, [documentCount, getDocumentsByOwner]);
+
+  // Add debug logs
+  // console.log("Address:", address);
+  // console.log("Document count:", documentCount);
+  // console.log("Raw getDocumentsByOwner:", getDocumentsByOwner);
+  // console.log("Processed documents:", processedDocuments);
+  // console.log("isLoadingUserDocuments:", isLoadingUserDocuments);
+  // console.log("isDocumentsError:", isDocumentsError);
+  // console.log("documentsError:", documentsError);
+
+  // Transform user documents to our Document interface with real filenames from IPFS
+  const documents: Document[] = useMemo(() => {
+    if (!processedDocuments || !Array.isArray(processedDocuments)) {
+      console.log("No documents or not an array:", processedDocuments);
+      return [];
+    }
+
+    console.log("Processing documents:", processedDocuments.length);
+
+    return processedDocuments.map((doc: ContractDocument, index: number) => ({
       id: `doc-${index}`,
-      fileName: `Document ${index + 1}`, // This would come from IPFS metadata
+      fileName: `Document ${index + 1}`, // This will be updated with real name from IPFS
       fileType: "unknown",
       fileSize: 0,
       cid: doc.cId,
@@ -300,15 +359,65 @@ export function useDocuments() {
       uploadTime: Number(doc.uploadTime),
       archived: doc.archived,
       accessLevel: "private" as const,
-    })) || [];
+    }));
+  }, [processedDocuments]);
+
+  // Update data validation to focus on user documents
+  const hasUserData = processedDocuments !== undefined;
+
+  // Fetch real filenames from IPFS metadata
+  const [documentNames, setDocumentNames] = useState<Map<string, string>>(new Map());
+
+  useMemo(() => {
+    if (!processedDocuments || !Array.isArray(processedDocuments)) return;
+
+    const fetchAllNames = async () => {
+      const namePromises = processedDocuments.map(async (doc: ContractDocument) => {
+        const name = await fetchIPFSMetadata(doc.cId);
+        return { cid: doc.cId, name };
+      });
+
+      try {
+        const results = await Promise.allSettled(namePromises);
+        const nameMap = new Map<string, string>();
+
+        results.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            nameMap.set(processedDocuments[index].cId, result.value.name);
+          } else {
+            nameMap.set(processedDocuments[index].cId, `Document ${index + 1}`);
+          }
+        });
+
+        setDocumentNames(nameMap);
+      } catch (error) {
+        console.error("Error fetching document names:", error);
+      }
+    };
+
+    fetchAllNames();
+  }, [processedDocuments, fetchIPFSMetadata]);
+
+  // Final documents with real names from IPFS
+  const finalDocuments: Document[] = useMemo(() => {
+    if (!documents.length) return [];
+
+    return documents.map((doc) => ({
+      ...doc,
+      fileName: documentNames.get(doc.cid) || doc.fileName,
+    }));
+  }, [documents, documentNames]);
 
   /**
    * Upload a document with encryption and IPFS storage
    */
   const uploadDocument = useCallback(
     async (params: UploadDocumentParams) => {
-      if (!address || !isConnected) {
-        throw new Error("Wallet not connected");
+      if (!activeAccount) {
+        toast.error("Please connect your wallet first", {
+          className: "toast-error",
+        });
+        return;
       }
 
       setIsLoading(true);
@@ -316,97 +425,69 @@ export function useDocuments() {
 
       try {
         const { docId, cId } = params;
-        // Upload to blockchain
-        // writeContract({
-        //   ...contracts.DocumentRegistry,
-        //   functionName: "uploadDocument",
-        //   args: [docId, cId],
-        // })
 
-        const walletClient = await getWagmiWalletClient();
-        if (!walletClient) {
-          toast.error(
-            "No connected wallet found. Please connect your wallet.",
-            {
-              className: "toast-error",
-            },
-          );
-          return;
-        }
+        console.log(
+          "============================================\n useDocuments uploading at chainId: ",
+          CHAIN_IDS.HEDERATESTNET,
+          "\n============================================"
+        );
 
-        const { request } = await publicClient.simulateContract({
-          account: walletClient.account,
-          address: contracts.DocumentRegistry.address,
-          abi: contracts.DocumentRegistry.abi,
-          functionName: "uploadDocument",
-          args: [docId, cId],
+        // Define the chain
+        const hederaTestnet = defineChain(CHAIN_IDS.HEDERATESTNET);
+
+        // Prepare the contract call using thirdweb
+        const transaction = prepareContractCall({
+          contract: {
+            address: contracts.DocumentRegistry.address,
+            abi: contracts.DocumentRegistry.abi,
+            chain: hederaTestnet,
+            client: thirdwebClient,
+          },
+          method: "uploadDocument",
+          params: [docId, cId],
         });
-        await walletClient.writeContract(request);
-      } catch (err) {
-        if (err instanceof UserRejectedRequestError) {
-          toast.error("Transaction cancelled by user", {
-            className: "toast-error",
-          });
-          return;
-        }
 
-        if (err instanceof BaseError) {
-          const revertError = err.walk(
-            (err) => err instanceof ContractFunctionRevertedError,
-          );
-          if (revertError instanceof ContractFunctionRevertedError) {
-            const errorName = revertError.reason ?? "Unknown Error Occurred";
-            toast.error(`Blockchain write failed: ${errorName}`, {
+        // Send transaction using thirdweb
+        sendTransaction(transaction, {
+          onSuccess: (result) => {
+            console.log("Transaction successful:", result);
+            toast.success("Document registered on blockchain!", {
+              className: "toast-success",
+            });
+          },
+          onError: (error) => {
+            console.error("Upload failed:", error);
+            toast.error(`Upload failed: ${error.message}`, {
               className: "toast-error",
             });
-            setError(`Blockchain write failed: ${errorName}`);
-          } else {
-            // Handle chain mismatch errors specifically
-            if (
-              err.message.includes("chain") ||
-              err.message.includes("Chain")
-            ) {
-              toast.error(
-                "Chain mismatch error. Switch to Hedera Testnet(id:296)",
-                {
-                  className: "toast-error",
-                },
-              );
-              setError(
-                "Chain mismatch error. Switch to Hedera Testnet(id:296)",
-              );
-            } else {
-              const errorMessage =
-                err.shortMessage || err.message || "Unknown error occurred";
-              toast.error(`Blockchain write failed: ${errorMessage}`, {
-                className: "toast-error",
-              });
-              setError(`Blockchain write failed: ${errorMessage}`);
-            }
-          }
-        } else {
-          const errorMessage =
-            err instanceof Error ? err.message : "Unknown error occurred";
-          toast.error(`Blockchain write failed: ${errorMessage}`, {
-            className: "toast-error",
-          });
-          setError(`Blockchain write failed: ${errorMessage}`);
-        }
+          },
+        });
+
+        console.log(
+          "============================================\n useDocuments Upload Document Function Called ",
+          "\n============================================"
+        );
+      } catch (error) {
+        console.error("Upload failed:", error);
+        toast.error(`Upload failed: ${error instanceof Error ? error.message : String(error)}`, {
+          className: "toast-error",
+        });
       } finally {
         setIsLoading(false);
       }
     },
-    [address, isConnected],
+    [activeAccount, sendTransaction],
   );
 
   return {
     // State
-    documents,
+    documents: finalDocuments,
     events,
     documentCount: documentCount || 0,
-    isLoading: isLoading || isLoadingDocuments,
-    error,
+    isLoading: isLoading || isLoadingUserDocuments || isLoadingEvents,
+    error: error || (eventsError ? String(eventsError) : null) || (documentsError ? String(documentsError) : null),
     getDocumentsByOwner,
+    hasContractData: hasUserData,
 
     // Actions
     uploadDocument,

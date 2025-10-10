@@ -7,7 +7,8 @@ import {
   type RoleRevokedEventData,
 } from "@/hooks/use-documents";
 import { formatRelativeTime, truncateAddress } from "@/lib/utils";
-import { useAccount, useReadContract } from "wagmi";
+import { useActiveAccount, useActiveWallet } from "thirdweb/react";
+import { useReadContract } from "wagmi";
 import contracts from "@/contracts/contracts";
 import { CHAIN_IDS } from "@/lib/chain-utils";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,10 @@ export function RecentActivity({
   heightClass,
 }: RecentActivityProps) {
   const { events, isLoading, error } = useDocuments();
-  const { address, chainId } = useAccount();
+  const activeAccount = useActiveAccount();
+  const activeWallet = useActiveWallet();
+  const address = activeAccount?.address;
+  const chain = activeWallet?.getChain();
 
   // Read role constants from contract
   const { data: userRole } = useReadContract({
@@ -187,7 +191,7 @@ export function RecentActivity({
   }
 
   // Wrong network state
-  if (chainId !== CHAIN_IDS.HEDERATESTNET) {
+  if (chain?.id !== CHAIN_IDS.HEDERATESTNET) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
@@ -200,7 +204,7 @@ export function RecentActivity({
           Please switch to the Hedera Testnet network to view recent activities.
         </p>
         <Badge variant="outline" className="mt-3 text-xs">
-          Current: {chainId ? `Chain ${chainId}` : "Unknown"}
+          Current: {chain?.id ? `Chain ${chain.id}` : "Unknown"}
         </Badge>
       </div>
     );

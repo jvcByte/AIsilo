@@ -1,14 +1,14 @@
-import { useDocuments, type ContractDocument } from "@/hooks/use-documents";
+import { useState, useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useActiveAccount, useActiveWallet } from "thirdweb/react";
+import { useDocuments } from "@/hooks/use-documents";
 import { formatRelativeTime, truncateAddress } from "@/lib/utils";
-import { useAccount } from "wagmi";
 import { CHAIN_IDS } from "@/lib/chain-utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Unplug, Hash, Clock, User, Copy, Eye } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState, useMemo } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { toast } from "react-hot-toast";
 
 interface FilesByOwnerProps {
@@ -17,30 +17,15 @@ interface FilesByOwnerProps {
 }
 
 export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
-  const { getDocumentsByOwner, isLoading, error } = useDocuments();
-  const { address, chainId } = useAccount();
+  const { documents, isLoading, error, hasContractData } = useDocuments();
+  const activeAccount = useActiveAccount();
+  const activeWallet = useActiveWallet();
+
+  // Get the chain from the active wallet
+  const chain = activeWallet?.getChain();
+
   const navigate = useNavigate();
   const [displayLimit, setDisplayLimit] = useState(limit);
-
-  console.log("getDocumentsByOwner: ", getDocumentsByOwner);
-
-  // Transform contract documents to our format
-  const documents = useMemo(() => {
-    if (!getDocumentsByOwner) return [];
-
-    return getDocumentsByOwner.map((doc: ContractDocument, index: number) => ({
-      id: `doc-${index}`,
-      fileName: `Document ${index + 1}`,
-      fileType: "unknown",
-      fileSize: 0,
-      cid: doc.cId,
-      documentId: doc.documentId,
-      uploader: doc.uploader,
-      uploadTime: Number(doc.uploadTime),
-      archived: doc.archived,
-      accessLevel: "private" as const,
-    }));
-  }, [getDocumentsByOwner]);
 
   // Copy CID to clipboard
   // Sort documents by upload time (most recent first)
@@ -53,6 +38,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
       return timeB > timeA ? 1 : timeB < timeA ? -1 : 0; // Descending order (most recent first)
     });
   }, [documents]);
+
   const copyToClipboard = async (cid: string) => {
     try {
       await navigator.clipboard.writeText(cid);
@@ -71,7 +57,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
   };
 
   // Empty state for no wallet connection
-  if (!address) {
+  if (!activeAccount?.address) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6 bg-gradient-to-br from-muted to-background">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -88,7 +74,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
   }
 
   // Wrong network state
-  if (chainId !== CHAIN_IDS.HEDERATESTNET) {
+  if (chain?.id !== CHAIN_IDS.HEDERATESTNET) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6 bg-gradient-to-br from-muted to-background">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
@@ -101,14 +87,14 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
           Please switch to the Hedera Testnet network to view your documents.
         </p>
         <Badge variant="outline" className="mt-3 text-xs">
-          Current: {chainId ? `Chain ${chainId}` : "Unknown"}
+          Current: {chain?.id ? `Chain ${chain.id}` : "Unknown"}
         </Badge>
       </div>
     );
   }
 
-  // Loading state
-  if (isLoading) {
+  // Loading state - show while waiting for contract data
+  if (isLoading || !hasContractData) {
     return (
       <div className="space-y-3 sm:space-y-4 bg-gradient-to-br from-muted to-background">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -154,8 +140,8 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
     );
   }
 
-  // No documents state
-  if (!isLoading && !error && documents.length === 0) {
+  // No documents state - only show after loading is complete and we have definitive data
+  if (!isLoading && !error && hasContractData && documents.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 sm:px-6 bg-gradient-to-br from-muted to-background">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -180,11 +166,17 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 ">
         <div>
           <p className="text-sm text-muted-foreground">
-            {documents.length} document{documents.length > 1 ? "s" : ""}{" "}
-            uploaded
+            {isLoading ? (
+              <span className="animate-pulse">Loading documents...</span>
+            ) : (
+              <>
+                {documents.length} document{documents.length !== 1 ? "s" : ""}{" "}
+                uploaded
+              </>
+            )}
           </p>
         </div>
-        {documents.length > displayLimit && (
+        {documents.length > displayLimit && !isLoading && (
           <Badge variant="outline" className="text-xs">
             Showing {displayLimit} of {documents.length}
           </Badge>
@@ -231,7 +223,7 @@ export function FilesByOwner({ limit = 10, heightClass }: FilesByOwnerProps) {
                         </span>
                         <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all flex-1">
                           {document.cid.length >
-                          (window.innerWidth < 640 ? 15 : 25)
+                            (window.innerWidth < 640 ? 15 : 25)
                             ? `${document.cid.slice(0, window.innerWidth < 640 ? 15 : 25)}...`
                             : document.cid}
                         </code>

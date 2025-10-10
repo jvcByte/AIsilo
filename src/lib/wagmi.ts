@@ -16,8 +16,8 @@ const wagmiConfig = createConfig(
       }),
       // Hedera Testnet - primary chain
       [hederaTestnet.id]: http("https://testnet.hashio.io/api", {
-        timeout: 3_000, // 3 seconds
-        retryCount: 3,
+        timeout: 60_000, // 60 seconds - further increased for Hedera testnet
+        retryCount: 10,    // increased retry count
         batch: true,
       }),
     },

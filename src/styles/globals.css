@@ -304,3 +304,93 @@ html {
 .dark .toast-loading {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
 }
+
+
+/* Essential thirdweb ConnectButton styling */
+.tw-connect-wallet,
+.tw-connected-wallet {
+  background-color: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--foreground) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  border-radius: 0.375rem !important;
+  padding: 0.5rem 1rem !important;
+  height: 2.25rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  white-space: nowrap !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  outline: none !important;
+  cursor: pointer !important;
+}
+
+.tw-connect-wallet:hover,
+.tw-connected-wallet:hover {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.tw-connected-wallet {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* Modal styling */
+.tw-modal-content {
+    background: linear-gradient(
+    to top,
+    var(--background),
+    var(--muted)
+  ) !important;
+  border-color: var(--border) !important;
+  border-radius: 0.75rem !important;
+}
+
+.tw-connected-wallet-details {
+    background: linear-gradient(
+    to top,
+    var(--background),
+    var(--muted)
+  ) !important;
+}
+
+/* Text styling */
+.tw-text-primary {
+  color: var(--foreground) !important;
+}
+
+.tw-text-secondary {
+  color: var(--muted-foreground) !important;
+}
+
+.tw-text-accent {
+  color: var(--primary) !important;
+}
+
+/* UI Elements */
+.tw-separator {
+  border-color: var(--muted) !important;
+}
+
+.tw-card,
+.tw-wallet-option {
+  background-color: var(--muted) !important;
+}
+
+.tw-skeleton {
+  background-color: var(--muted-foreground) !important;
+}
+
+.tw-input {
+  border-color: var(--border) !important;
+  background-color: var(--background) !important;
+}
+
+.tw-selected {
+  color: var(--primary) !important;
+  background-color: var(--muted) !important;
+}

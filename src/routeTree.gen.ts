@@ -8,250 +8,250 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as DocsRouteImport } from "./routes/docs";
-import { Route as AboutRouteImport } from "./routes/about";
-import { Route as AuthenticatedRouteRouteImport } from "./routes/_authenticated/route";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as AuthenticatedUploadTextRouteImport } from "./routes/_authenticated/upload-text";
-import { Route as AuthenticatedUploadFileRouteImport } from "./routes/_authenticated/upload-file";
-import { Route as AuthenticatedTempRouteRouteImport } from "./routes/_authenticated/temp-route";
-import { Route as AuthenticatedDownloadFileRouteImport } from "./routes/_authenticated/download-file";
-import { Route as AuthenticatedDecryptRouteImport } from "./routes/_authenticated/decrypt";
-import { Route as AuthenticatedDashboardRouteImport } from "./routes/_authenticated/dashboard";
-import { Route as AuthenticatedActivitiesRouteImport } from "./routes/_authenticated/activities";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedUploadTextRouteImport } from './routes/_authenticated/upload-text'
+import { Route as AuthenticatedUploadFileRouteImport } from './routes/_authenticated/upload-file'
+import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
+import { Route as AuthenticatedDownloadFileRouteImport } from './routes/_authenticated/download-file'
+import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 
 const DocsRoute = DocsRouteImport.update({
-  id: "/docs",
-  path: "/docs",
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AboutRoute = AboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: "/_authenticated",
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthenticatedUploadTextRoute = AuthenticatedUploadTextRouteImport.update({
-  id: "/upload-text",
-  path: "/upload-text",
+  id: '/upload-text',
+  path: '/upload-text',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const AuthenticatedUploadFileRoute = AuthenticatedUploadFileRouteImport.update({
-  id: "/upload-file",
-  path: "/upload-file",
+  id: '/upload-file',
+  path: '/upload-file',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const AuthenticatedTempRouteRoute = AuthenticatedTempRouteRouteImport.update({
-  id: "/temp-route",
-  path: "/temp-route",
+  id: '/temp-route',
+  path: '/temp-route',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const AuthenticatedDownloadFileRoute =
   AuthenticatedDownloadFileRouteImport.update({
-    id: "/download-file",
-    path: "/download-file",
+    id: '/download-file',
+    path: '/download-file',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedDecryptRoute = AuthenticatedDecryptRouteImport.update({
-  id: "/decrypt",
-  path: "/decrypt",
+  id: '/decrypt',
+  path: '/decrypt',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
-  id: "/activities",
-  path: "/activities",
+  id: '/activities',
+  path: '/activities',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/docs": typeof DocsRoute;
-  "/activities": typeof AuthenticatedActivitiesRoute;
-  "/dashboard": typeof AuthenticatedDashboardRoute;
-  "/decrypt": typeof AuthenticatedDecryptRoute;
-  "/download-file": typeof AuthenticatedDownloadFileRoute;
-  "/temp-route": typeof AuthenticatedTempRouteRoute;
-  "/upload-file": typeof AuthenticatedUploadFileRoute;
-  "/upload-text": typeof AuthenticatedUploadTextRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/docs': typeof DocsRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/decrypt': typeof AuthenticatedDecryptRoute
+  '/download-file': typeof AuthenticatedDownloadFileRoute
+  '/temp-route': typeof AuthenticatedTempRouteRoute
+  '/upload-file': typeof AuthenticatedUploadFileRoute
+  '/upload-text': typeof AuthenticatedUploadTextRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/docs": typeof DocsRoute;
-  "/activities": typeof AuthenticatedActivitiesRoute;
-  "/dashboard": typeof AuthenticatedDashboardRoute;
-  "/decrypt": typeof AuthenticatedDecryptRoute;
-  "/download-file": typeof AuthenticatedDownloadFileRoute;
-  "/temp-route": typeof AuthenticatedTempRouteRoute;
-  "/upload-file": typeof AuthenticatedUploadFileRoute;
-  "/upload-text": typeof AuthenticatedUploadTextRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/docs': typeof DocsRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/decrypt': typeof AuthenticatedDecryptRoute
+  '/download-file': typeof AuthenticatedDownloadFileRoute
+  '/temp-route': typeof AuthenticatedTempRouteRoute
+  '/upload-file': typeof AuthenticatedUploadFileRoute
+  '/upload-text': typeof AuthenticatedUploadTextRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/_authenticated": typeof AuthenticatedRouteRouteWithChildren;
-  "/about": typeof AboutRoute;
-  "/docs": typeof DocsRoute;
-  "/_authenticated/activities": typeof AuthenticatedActivitiesRoute;
-  "/_authenticated/dashboard": typeof AuthenticatedDashboardRoute;
-  "/_authenticated/decrypt": typeof AuthenticatedDecryptRoute;
-  "/_authenticated/download-file": typeof AuthenticatedDownloadFileRoute;
-  "/_authenticated/temp-route": typeof AuthenticatedTempRouteRoute;
-  "/_authenticated/upload-file": typeof AuthenticatedUploadFileRoute;
-  "/_authenticated/upload-text": typeof AuthenticatedUploadTextRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/docs': typeof DocsRoute
+  '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
+  '/_authenticated/download-file': typeof AuthenticatedDownloadFileRoute
+  '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
+  '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
+  '/_authenticated/upload-text': typeof AuthenticatedUploadTextRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/about"
-    | "/docs"
-    | "/activities"
-    | "/dashboard"
-    | "/decrypt"
-    | "/download-file"
-    | "/temp-route"
-    | "/upload-file"
-    | "/upload-text";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/about'
+    | '/docs'
+    | '/activities'
+    | '/dashboard'
+    | '/decrypt'
+    | '/download-file'
+    | '/temp-route'
+    | '/upload-file'
+    | '/upload-text'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/about"
-    | "/docs"
-    | "/activities"
-    | "/dashboard"
-    | "/decrypt"
-    | "/download-file"
-    | "/temp-route"
-    | "/upload-file"
-    | "/upload-text";
+    | '/'
+    | '/about'
+    | '/docs'
+    | '/activities'
+    | '/dashboard'
+    | '/decrypt'
+    | '/download-file'
+    | '/temp-route'
+    | '/upload-file'
+    | '/upload-text'
   id:
-    | "__root__"
-    | "/"
-    | "/_authenticated"
-    | "/about"
-    | "/docs"
-    | "/_authenticated/activities"
-    | "/_authenticated/dashboard"
-    | "/_authenticated/decrypt"
-    | "/_authenticated/download-file"
-    | "/_authenticated/temp-route"
-    | "/_authenticated/upload-file"
-    | "/_authenticated/upload-text";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/about'
+    | '/docs'
+    | '/_authenticated/activities'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/decrypt'
+    | '/_authenticated/download-file'
+    | '/_authenticated/temp-route'
+    | '/_authenticated/upload-file'
+    | '/_authenticated/upload-text'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren;
-  AboutRoute: typeof AboutRoute;
-  DocsRoute: typeof DocsRoute;
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  DocsRoute: typeof DocsRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/docs": {
-      id: "/docs";
-      path: "/docs";
-      fullPath: "/docs";
-      preLoaderRoute: typeof DocsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/about": {
-      id: "/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof AboutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_authenticated": {
-      id: "/_authenticated";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_authenticated/upload-text": {
-      id: "/_authenticated/upload-text";
-      path: "/upload-text";
-      fullPath: "/upload-text";
-      preLoaderRoute: typeof AuthenticatedUploadTextRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
-    "/_authenticated/upload-file": {
-      id: "/_authenticated/upload-file";
-      path: "/upload-file";
-      fullPath: "/upload-file";
-      preLoaderRoute: typeof AuthenticatedUploadFileRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
-    "/_authenticated/temp-route": {
-      id: "/_authenticated/temp-route";
-      path: "/temp-route";
-      fullPath: "/temp-route";
-      preLoaderRoute: typeof AuthenticatedTempRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
-    "/_authenticated/download-file": {
-      id: "/_authenticated/download-file";
-      path: "/download-file";
-      fullPath: "/download-file";
-      preLoaderRoute: typeof AuthenticatedDownloadFileRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
-    "/_authenticated/decrypt": {
-      id: "/_authenticated/decrypt";
-      path: "/decrypt";
-      fullPath: "/decrypt";
-      preLoaderRoute: typeof AuthenticatedDecryptRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
-    "/_authenticated/dashboard": {
-      id: "/_authenticated/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
-    "/_authenticated/activities": {
-      id: "/_authenticated/activities";
-      path: "/activities";
-      fullPath: "/activities";
-      preLoaderRoute: typeof AuthenticatedActivitiesRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/upload-text': {
+      id: '/_authenticated/upload-text'
+      path: '/upload-text'
+      fullPath: '/upload-text'
+      preLoaderRoute: typeof AuthenticatedUploadTextRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/upload-file': {
+      id: '/_authenticated/upload-file'
+      path: '/upload-file'
+      fullPath: '/upload-file'
+      preLoaderRoute: typeof AuthenticatedUploadFileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/temp-route': {
+      id: '/_authenticated/temp-route'
+      path: '/temp-route'
+      fullPath: '/temp-route'
+      preLoaderRoute: typeof AuthenticatedTempRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/download-file': {
+      id: '/_authenticated/download-file'
+      path: '/download-file'
+      fullPath: '/download-file'
+      preLoaderRoute: typeof AuthenticatedDownloadFileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/decrypt': {
+      id: '/_authenticated/decrypt'
+      path: '/decrypt'
+      fullPath: '/decrypt'
+      preLoaderRoute: typeof AuthenticatedDecryptRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/activities': {
+      id: '/_authenticated/activities'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute;
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute;
-  AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute;
-  AuthenticatedDownloadFileRoute: typeof AuthenticatedDownloadFileRoute;
-  AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute;
-  AuthenticatedUploadFileRoute: typeof AuthenticatedUploadFileRoute;
-  AuthenticatedUploadTextRoute: typeof AuthenticatedUploadTextRoute;
+  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute
+  AuthenticatedDownloadFileRoute: typeof AuthenticatedDownloadFileRoute
+  AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute
+  AuthenticatedUploadFileRoute: typeof AuthenticatedUploadFileRoute
+  AuthenticatedUploadTextRoute: typeof AuthenticatedUploadTextRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -262,17 +262,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTempRouteRoute: AuthenticatedTempRouteRoute,
   AuthenticatedUploadFileRoute: AuthenticatedUploadFileRoute,
   AuthenticatedUploadTextRoute: AuthenticatedUploadTextRoute,
-};
+}
 
 const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren);
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   DocsRoute: DocsRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

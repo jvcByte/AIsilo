@@ -1,7 +1,8 @@
 // src/components/DecryptFile.tsx
 import { useState } from "react";
 import { type Address } from "viem";
-import { useAccount, useSignMessage } from "wagmi";
+import { useActiveAccount } from "thirdweb/react";
+import { signMessage } from "thirdweb/utils";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -19,8 +20,9 @@ import {
 import { decryptFile } from "../lib/encryption";
 
 export function DecryptFile() {
-  const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const activeAccount = useActiveAccount();
+  const address = activeAccount?.address;
+  const isConnected = !!activeAccount?.address;
   const [encryptedData, setEncryptedData] = useState("");
   const [iv, setIv] = useState("");
   const [fileName, setFileName] = useState("");
@@ -37,8 +39,9 @@ export function DecryptFile() {
     setIsSigning(true);
     setError(null);
     try {
-      const signature = await signMessageAsync({
+      const signature = await signMessage({
         message: "Encrypt My File",
+        account: activeAccount,
       });
       setSignature(signature);
     } catch (error) {
@@ -89,7 +92,7 @@ export function DecryptFile() {
     return (
       <>
         <div className="container mx-auto p-4">
-          <Card className="max-w-2xl mx-auto">
+          <Card className="max-w-2xl mx-auto bg-gradient-to-b from-muted to-background">
             <CardContent className="p-8 text-center">
               <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
               <h2 className="text-xl font-semibold mb-2">

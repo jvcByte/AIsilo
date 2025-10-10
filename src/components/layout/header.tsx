@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "./theme-switcher";
-import { WalletConnectionButton } from "@/components/wallet/wallet-connection-button";
+import SignInButton from "@/components/wallet/thirdweb-connect-btn"
+
 const menuItems = [
   { name: "Docs", to: "/docs" },
   // { name: "Join", to: "#link" },
@@ -29,7 +30,7 @@ export const HeroHeader = () => {
         className={cn(
           "fixed z-20 w-full transition-all duration-300",
           isScrolled &&
-            "bg-background/75 border-b border-black/5 backdrop-blur-lg",
+          "bg-background/75 border-b border-black/5 backdrop-blur-lg",
         )}
       >
         <div className="mx-auto max-w-5xl px-6">
@@ -54,7 +55,7 @@ export const HeroHeader = () => {
                   <ThemeSwitcher />
                 </div>
                 <div className="lg:hidden">
-                  <WalletConnectionButton />
+                  <SignInButton />
                 </div>
 
                 <button
@@ -98,7 +99,7 @@ export const HeroHeader = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 lg:gap-6 sm:space-y-0 md:w-fit">
-                <WalletConnectionButton />
+                <SignInButton />
                 <div className="hidden lg:block">
                   <ThemeSwitcher />
                 </div>

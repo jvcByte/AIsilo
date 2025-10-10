@@ -230,9 +230,9 @@ export default function HeroSection() {
               </h1>
 
               {/* Subheading */}
-              <p className="animate-fade-in-up text-lg md:text-2xl text-muted-foreground mt-6 mb-8 max-w-3xl mx-auto [animation-delay:400ms]">
+              <div className="animate-fade-in-up text-lg md:text-2xl text-muted-foreground mt-6 mb-8 max-w-3xl mx-auto [animation-delay:400ms]">
                 <HeroTextLoop />
-              </p>
+              </div>
 
               {/* CTA Buttons */}
               <div className="animate-fade-in-up flex gap-4 justify-center items-center [animation-delay:600ms]">
