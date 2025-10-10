@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "./theme-switcher";
-import SignInButton from "@/components/wallet/thirdweb-connect-btn"
+import SignInButton from "@/components/wallet/thirdweb-connect-btn";
 
 const menuItems = [
   { name: "Docs", to: "/docs" },
@@ -30,7 +30,7 @@ export const HeroHeader = () => {
         className={cn(
           "fixed z-20 w-full transition-all duration-300",
           isScrolled &&
-          "bg-background/75 border-b border-black/5 backdrop-blur-lg",
+            "bg-background/75 border-b border-black/5 backdrop-blur-lg",
         )}
       >
         <div className="mx-auto max-w-5xl px-6">

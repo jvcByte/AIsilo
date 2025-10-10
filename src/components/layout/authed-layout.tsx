@@ -34,7 +34,8 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const address = activeAccount?.address;
 
   // Use thirdweb's useSendTransaction instead of wagmi's useWriteContract
-  const { mutate: sendTransaction, isPending: isRegistering } = useSendTransaction();
+  const { mutate: sendTransaction, isPending: isRegistering } =
+    useSendTransaction();
 
   const {
     data: user,
@@ -42,7 +43,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     error: userError,
     isError: isUserError,
     isLoading: isCheckingUser,
-    isFetched: isUserFetched
+    isFetched: isUserFetched,
   } = useReadContract({
     ...contracts.DocumentRegistry,
     functionName: "isUser",
@@ -52,7 +53,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       enabled: !!address, // Only fetch when address exists
       refetchOnMount: true,
       refetchOnWindowFocus: false,
-    }
+    },
   });
 
   const handleRegister = async () => {
@@ -67,7 +68,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       console.log(
         "============================================\n Auth Layout Registering at chainId: ",
         CHAIN_IDS.HEDERATESTNET,
-        "\n============================================"
+        "\n============================================",
       );
 
       // Define the chain
@@ -108,13 +109,16 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
       console.log(
         "============================================\n Auth Layout Register User Function Called ",
-        "\n============================================"
+        "\n============================================",
       );
     } catch (error) {
       console.error("Registration failed:", error);
-      toast.error(`Registration failed: ${error instanceof Error ? error.message : String(error)}`, {
-        className: "toast-error",
-      });
+      toast.error(
+        `Registration failed: ${error instanceof Error ? error.message : String(error)}`,
+        {
+          className: "toast-error",
+        },
+      );
     }
   };
 
@@ -181,7 +185,9 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                 <Card className="w-full max-w-md bg-gradient-to-br from-muted to-background">
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
-                    <p className="text-muted-foreground">Checking registration status...</p>
+                    <p className="text-muted-foreground">
+                      Checking registration status...
+                    </p>
                   </CardContent>
                 </Card>
               </div>
