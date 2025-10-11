@@ -193,14 +193,14 @@ export default function HeroSection() {
             background: radial-gradient(
               circle at center,
               transparent 0%,
-              rgba(99, 102, 241, 0.03) 50%,
+              rgba(0, 0, 0, 0.03) 50%,
               transparent 100%
             );
           }
         `}
       </style>
       <main>
-        <section className="relative bg-linear-to-b to-muted from-background min-h-screen flex items-center overflow-hidden">
+        <section className="relative bg-linear-to-b to-muted from-background min-h-[90vh] flex items-center overflow-hidden">
           {/* Gradient overlay */}
           <div className="absolute inset-0 hero-gradient pointer-events-none" />
 
