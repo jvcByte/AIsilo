@@ -181,7 +181,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                 <SidebarTrigger className="mr-5" />
                 <AuthenticatedHeader className="mx-auto" />
               </div>
-              <div className="flex w-full items-center justify-center min-h-screen p-4">
+              <div className="flex w-full items-center justify-center min-h-[90vh] p-4">
                 <Card className="w-full max-w-md bg-gradient-to-br from-muted to-background">
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
@@ -211,7 +211,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                 <SidebarTrigger className="mr-5" />
                 <AuthenticatedHeader className="mx-auto" />
               </div>
-              <div className="flex w-full items-center justify-center min-h-screen p-4 bg-gradient-to-tl from-muted to-background">
+              <div className="flex w-full items-center justify-center min-h-[90vh] p-4 bg-gradient-to-tl from-muted to-background">
                 <Card className="w-full max-w-md bg-gradient-to-br from-muted to-background">
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">

@@ -15,57 +15,14 @@ import {
   BookOpen,
   Key,
 } from "lucide-react";
+import { sections } from "@/data/documentation-data";
 
 export default function DocumentationPage() {
-  const sections = [
-    {
-      id: "overview",
-      title: "Overview",
-      icon: BookOpen,
-      content:
-        "FileIt combines AES-256-GCM encryption, Hedera blockchain, and IPFS to provide strong security for your files with zero-knowledge architecture.",
-    },
-    {
-      id: "getting-started",
-      title: "Getting Started",
-      icon: Zap,
-      content:
-        "Connect your wallet, sign a message for encryption, and upload files. All encryption happens in your browser before upload.",
-    },
-    {
-      id: "architecture",
-      title: "Architecture",
-      icon: Database,
-      content:
-        "Decentralized system with client-side encryption, IPFS storage, and Hedera blockchain for immutable audit trails.",
-    },
-    {
-      id: "security",
-      title: "Security",
-      icon: Shield,
-      content:
-        "AES-256-GCM encryption (uses NSA Suite B approved algorithm) with Keccak256 key derivation from wallet signatures. Files are encrypted before leaving your browser.",
-    },
-    {
-      id: "smart-contracts",
-      title: "Smart Contracts",
-      icon: Lock,
-      content:
-        "DocumentRegistry contract on Hedera Testnet manages document metadata, access control, and emits events for audit trails.",
-    },
-    {
-      id: "technology",
-      title: "Technology Stack",
-      icon: Key,
-      content:
-        "Built with React 19, TypeScript, Wagmi, Viem, TanStack Router/Query, Tailwind CSS, and Pinata for IPFS storage.",
-    },
-  ];
 
   return (
     <div className="p-2">
       <HeroHeader />
-      <div className="min-h-screen bg-background">
+      <div className="bg-background">
         {/* Hero Section */}
         <section className="relative py-20 px-6 bg-gradient-to-b from-primary/5 to-background">
           <div className="mx-auto max-w-4xl text-center">
@@ -561,10 +518,10 @@ export default function DocumentationPage() {
         </section>
 
         {/* Getting Started CTA */}
-        <section className="py-16 px-6 bg-primary text-primary-foreground">
+        <section className="py-16 px-6 bg-gradient-to-b from-muted to-background">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-            <p className="text-primary-foreground/80 mb-8 text-lg">
+            <p className="mb-8 text-lg">
               Experience enterprise-grade AES-256-GCM encryption with
               zero-knowledge architecture. Your files, your keys, your control.
             </p>
