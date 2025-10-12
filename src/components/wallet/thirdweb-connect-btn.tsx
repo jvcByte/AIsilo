@@ -7,7 +7,40 @@ import { truncateAddress } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { generateColorFromAddress } from "@/lib/utils";
 
-const SignInButton: React.FC = () => {
+interface SignInButtonProps {
+  label?: string;
+  connectButtonStyle?: React.CSSProperties;
+  detailsButtonStyle?: React.CSSProperties;
+  termsOfServiceUrl?: string;
+  privacyPolicyUrl?: string;
+}
+
+const SignInButton: React.FC<SignInButtonProps> = ({
+  label = "Sign In",
+  connectButtonStyle = {
+    fontSize: "0.875rem sm:text-base",
+    fontWeight: "normal",
+    color: "var(--primary)",
+    backgroundColor: "var(--background)",
+    border: "2px solid var(--border)",
+    height: "2.25rem",
+    minWidth: "auto",
+  },
+  detailsButtonStyle = {
+    fontSize: "0.875rem sm:text-base",
+    fontWeight: "semibold",
+    color: "hsl(var(--primary-foreground))",
+    background:
+      "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))",
+    border: "1px solid hsl(var(--border))",
+    borderRadius: "var(--radius)",
+    height: "2.25rem",
+    transition: "all 0.3s ease",
+    minWidth: "auto",
+  },
+  termsOfServiceUrl = "https://sealedtrust.com",
+  privacyPolicyUrl = "https://sealedtrust.com",
+}) => {
   const activeAccount = useActiveAccount();
   const avatarBg = generateColorFromAddress(activeAccount?.address);
 
@@ -44,38 +77,19 @@ const SignInButton: React.FC = () => {
         },
       })}
       connectButton={{
-        label: "Sign In",
-        style: {
-          fontSize: "0.875rem sm:text-base",
-          fontWeight: "normal",
-          color: "var(--primary)",
-          backgroundColor: "var(--background)",
-          border: "2px solid var(--border)",
-          height: "2.25rem",
-          minWidth: "auto",
-        },
+        label,
+        style: connectButtonStyle,
       }}
       connectModal={{
         size: "wide",
         title: "Welcome",
         titleIcon: "/logo.svg",
         showThirdwebBranding: false,
-        termsOfServiceUrl: "https://sealedtrust.com",
-        privacyPolicyUrl: "https://sealedtrust.com",
+        termsOfServiceUrl,
+        privacyPolicyUrl,
       }}
       detailsButton={{
-        style: {
-          fontSize: "0.875rem sm:text-base",
-          fontWeight: "semibold",
-          color: "hsl(var(--primary-foreground))",
-          background:
-            "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))",
-          border: "1px solid hsl(var(--border))",
-          borderRadius: "var(--radius)",
-          height: "2.25rem",
-          transition: "all 0.3s ease",
-          minWidth: "auto",
-        },
+        style: detailsButtonStyle,
         render: () => (
           <div className="flex items-center gap-1 sm:gap-2 px-1 sm:px-2 cursor-pointer border rounded-md p-1 sm:p-2">
             <Avatar className="w-4 h-4 sm:w-5 sm:h-5">

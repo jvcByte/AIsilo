@@ -16,11 +16,11 @@ import {
   Key,
 } from "lucide-react";
 import { sections } from "@/data/documentation-data";
+import SignInButton from "@/components/wallet/thirdweb-connect-btn";
 
 export default function DocumentationPage() {
-
   return (
-    <div className="p-2">
+    <div className="">
       <HeroHeader />
       <div className="bg-background">
         {/* Hero Section */}
@@ -44,10 +44,24 @@ export default function DocumentationPage() {
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center">
-              <Button size="lg" className="gap-2">
-                <Zap className="w-5 h-5" />
-                Get Started
-              </Button>
+              <div className="flex items-center gap-0 bg-primary rounded-md px-2 pl-4">
+                <Zap className="w-4 h-4 text-secondary" />
+                <SignInButton
+                  label="Get Started"
+                  connectButtonStyle={{
+                    fontSize: "0.875rem sm:text-base",
+                    fontWeight: "semibold",
+                    color: "var(--background)",
+                    backgroundColor: "var(--primary)",
+                    // border: "2px solid var(--border)",
+                    height: "2.25rem",
+                    minWidth: "auto",
+                    borderRadius: "0.7rem",
+                  }}
+                  termsOfServiceUrl="https://fileit01.vercel.app"
+                  privacyPolicyUrl="https://fileit01.vercel.app"
+                />
+              </div>
               <Button variant="outline" size="lg" className="gap-2">
                 <Github className="w-5 h-5" />
                 View Source

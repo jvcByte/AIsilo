@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { ConnectKitButton } from "connectkit";
 import { Link } from "@tanstack/react-router";
+import SignInButton from "@/components/wallet/thirdweb-connect-btn";
 
 interface FloatingIconProps {
   icon: LucideIcon;
@@ -236,21 +236,21 @@ export default function HeroSection() {
 
               {/* CTA Buttons */}
               <div className="animate-fade-in-up flex gap-4 justify-center items-center [animation-delay:600ms]">
-                <ConnectKitButton.Custom>
-                  {({ isConnecting, show }) => (
-                    <Button
-                      variant="secondary"
-                      className="group relative md:px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold text-sm md:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                      onClick={show}
-                      disabled={isConnecting}
-                    >
-                      <span className="relative z-10">
-                        {isConnecting ? "Connecting..." : "Get Started"}
-                      </span>
-                      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </Button>
-                  )}
-                </ConnectKitButton.Custom>
+                <SignInButton
+                  label="Get Started"
+                  connectButtonStyle={{
+                    fontSize: "0.875rem sm:text-base",
+                    fontWeight: "bold",
+                    color: "var(--background)",
+                    backgroundColor: "var(--primary)",
+                    border: "2px solid var(--border)",
+                    height: "2.25rem",
+                    minWidth: "auto",
+                    borderRadius: "0.7rem",
+                  }}
+                  termsOfServiceUrl="https://fileit01.vercel.app"
+                  privacyPolicyUrl="https://fileit01.vercel.app"
+                />
 
                 <Button
                   asChild
