@@ -74,6 +74,7 @@ const SignInButton: React.FC<SignInButtonProps> = ({
           secondaryText: "var(--muted-foreground)",
           selectedTextColor: "var(--primary)",
           inputAutofillBg: "var(--background)",
+          secondaryButtonBg: "var(--muted)",
         },
       })}
       connectButton={{
