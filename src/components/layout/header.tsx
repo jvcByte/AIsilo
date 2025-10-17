@@ -46,7 +46,7 @@ export const HeroHeader = () => {
                   style={{ fontFamily: "Georgia, serif" }}
                 >
                   <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded" />
-                  <span className="">leIt</span>
+                  <span className="">silo</span>
                 </span>
               </Link>
 

@@ -1,4 +1,4 @@
-package com.fileit.hedera;
+package com.aisilo.hedera;
 
 import com.getcapacitor.BridgeActivity;
 

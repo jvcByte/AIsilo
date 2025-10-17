@@ -159,7 +159,7 @@ export function DownloadFile() {
         file as string,
         iv,
         state.signature,
-        state.fileName || "FileIt",
+        state.fileName || "AIsilo",
         "application/octet-stream",
       );
 
@@ -196,7 +196,7 @@ export function DownloadFile() {
     const url = URL.createObjectURL(state.decryptedFile);
     const link = document.createElement("a");
     link.href = url;
-    link.download = state.fileName || "FileIt";
+    link.download = state.fileName || "AIsilo";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -358,7 +358,7 @@ export function DownloadFile() {
                 <Label>File Name:</Label>
                 <div className="p-3 bg-muted rounded-lg">
                   <span className="text-sm font-medium">
-                    {state.fileName || "FileIt"}
+                    {state.fileName || "AIsilo"}
                   </span>
                 </div>
               </div>

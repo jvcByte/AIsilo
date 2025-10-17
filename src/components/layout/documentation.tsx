@@ -34,11 +34,11 @@ export default function DocumentationPage() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              FileIt Documentation
+              AIsilo Documentation
             </h1>
 
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Complete guide to using FileIt - the decentralized file storage
+              Complete guide to using AIsilo - the decentralized file storage
               platform with enterprise-grade AES-256-GCM encryption, built on
               blockchain and IPFS.
             </p>
@@ -112,9 +112,9 @@ export default function DocumentationPage() {
         <section className="py-16 px-6 bg-muted/30">
           <div className="mx-auto max-w-6xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Why Choose FileIt?</h2>
+              <h2 className="text-3xl font-bold mb-4">Why Choose AIsilo?</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                FileIt combines the best of blockchain technology and modern
+                AIsilo combines the best of blockchain technology and modern
                 encryption to provide unparalleled security for your digital
                 assets.
               </p>
@@ -189,7 +189,7 @@ export default function DocumentationPage() {
                 Security First Approach
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                FileIt implements the industry-standard CIA triad to ensure
+                AIsilo implements the industry-standard CIA triad to ensure
                 comprehensive protection of your digital assets.
               </p>
             </div>
@@ -255,7 +255,7 @@ export default function DocumentationPage() {
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Deep dive into the technical architecture and implementation
-                details of FileIt.
+                details of AIsilo.
               </p>
             </div>
 
@@ -466,7 +466,7 @@ export default function DocumentationPage() {
                 Security Standards Alignment
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                FileIt is designed following industry security best practices
+                AIsilo is designed following industry security best practices
                 and standards. Not formally certified or audited.
               </p>
             </div>

@@ -1,10 +1,8 @@
-# FileIt - Decentralized Encrypted File Storage
+# AIsilo - Decentralized AI Marketplace
 
 <div align="center">
 
-<img src="public/logo.svg" alt="FileIt Logo" width="200"/>
-
-**A decentralized, blockchain-based secure data encryption and storage platform built on Hedera Network**
+<img src="public/logo.svg" alt="AIsilo Logo" width="200"/>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Hedera](https://img.shields.io/badge/Hedera-Testnet-purple.svg)](https://hedera.com)
@@ -36,9 +34,7 @@
 
 ## 🎯 Overview
 
-FileIt is a cutting-edge decentralized application (dApp) that provides strong, enterprise-grade encryption for file storage using blockchain technology. By combining **AES-256-GCM encryption**, **Hedera blockchain**, and **IPFS distributed storage**, FileIt ensures your sensitive documents remain secure, verifiable, and accessible only to authorized parties.
-
-### Key Highlights
+AIsilo is a marketplace for AI models and datasets that operates on the Hedera network. It enables AI developers to monetize their models, promotes the sharing of high-quality datasets, and facilitates the development of decentralized AI applications..
 
 - 🔐 **Client-Side Encryption**: AES-256-GCM encryption in your browser before upload
 - 🌐 **Decentralized Storage**: IPFS ensures no single point of failure
@@ -218,11 +214,7 @@ Create a secure data encryption and storage platform designed with **NIST** and 
 - ✅ **Presigned URLs prevent frontend token exposure**
 - ✅ Zero-trust architecture for IPFS uploads
 
-### Cloudflare Worker Security Layer
-
-FileIt uses **Cloudflare Workers** as a secure intermediary between the frontend and Pinata IPFS:
-
-**Why This Matters:**
+AIsilo
 - **JWT Token Protection**: Pinata JWT tokens never exposed in frontend code or browser
 - **Presigned URL Generation**: Server-side authentication with Pinata
 - **Zero-Trust Upload**: Frontend receives temporary, scoped upload URLs
@@ -261,10 +253,7 @@ Frontend → Cloudflare Worker → Pinata API → Presigned URL → Frontend
 - Implement key rotation mechanisms
 - Add multi-signature support for shared files
 - Consider HSM integration for production deployments
-
-**Honest Assessment:**
-FileIt provides **strong, enterprise-grade encryption** using industry-standard algorithms (AES-256-GCM). While the encryption algorithm itself is used by military systems, the overall implementation lacks some features required for true "military-grade" classification, such as FIPS-validated modules, HSM key storage, and formal security audits.
-
+AIsilo
 ---
 
 ## 🛠 Technology Stack
@@ -382,8 +371,8 @@ event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, 
 
 ```bash
 # Clone the repository
-git clone https://github.com/jvcByte/FileIt.git
-cd FileIt
+git clone https://github.com/jvcByte/AIsilo.git
+cd AIsilo
 
 # Install dependencies
 pnpm install
@@ -431,7 +420,7 @@ VITE_PINATA_GATEWAY=your_pinata_gateway_url
 VITE_SERVER_URL=your_cloudflare_worker_url
 
 # App Metadata
-VITE_APP_NAME=FileIt
+VITE_APP_NAME=AIsilo
 VITE_APP_DESCRIPTION=Decentralized Encrypted File Storage
 VITE_APP_URL=https://your-domain.com
 VITE_APP_ICON=/logo.png
@@ -458,7 +447,7 @@ The backend uses Cloudflare Workers to generate presigned URLs for secure IPFS u
 ## 📁 Project Structure
 
 ```
-FileIt/
+AIsilo/
 ├── public/                  # Static assets
 │   ├── logo.png
 │   └── favicon.ico
@@ -594,7 +583,7 @@ const { data } = await pinata.gateways.public.get(cid);
 
 ## ✅ Security Standards & Compliance
 
-**Important Note**: FileIt is designed with security best practices in mind but is **not formally certified or audited**. The following describes alignment with industry standards:
+**Important Note**: AIsilo is designed with security best practices in mind but is **not formally certified or audited**. The following describes alignment with industry standards:
 
 ### NIST Cryptographic Standards (Algorithm Alignment)
 
@@ -611,7 +600,7 @@ const { data } = await pinata.gateways.public.get(cid);
 
 ### ISO 27001:2013 (Design Alignment)
 
-FileIt's architecture aligns with these ISO 27001 control objectives:
+AIsilo's architecture aligns with these ISO 27001 control objectives:
 
 - **A.9**: Access Control - Wallet-based authentication and smart contract permissions
 - **A.10**: Cryptography - Strong encryption with proper key management principles
@@ -628,16 +617,15 @@ FileIt's architecture aligns with these ISO 27001 control objectives:
 - **Privacy by Design**: Zero-knowledge architecture
 - **Data Minimization**: Only CID and metadata stored on-chain
 
-### What FileIt IS and IS NOT
+### What AIsilo IS and IS NOT
 
-**✅ FileIt IS:**
+**✅ AIsilo IS:**
 - Built with industry-standard cryptographic algorithms
 - Designed following security best practices
 - Suitable for business and personal sensitive data
 - Transparent about security implementation
 
-**❌ FileIt IS NOT:**
-- FIPS 140-2/3 validated
+**❌ AIsilo IS NOT:**
 - Formally audited by third-party security firms
 - ISO 27001 certified
 - Suitable for classified government data requiring formal certifications
@@ -672,7 +660,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **GitHub**: [https://github.com/jvcByte/FileIt](https://github.com/jvcByte/FileIt)
+- **GitHub**: [https://github.com/jvcByte/AIsilo](https://github.com/jvcByte/AIsilo)
 - **Hedera Network**: [https://hedera.com](https://hedera.com)
 - **HashScan Explorer**: [https://hashscan.io/testnet](https://hashscan.io/testnet)
 - **IPFS**: [https://ipfs.io](https://ipfs.io)
@@ -684,7 +672,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, issues, or feature requests:
 
-- Open an issue on [GitHub](https://github.com/jvcByte/FileIt/issues)
+- Open an issue on [GitHub](https://github.com/jvcByte/AIsilo/issues)
 - Contact: [Your contact information]
 
 ---
@@ -704,6 +692,6 @@ For questions, issues, or feature requests:
 
 **Built with ❤️ for a more secure, decentralized future**
 
-[⬆ Back to Top](#fileit---decentralized-encrypted-file-storage)
+[⬆ Back to Top](#aisilo---decentralized-encrypted-file-storage)
 
 </div>
