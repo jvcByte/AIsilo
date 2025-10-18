@@ -22,7 +22,7 @@ import { Route as AuthenticatedDownloadFileRouteImport } from './routes/_authent
 import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
-import { Route as MarketplaceIdBuyRouteImport } from './routes/marketplace/$id.buy'
+import { Route as MarketplaceBuyBuyRouteImport } from './routes/marketplace/$buy.buy'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -89,10 +89,10 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
   path: '/activities',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const MarketplaceIdBuyRoute = MarketplaceIdBuyRouteImport.update({
-  id: '/buy',
-  path: '/buy',
-  getParentRoute: () => MarketplaceIdRoute,
+const MarketplaceBuyBuyRoute = MarketplaceBuyBuyRouteImport.update({
+  id: '/marketplace/$buy/buy',
+  path: '/marketplace/$buy/buy',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -106,9 +106,9 @@ export interface FileRoutesByFullPath {
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
   '/upload-text': typeof AuthenticatedUploadTextRoute
-  '/marketplace/$id': typeof MarketplaceIdRouteWithChildren
+  '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace': typeof MarketplaceIndexRoute
-  '/marketplace/$id/buy': typeof MarketplaceIdBuyRoute
+  '/marketplace/$buy/buy': typeof MarketplaceBuyBuyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,9 +121,9 @@ export interface FileRoutesByTo {
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
   '/upload-text': typeof AuthenticatedUploadTextRoute
-  '/marketplace/$id': typeof MarketplaceIdRouteWithChildren
+  '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace': typeof MarketplaceIndexRoute
-  '/marketplace/$id/buy': typeof MarketplaceIdBuyRoute
+  '/marketplace/$buy/buy': typeof MarketplaceBuyBuyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -138,9 +138,9 @@ export interface FileRoutesById {
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
   '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
   '/_authenticated/upload-text': typeof AuthenticatedUploadTextRoute
-  '/marketplace/$id': typeof MarketplaceIdRouteWithChildren
+  '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/': typeof MarketplaceIndexRoute
-  '/marketplace/$id/buy': typeof MarketplaceIdBuyRoute
+  '/marketplace/$buy/buy': typeof MarketplaceBuyBuyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,7 +157,7 @@ export interface FileRouteTypes {
     | '/upload-text'
     | '/marketplace/$id'
     | '/marketplace'
-    | '/marketplace/$id/buy'
+    | '/marketplace/$buy/buy'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,7 +172,7 @@ export interface FileRouteTypes {
     | '/upload-text'
     | '/marketplace/$id'
     | '/marketplace'
-    | '/marketplace/$id/buy'
+    | '/marketplace/$buy/buy'
   id:
     | '__root__'
     | '/'
@@ -188,7 +188,7 @@ export interface FileRouteTypes {
     | '/_authenticated/upload-text'
     | '/marketplace/$id'
     | '/marketplace/'
-    | '/marketplace/$id/buy'
+    | '/marketplace/$buy/buy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -196,8 +196,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
-  MarketplaceIdRoute: typeof MarketplaceIdRouteWithChildren
+  MarketplaceIdRoute: typeof MarketplaceIdRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  MarketplaceBuyBuyRoute: typeof MarketplaceBuyBuyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -293,12 +294,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/marketplace/$id/buy': {
-      id: '/marketplace/$id/buy'
-      path: '/buy'
-      fullPath: '/marketplace/$id/buy'
-      preLoaderRoute: typeof MarketplaceIdBuyRouteImport
-      parentRoute: typeof MarketplaceIdRoute
+    '/marketplace/$buy/buy': {
+      id: '/marketplace/$buy/buy'
+      path: '/marketplace/$buy/buy'
+      fullPath: '/marketplace/$buy/buy'
+      preLoaderRoute: typeof MarketplaceBuyBuyRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -326,25 +327,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface MarketplaceIdRouteChildren {
-  MarketplaceIdBuyRoute: typeof MarketplaceIdBuyRoute
-}
-
-const MarketplaceIdRouteChildren: MarketplaceIdRouteChildren = {
-  MarketplaceIdBuyRoute: MarketplaceIdBuyRoute,
-}
-
-const MarketplaceIdRouteWithChildren = MarketplaceIdRoute._addFileChildren(
-  MarketplaceIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
-  MarketplaceIdRoute: MarketplaceIdRouteWithChildren,
+  MarketplaceIdRoute: MarketplaceIdRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
+  MarketplaceBuyBuyRoute: MarketplaceBuyBuyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
