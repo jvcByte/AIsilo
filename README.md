@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="public/logo.svg" alt="AIsilo Logo" width="200"/>
+<img src="public/full-logo.png" alt="AIsilo Logo" width="200"/>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Hedera](https://img.shields.io/badge/Hedera-Testnet-purple.svg)](https://hedera.com)

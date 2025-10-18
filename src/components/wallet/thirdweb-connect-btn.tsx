@@ -84,7 +84,7 @@ const SignInButton: React.FC<SignInButtonProps> = ({
       connectModal={{
         size: "wide",
         title: "Welcome",
-        titleIcon: "/logo.svg",
+        titleIcon: "/favicon/favicon.svg",
         showThirdwebBranding: false,
         termsOfServiceUrl,
         privacyPolicyUrl,

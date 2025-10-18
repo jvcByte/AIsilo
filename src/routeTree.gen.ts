@@ -9,11 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
+import { Route as MarketplaceIdRouteImport } from './routes/marketplace/$id'
 import { Route as AuthenticatedUploadTextRouteImport } from './routes/_authenticated/upload-text'
 import { Route as AuthenticatedUploadFileRouteImport } from './routes/_authenticated/upload-file'
 import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
@@ -21,12 +22,8 @@ import { Route as AuthenticatedDownloadFileRouteImport } from './routes/_authent
 import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
+import { Route as MarketplaceIdBuyRouteImport } from './routes/marketplace/$id.buy'
 
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -44,6 +41,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceIdRoute = MarketplaceIdRouteImport.update({
+  id: '/marketplace/$id',
+  path: '/marketplace/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedUploadTextRoute = AuthenticatedUploadTextRouteImport.update({
@@ -82,12 +89,16 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
   path: '/activities',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const MarketplaceIdBuyRoute = MarketplaceIdBuyRouteImport.update({
+  id: '/buy',
+  path: '/buy',
+  getParentRoute: () => MarketplaceIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
@@ -95,12 +106,14 @@ export interface FileRoutesByFullPath {
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
   '/upload-text': typeof AuthenticatedUploadTextRoute
+  '/marketplace/$id': typeof MarketplaceIdRouteWithChildren
+  '/marketplace': typeof MarketplaceIndexRoute
+  '/marketplace/$id/buy': typeof MarketplaceIdBuyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
@@ -108,6 +121,9 @@ export interface FileRoutesByTo {
   '/temp-route': typeof AuthenticatedTempRouteRoute
   '/upload-file': typeof AuthenticatedUploadFileRoute
   '/upload-text': typeof AuthenticatedUploadTextRoute
+  '/marketplace/$id': typeof MarketplaceIdRouteWithChildren
+  '/marketplace': typeof MarketplaceIndexRoute
+  '/marketplace/$id/buy': typeof MarketplaceIdBuyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,7 +131,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
@@ -123,6 +138,9 @@ export interface FileRoutesById {
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
   '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
   '/_authenticated/upload-text': typeof AuthenticatedUploadTextRoute
+  '/marketplace/$id': typeof MarketplaceIdRouteWithChildren
+  '/marketplace/': typeof MarketplaceIndexRoute
+  '/marketplace/$id/buy': typeof MarketplaceIdBuyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,7 +148,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/login'
-    | '/marketplace'
     | '/activities'
     | '/dashboard'
     | '/decrypt'
@@ -138,12 +155,14 @@ export interface FileRouteTypes {
     | '/temp-route'
     | '/upload-file'
     | '/upload-text'
+    | '/marketplace/$id'
+    | '/marketplace'
+    | '/marketplace/$id/buy'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/login'
-    | '/marketplace'
     | '/activities'
     | '/dashboard'
     | '/decrypt'
@@ -151,13 +170,15 @@ export interface FileRouteTypes {
     | '/temp-route'
     | '/upload-file'
     | '/upload-text'
+    | '/marketplace/$id'
+    | '/marketplace'
+    | '/marketplace/$id/buy'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/about'
     | '/login'
-    | '/marketplace'
     | '/_authenticated/activities'
     | '/_authenticated/dashboard'
     | '/_authenticated/decrypt'
@@ -165,6 +186,9 @@ export interface FileRouteTypes {
     | '/_authenticated/temp-route'
     | '/_authenticated/upload-file'
     | '/_authenticated/upload-text'
+    | '/marketplace/$id'
+    | '/marketplace/'
+    | '/marketplace/$id/buy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,18 +196,12 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
-  MarketplaceRoute: typeof MarketplaceRoute
+  MarketplaceIdRoute: typeof MarketplaceIdRouteWithChildren
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -210,6 +228,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/$id': {
+      id: '/marketplace/$id'
+      path: '/marketplace/$id'
+      fullPath: '/marketplace/$id'
+      preLoaderRoute: typeof MarketplaceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/upload-text': {
@@ -261,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/marketplace/$id/buy': {
+      id: '/marketplace/$id/buy'
+      path: '/buy'
+      fullPath: '/marketplace/$id/buy'
+      preLoaderRoute: typeof MarketplaceIdBuyRouteImport
+      parentRoute: typeof MarketplaceIdRoute
+    }
   }
 }
 
@@ -287,12 +326,25 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface MarketplaceIdRouteChildren {
+  MarketplaceIdBuyRoute: typeof MarketplaceIdBuyRoute
+}
+
+const MarketplaceIdRouteChildren: MarketplaceIdRouteChildren = {
+  MarketplaceIdBuyRoute: MarketplaceIdBuyRoute,
+}
+
+const MarketplaceIdRouteWithChildren = MarketplaceIdRoute._addFileChildren(
+  MarketplaceIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
-  MarketplaceRoute: MarketplaceRoute,
+  MarketplaceIdRoute: MarketplaceIdRouteWithChildren,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -8,6 +8,7 @@ import { Link } from "@tanstack/react-router";
 import { PlusCircleIcon } from "lucide-react";
 import { MOCK_LISTINGS } from "@/data/marketplace-data";
 import type { Listing, ListingType } from "@/data/types";
+import type { FileRouteTypes } from "@/routeTree.gen";
 
 /**
  * Marketplace route
@@ -22,7 +23,7 @@ import type { Listing, ListingType } from "@/data/types";
  * API-driven content.
  */
 
-export const Route = createFileRoute("/marketplace")({
+export const Route = createFileRoute("/marketplace/")({
   component: Marketplace,
 });
 
@@ -69,10 +70,21 @@ function ListingCard({ item }: { item: Listing }) {
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline" className="px-3 py-1">
-            <Link to={`/marketplace/${item.id}`}>Details</Link>
+            {/* Cast through unknown to the router-generated `to` union type so ESLint doesn't require `any` */}
+            <Link
+              to={`/marketplace/${item.id}` as unknown as FileRouteTypes["to"]}
+            >
+              Details
+            </Link>
           </Button>
           <Button asChild className="px-3 py-1">
-            <Link to={`/marketplace/${item.id}/buy`}>Buy / License</Link>
+            <Link
+              to={
+                `/marketplace/${item.id}/buy` as unknown as FileRouteTypes["to"]
+              }
+            >
+              Buy / License
+            </Link>
           </Button>
         </div>
       </div>

@@ -22,7 +22,11 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="bg-gradient-to-tl from-muted to-background">
         <div className="flex items-center justify-center gap-2 p-1">
-          <img src="/jvcLogo.svg" alt="Logo" className="h-8 w-8" />
+          <img
+            src="/favicon/web-app-manifest-512x512.png"
+            alt="Logo"
+            className="h-8 w-8 rounded-md dark:invert"
+          />
           <p className=" truncate text-center text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} jvcByte
           </p>

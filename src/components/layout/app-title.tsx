@@ -17,7 +17,13 @@ export function AppTitle() {
           asChild
         >
           <div className="gap-2 md:gap-6">
-            <img src="/logo.svg" alt="Logo" width={32} height={32} />
+            <img
+              src="/logo.png"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="dark:invert"
+            />
             <Link
               to="/"
               onClick={() => setOpenMobile(false)}

@@ -45,8 +45,12 @@ export const Header = () => {
                   className="text-2xl font-bold md:text-3xl flex"
                   style={{ fontFamily: "Georgia, serif" }}
                 >
-                  <img src="/logo.svg" alt="Logo" className="w-8 h-8 rounded" />
-                  <span className="">silo</span>
+                  <img
+                    src="/logo.png"
+                    alt="Logo"
+                    className="w-8 h-8 rounded dark:invert dark:filter"
+                  />
+                  <span className="">AIsilo</span>
                 </span>
               </Link>
 
