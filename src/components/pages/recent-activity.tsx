@@ -1,11 +1,11 @@
 import {
-  useDocuments,
+  useModels,
   getEventStyle,
-  type DocumentRegistryEventData,
-  type DocumentUploadedEventData,
+  type ModelRegistryEventData,
+  type ModelUploadedEventData,
   type RoleGrantedEventData,
   type RoleRevokedEventData,
-} from "@/hooks/use-documents";
+} from "@/hooks/use-models";
 import { formatRelativeTime, truncateAddress } from "@/lib/utils";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { useReadContract } from "wagmi";
@@ -61,7 +61,7 @@ export function RecentActivity({
   limit = 10,
   heightClass,
 }: RecentActivityProps) {
-  const { events, isLoading, error } = useDocuments();
+  const { events, isLoading, error } = useModels();
   const activeAccount = useActiveAccount();
   const activeWallet = useActiveWallet();
   const address = activeAccount?.address;
@@ -69,7 +69,7 @@ export function RecentActivity({
 
   // Read role constants from contract
   const { data: userRole } = useReadContract({
-    ...contracts.DocumentRegistry,
+    ...contracts.ModelRegistry,
     functionName: "USER_ROLE",
     query: {
       enabled: true,
@@ -77,7 +77,7 @@ export function RecentActivity({
   });
 
   const { data: defaultAdminRole } = useReadContract({
-    ...contracts.DocumentRegistry,
+    ...contracts.ModelRegistry,
     functionName: "DEFAULT_ADMIN_ROLE",
     query: {
       enabled: true,
@@ -106,7 +106,7 @@ export function RecentActivity({
   const filteredEvents = useMemo(() => {
     if (!Array.isArray(events)) return [];
 
-    return events.filter((event: DocumentRegistryEventData) => {
+    return events.filter((event: ModelRegistryEventData) => {
       // Event type filter
       if (eventTypeFilter !== "all" && event.eventName !== eventTypeFilter) {
         return false;
@@ -124,11 +124,11 @@ export function RecentActivity({
       ];
 
       // Add event-specific fields
-      if (event.eventName === "DocumentUploaded") {
+      if (event.eventName === "ModelUploaded") {
         searchableFields.push(
-          (event as DocumentUploadedEventData).cid,
-          (event as DocumentUploadedEventData).user,
-          (event as DocumentUploadedEventData).documentId,
+          (event as ModelUploadedEventData).cid,
+          (event as ModelUploadedEventData).user,
+          (event as ModelUploadedEventData).modelId,
         );
       } else if (event.eventName === "RoleGranted") {
         searchableFields.push(
@@ -314,9 +314,7 @@ export function RecentActivity({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Events</SelectItem>
-                <SelectItem value="DocumentUploaded">
-                  Document Uploaded
-                </SelectItem>
+                <SelectItem value="ModelUploaded">Model Uploaded</SelectItem>
                 <SelectItem value="RoleGranted">Role Granted</SelectItem>
                 <SelectItem value="RoleRevoked">Role Revoked</SelectItem>
               </SelectContent>
@@ -424,7 +422,7 @@ export function RecentActivity({
                         <div className="flex-shrink-0">
                           <div
                             className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gradient-to-br ${
-                              event.eventName === "DocumentUploaded"
+                              event.eventName === "ModelUploaded"
                                 ? "from-blue-100 to-blue-200 text-blue-600"
                                 : event.eventName === "RoleGranted"
                                   ? "from-green-100 to-green-200 text-green-600"
@@ -440,8 +438,8 @@ export function RecentActivity({
                           {/* Main Description */}
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
                             <h4 className={`font-semibold text-sm ${color}`}>
-                              {event.eventName === "DocumentUploaded" &&
-                                "Document Uploaded"}
+                              {event.eventName === "ModelUploaded" &&
+                                "Model Uploaded"}
                               {event.eventName === "RoleGranted" &&
                                 "Role Granted"}
                               {event.eventName === "RoleRevoked" &&
@@ -454,19 +452,18 @@ export function RecentActivity({
 
                           {/* Event Details - Stack on mobile */}
                           <div className="space-y-2">
-                            {event.eventName === "DocumentUploaded" && (
+                            {event.eventName === "ModelUploaded" && (
                               <div className="flex flex-col sm:grid sm:grid-cols-2 gap-2 text-sm">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground font-medium text-xs sm:text-sm">
                                     IPFS CID:
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">
-                                    {(event as DocumentUploadedEventData).cid
+                                    {(event as ModelUploadedEventData).cid
                                       .length >
                                     (window.innerWidth < 640 ? 15 : 20)
-                                      ? `${(event as DocumentUploadedEventData).cid.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
-                                      : (event as DocumentUploadedEventData)
-                                          .cid}
+                                      ? `${(event as ModelUploadedEventData).cid.slice(0, window.innerWidth < 640 ? 15 : 20)}...`
+                                      : (event as ModelUploadedEventData).cid}
                                   </code>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -475,7 +472,7 @@ export function RecentActivity({
                                   </span>
                                   <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
                                     {truncateAddress(
-                                      (event as DocumentUploadedEventData).user,
+                                      (event as ModelUploadedEventData).user,
                                       window.innerWidth < 640 ? 4 : 6,
                                     )}
                                   </code>

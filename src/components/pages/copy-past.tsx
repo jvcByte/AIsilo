@@ -1,42 +1,46 @@
-// src/components/UploadFile.tsx
+// src/components/TextUpload.tsx
 import { useState } from "react";
 import { type Address } from "viem";
 import { useActiveAccount } from "thirdweb/react";
-// import { useSignMessage } from "wagmi";
 import { signMessage } from "thirdweb/utils";
-import { useDocuments } from "../hooks/use-documents";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Upload, FileText, Lock, PenTool, CheckCircle2 } from "lucide-react";
-import { encryptFile } from "../lib/encryption";
+import { useModels } from "@/hooks/use-models";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Upload,
+  FileText,
+  Lock,
+  PenTool,
+  CheckCircle2,
+  Type,
+} from "lucide-react";
+import { encryptText } from "@/lib/encryption";
 import { pinata } from "@/lib/ipfs";
 import { toast } from "react-hot-toast";
 
-type UploadStep = "file" | "sign" | "upload" | "complete";
+type UploadStep = "input" | "sign" | "upload" | "complete";
 
 interface UploadState {
   step: UploadStep;
-  file: File | null;
+  text: string;
   signature: Address | null;
   cid: string | null;
   iv: string | null;
 }
 
-export function UploadFile() {
+export function CopyPaste() {
   const activeAccount = useActiveAccount();
-  // const { signMessageAsync } = useSignMessage();
-  const { uploadDocument, isLoading: isContractLoading } = useDocuments();
+  const { uploadModel, isLoading: isContractLoading } = useModels();
 
   const address = activeAccount?.address;
   const isConnected = !!activeAccount?.address;
 
   const [state, setState] = useState<UploadState>({
-    step: "file",
-    file: null,
+    step: "input",
+    text: "",
     signature: null,
     cid: null,
     iv: null,
@@ -47,24 +51,22 @@ export function UploadFile() {
   // Reset function
   const resetUpload = () => {
     setState({
-      step: "file",
-      file: null,
+      step: "input",
+      text: "",
       signature: null,
       cid: null,
       iv: null,
     });
   };
 
-  // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
+  // Handle text input change
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
 
-    if (!selectedFile) return;
-
-    // Validate file size (max 100MB)
-    const maxSize = 100 * 1024 * 1024;
-    if (selectedFile.size > maxSize) {
-      toast.error("File size must be less than 100MB", {
+    // Validate text length (max 10MB equivalent)
+    const maxLength = 10 * 1024 * 1024; // 10MB in characters (rough estimate)
+    if (text.length > maxLength) {
+      toast.error("Text is too long. Maximum size is approximately 10MB.", {
         className: "toast-error",
       });
       return;
@@ -72,8 +74,8 @@ export function UploadFile() {
 
     setState((prev) => ({
       ...prev,
-      file: selectedFile,
-      step: "sign",
+      text,
+      step: text.trim() ? "sign" : "input",
     }));
   };
 
@@ -92,11 +94,8 @@ export function UploadFile() {
     });
 
     try {
-      // const signature = await signMessageAsync({
-      //   message: "Encrypt My File",
-      // });
       const signature = await signMessage({
-        message: "Encrypt My File",
+        message: "Encrypt My Text",
         account: activeAccount,
       });
 
@@ -120,30 +119,31 @@ export function UploadFile() {
     }
   };
 
-  // Handle file upload to IPFS
+  // Handle text upload to IPFS
   const handleUpload = async () => {
-    if (!state.file || !state.signature || !address) {
-      toast.error("Missing required data for upload", {
+    if (!state.text.trim() || !state.signature || !address) {
+      toast.error("Please enter some text to upload", {
         className: "toast-error",
       });
       return;
     }
 
     setIsProcessing(true);
-    const uploadToast = toast.loading("Encrypting file...", {
+    const uploadToast = toast.loading("Encrypting text...", {
       className: "toast-loading",
     });
 
     try {
-      // Step 1: Encrypt file
-      toast.loading("Encrypting file...", {
+      // Step 1: Encrypt text
+      toast.loading("Encrypting text...", {
         id: uploadToast,
         className: "toast-loading",
       });
-      const { encrypted, iv } = await encryptFile(state.file, state.signature);
+      const { encrypted, iv } = await encryptText(state.text, state.signature);
 
-      const encryptedFile = new File([encrypted], state.file.name, {
-        type: state.file.type,
+      // Convert encrypted data to file for IPFS upload
+      const encryptedFile = new File([encrypted], "encrypted-text.txt", {
+        type: "text/plain",
       });
 
       // Step 2: Get presigned URL
@@ -213,7 +213,7 @@ export function UploadFile() {
         step: "complete",
       }));
 
-      toast.success("File uploaded to IPFS successfully!", {
+      toast.success("Text uploaded to IPFS successfully!", {
         id: uploadToast,
         className: "toast-success",
       });
@@ -233,8 +233,8 @@ export function UploadFile() {
   };
 
   // Handle smart contract write
-  const handleContractWrite = async (docId: string, cid: string) => {
-    if (!uploadDocument) {
+  const handleContractWrite = async (modelId: string, cid: string) => {
+    if (!uploadModel) {
       toast.error("Contract write function not available", {
         className: "toast-error",
       });
@@ -246,12 +246,12 @@ export function UploadFile() {
     });
 
     try {
-      await uploadDocument({
-        docId: docId,
+      await uploadModel({
+        modelId: modelId,
         cId: cid,
       });
 
-      toast.success("Document registered on blockchain!", {
+      toast.success("Text registered on blockchain!", {
         id: contractToast,
         className: "toast-success",
       });
@@ -274,7 +274,7 @@ export function UploadFile() {
             <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-xl font-semibold mb-2">Wallet Not Connected</h2>
             <p className="text-muted-foreground">
-              Please connect your wallet to upload files securely.
+              Please connect your wallet to upload text securely.
             </p>
           </CardContent>
         </Card>
@@ -287,42 +287,44 @@ export function UploadFile() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center gap-2 mb-6">
-        <Upload className="w-6 h-6" />
-        <h1 className="text-2xl font-bold text-foreground">Upload Document</h1>
+        <Type className="w-6 h-6" />
+        <h1 className="text-2xl font-bold text-foreground">Upload Text</h1>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* File Selection Card */}
+        {/* Text Input Card */}
         <Card className="bg-gradient-to-br from-muted to-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              File Selection
+              Text Input
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="file" className="text-foreground">
-                  Select File
+                <Label htmlFor="text" className="text-foreground">
+                  Enter your text
                 </Label>
-                <Input
-                  id="file"
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full mt-2"
-                  disabled={state.step !== "file" || isLoading}
+                <textarea
+                  id="text"
+                  value={state.text}
+                  onChange={handleTextChange}
+                  placeholder="Type your text here..."
+                  className="w-full mt-2 p-3 border rounded-md min-h-[200px] font-mono text-sm"
+                  disabled={isLoading}
                 />
-                {state.file && (
+                {state.text && (
                   <div className="mt-2 p-3 bg-muted rounded-lg">
                     <div className="flex items-center gap-2 flex-wrap">
                       <FileText className="w-4 h-4" />
-                      <span className="font-medium">{state.file.name}</span>
-                      <Badge variant="outline">
-                        {state.file.type || "unknown"}
+                      <span className="font-medium">Text content</span>
+                      <Badge variant="outline">text/plain</Badge>
+                      <Badge variant="secondary">
+                        {state.text.length} characters
                       </Badge>
                       <Badge variant="secondary">
-                        {(state.file.size / 1024 / 1024).toFixed(2)} MB
+                        {(new Blob([state.text]).size / 1024).toFixed(2)} KB
                       </Badge>
                     </div>
                   </div>
@@ -333,7 +335,7 @@ export function UploadFile() {
         </Card>
 
         {/* Signature Card */}
-        {state.step === "sign" && state.file && (
+        {state.step === "sign" && state.text.trim() && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -346,13 +348,13 @@ export function UploadFile() {
                 <Alert>
                   <Lock className="h-4 w-4" />
                   <AlertDescription>
-                    To encrypt your file securely, please sign this message with
+                    To encrypt your text securely, please sign this message with
                     your wallet. Your signature will be used to generate a
                     unique encryption key.
                   </AlertDescription>
                 </Alert>
                 <div className="p-3 bg-muted rounded-lg">
-                  <code className="text-sm font-mono">"Encrypt My File"</code>
+                  <code className="text-sm font-mono">"Encrypt My Text"</code>
                 </div>
                 <Button
                   onClick={handleSignMessage}
@@ -389,7 +391,7 @@ export function UploadFile() {
               <Alert>
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertDescription>
-                  Your file is ready to be encrypted and uploaded to IPFS.
+                  Your text is ready to be encrypted and uploaded to IPFS.
                 </AlertDescription>
               </Alert>
               <Button
@@ -426,7 +428,7 @@ export function UploadFile() {
               <Alert className="border-green-500">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertDescription>
-                  Your file has been successfully encrypted, uploaded to IPFS,
+                  Your text has been successfully encrypted, uploaded to IPFS,
                   and registered on the blockchain.
                 </AlertDescription>
               </Alert>
@@ -441,7 +443,7 @@ export function UploadFile() {
                 variant="outline"
                 className="w-full"
               >
-                Upload Another File
+                Upload Another Text
               </Button>
             </CardContent>
           </Card>

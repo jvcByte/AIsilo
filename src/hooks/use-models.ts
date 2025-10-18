@@ -6,21 +6,21 @@ import { publicClient } from "@/lib/viem";
 import contracts from "@/contracts/contracts";
 import { toast } from "react-hot-toast";
 import type { Address } from "viem";
-import { DOCUMENT_REGISTRY_EVENTS } from "@/contracts/events";
+import { MODEL_REGISTRY_EVENTS } from "@/contracts/events";
 import { CHAIN_IDS } from "@/lib/chain-utils";
 import { prepareContractCall } from "thirdweb";
 import { defineChain } from "thirdweb/chains";
 import { thirdwebClient } from "@/lib/thirdweb/thirdweb-client";
 
-export interface ContractDocument {
-  documentId: string;
+export interface ContractModel {
+  modelId: string;
   cId: string;
   uploader: `0x${string}`;
   uploadTime: bigint;
   archived: boolean;
 }
 
-export interface DocumentUploadedLog {
+export interface ModelUploadedLog {
   user?: `0x${string}`;
   docID?: string;
   cid?: string;
@@ -38,8 +38,8 @@ export interface RoleRevokedLog {
   sender?: `0x${string}`;
 }
 
-export interface DocumentAccess {
-  documentId: string;
+export interface ModelAccess {
+  modelId: string;
   userAddress: string;
   accessLevel: "read" | "write" | "emergency";
   grantedBy: string;
@@ -47,21 +47,12 @@ export interface DocumentAccess {
   expiresAt?: number;
 }
 
-export interface EmergencyAccess {
-  documentId: string;
-  emergencyCode: string;
-  qrCode: string;
-  expirationTime: number;
-  createdBy: string;
-  createdAt: number;
-}
-
-export interface UploadDocumentParams {
-  docId: string;
+export interface UploadModelParams {
+  modelId: string;
   cId: string;
 }
 
-export interface DocumentRegistryEventBase {
+export interface ModelRegistryEventBase {
   eventName: string;
   blockNumber: bigint;
   transactionHash: `0x${string}`;
@@ -69,40 +60,40 @@ export interface DocumentRegistryEventBase {
   timestamp: bigint;
 }
 
-export interface DocumentUploadedEventData extends DocumentRegistryEventBase {
-  eventName: "DocumentUploaded";
+export interface ModelUploadedEventData extends ModelRegistryEventBase {
+  eventName: "ModelUploaded";
   user: `0x${string}`;
-  documentId: string;
+  modelId: string;
   cid: string;
 }
 
-export interface RoleGrantedEventData extends DocumentRegistryEventBase {
+export interface RoleGrantedEventData extends ModelRegistryEventBase {
   eventName: "RoleGranted";
   role: `0x${string}`;
   account: `0x${string}`;
   sender: `0x${string}`;
 }
 
-export interface RoleRevokedEventData extends DocumentRegistryEventBase {
+export interface RoleRevokedEventData extends ModelRegistryEventBase {
   eventName: "RoleRevoked";
   role: `0x${string}`;
   account: `0x${string}`;
   sender: `0x${string}`;
 }
 
-export type DocumentRegistryEventData =
-  | DocumentUploadedEventData
+export type ModelRegistryEventData =
+  | ModelUploadedEventData
   | RoleGrantedEventData
   | RoleRevokedEventData;
 
-// Custom Document interface for our application data
-export interface Document {
+// Custom Model interface for our application data
+export interface Model {
   id: string;
   fileName: string;
   fileType: string;
   fileSize: number;
   cid: string;
-  documentId: string;
+  modelId: string;
   uploader: string;
   uploadTime: number;
   archived: boolean;
@@ -110,19 +101,19 @@ export interface Document {
 }
 
 /**
- * Hook for managing documents and contract events with NIST/ISO compliant security
+ * Hook for managing models and contract events with NIST/ISO compliant security
  */
-export function useDocuments() {
+export function useModels() {
   const activeAccount = useActiveAccount();
   const { mutate: sendTransaction } = useSendTransaction();
   const address = activeAccount?.address;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get document count for the current address
-  const { data: documentCount } = useReadContract({
-    ...contracts.DocumentRegistry,
-    functionName: "_docCountPerAddr",
+  // Get model count for the current address
+  const { data: modelCountPerAddress } = useReadContract({
+    ...contracts.ModelRegistry,
+    functionName: "_modelCountPerAddr",
     chainId: CHAIN_IDS.HEDERATESTNET,
     args: address ? [address as Address] : undefined,
     query: {
@@ -130,24 +121,24 @@ export function useDocuments() {
     },
   });
 
-  // If document count is 0, user has no documents - skip the documents query
+  // If model count is 0, user has no models - skip the models query
 
-  // Get documents belonging to the current user (only if they have documents)
+  // Get models belonging to the current user (only if they have models)
   const {
-    data: getDocumentsByOwner,
-    isLoading: isLoadingUserDocuments,
-    // isError: isDocumentsError,
-    error: documentsError,
+    data: getModelsByOwner,
+    isLoading: isLoadingUserModels,
+    // isError: isModelsError,
+    error: modelsError,
   } = useReadContract({
-    ...contracts.DocumentRegistry,
-    functionName: "getDocumentsByOwner",
+    ...contracts.ModelRegistry,
+    functionName: "getModelsByOwner",
     chainId: CHAIN_IDS.HEDERATESTNET,
     args: address ? [address as Address] : undefined,
     query: {
       enabled:
         !!address &&
-        documentCount !== undefined &&
-        (documentCount as bigint) > 0n, // Only if has documents
+        modelCountPerAddress !== undefined &&
+        (modelCountPerAddress as bigint) > 0n, // Only if has models
       refetchInterval: 10000,
       staleTime: 5000,
     },
@@ -160,11 +151,11 @@ export function useDocuments() {
     error: eventsError,
   } = useQuery({
     queryKey: [
-      "document-registry-events",
-      contracts.DocumentRegistry.address,
+      "model-registry-events",
+      contracts.ModelRegistry.address,
       address,
     ],
-    queryFn: async (): Promise<DocumentRegistryEventData[]> => {
+    queryFn: async (): Promise<ModelRegistryEventData[]> => {
       if (!publicClient || !address) return [];
 
       try {
@@ -181,32 +172,32 @@ export function useDocuments() {
 
         // Fetch all event types in parallel
         const [
-          documentUploadedLogs,
+          ModelUploadedLogs,
           roleGrantedLogs,
           roleRevokedLogs,
           roleAdminChangedLogs,
         ] = await Promise.all([
           publicClient.getLogs({
-            address: contracts.DocumentRegistry.address,
-            event: DOCUMENT_REGISTRY_EVENTS.DocumentUploaded,
+            address: contracts.ModelRegistry.address,
+            event: MODEL_REGISTRY_EVENTS.ModelUploaded,
             fromBlock: fromBlock,
             toBlock: "latest",
           }),
           publicClient.getLogs({
-            address: contracts.DocumentRegistry.address,
-            event: DOCUMENT_REGISTRY_EVENTS.RoleGranted,
+            address: contracts.ModelRegistry.address,
+            event: MODEL_REGISTRY_EVENTS.RoleGranted,
             fromBlock: fromBlock,
             toBlock: "latest",
           }),
           publicClient.getLogs({
-            address: contracts.DocumentRegistry.address,
-            event: DOCUMENT_REGISTRY_EVENTS.RoleRevoked,
+            address: contracts.ModelRegistry.address,
+            event: MODEL_REGISTRY_EVENTS.RoleRevoked,
             fromBlock: fromBlock,
             toBlock: "latest",
           }),
           publicClient.getLogs({
-            address: contracts.DocumentRegistry.address,
-            event: DOCUMENT_REGISTRY_EVENTS.RoleAdminChanged,
+            address: contracts.ModelRegistry.address,
+            event: MODEL_REGISTRY_EVENTS.RoleAdminChanged,
             fromBlock: fromBlock,
             toBlock: "latest",
           }),
@@ -214,7 +205,7 @@ export function useDocuments() {
 
         // Get unique block numbers for batch fetching timestamps
         const allLogs = [
-          ...documentUploadedLogs,
+          ...ModelUploadedLogs,
           ...roleGrantedLogs,
           ...roleRevokedLogs,
           ...roleAdminChangedLogs,
@@ -237,18 +228,18 @@ export function useDocuments() {
         });
 
         // Transform and combine all events with timestamps
-        const allEvents: DocumentRegistryEventData[] = [
-          // Document Uploaded Events
-          ...documentUploadedLogs.map(
-            (log): DocumentUploadedEventData => ({
-              eventName: "DocumentUploaded",
+        const allEvents: ModelRegistryEventData[] = [
+          // Model Uploaded Events
+          ...ModelUploadedLogs.map(
+            (log): ModelUploadedEventData => ({
+              eventName: "ModelUploaded",
               blockNumber: log.blockNumber,
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,
               timestamp: blockTimestamps.get(log.blockNumber) || 0n,
-              user: (log.args as DocumentUploadedLog).user || "0x",
-              documentId: (log.args as DocumentUploadedLog).docID || "",
-              cid: (log.args as DocumentUploadedLog).cid || "",
+              user: (log.args as ModelUploadedLog).user || "0x",
+              modelId: (log.args as ModelUploadedLog).docID || "",
+              cid: (log.args as ModelUploadedLog).cid || "",
             }),
           ),
 
@@ -292,7 +283,7 @@ export function useDocuments() {
           })
           .slice(0, 100); // Limit to 100 most recent events
       } catch (error) {
-        console.error("Failed to fetch Document Registry events:", error);
+        console.error("Failed to fetch Model Registry events:", error);
         return [];
       }
     },
@@ -301,7 +292,7 @@ export function useDocuments() {
     refetchInterval: 20000, // Refetch every 20 seconds
   });
 
-  // Fetch IPFS metadata for a document (memoized for performance)
+  // Fetch IPFS metadata for a model (memoized for performance)
   const fetchIPFSMetadata = useCallback(
     async (cid: string): Promise<string> => {
       try {
@@ -319,83 +310,79 @@ export function useDocuments() {
           console.warn(
             `Failed to fetch IPFS metadata for CID ${cid}: ${response.status}`,
           );
-          return `Document`; // Fallback name
+          return `Model`; // Fallback name
         }
 
         const result = await response.json();
 
         if (!result.data?.files || result.data.files.length === 0) {
           console.log("No files found in IPFS metadata for CID", cid);
-          return `Document`; // Fallback name
+          return `Model`; // Fallback name
         }
 
-        return result.data.files[0].name || `Document`;
+        return result.data.files[0].name || `Model`;
       } catch (error) {
         console.error(`Error fetching IPFS metadata for CID ${cid}:`, error);
-        return `Document`; // Fallback name
+        return `Model`; // Fallback name
       }
     },
     [],
   );
 
-  // Handle documents based on count - moved after queries are defined
-  const processedDocuments = useMemo(() => {
-    const count = documentCount as bigint | undefined;
-    if (count === 0n || count === undefined) return []; // No documents or still loading
-    // If count > 0, return the actual documents (could be undefined if still loading)
-    return getDocumentsByOwner;
-  }, [documentCount, getDocumentsByOwner]);
+  // Handle models based on count - moved after queries are defined
+  const processedModels = useMemo(() => {
+    const count = modelCountPerAddress as bigint | undefined;
+    if (count === 0n || count === undefined) return []; // No models or still loading
+    // If count > 0, return the actual models (could be undefined if still loading)
+    return getModelsByOwner;
+  }, [modelCountPerAddress, getModelsByOwner]);
 
   // Add debug logs
   // console.log("Address:", address);
-  // console.log("Document count:", documentCount);
-  // console.log("Raw getDocumentsByOwner:", getDocumentsByOwner);
-  // console.log("Processed documents:", processedDocuments);
-  // console.log("isLoadingUserDocuments:", isLoadingUserDocuments);
-  // console.log("isDocumentsError:", isDocumentsError);
-  // console.log("documentsError:", documentsError);
+  // console.log("Model count:", modelCount);
+  // console.log("Raw getModelsByOwner:", getModelsByOwner);
+  // console.log("Processed models:", processedModels);
+  // console.log("isLoadingUserModels:", isLoadingUserModels);
+  // console.log("isModelsError:", isModelsError);
+  // console.log("modelsError:", modelsError);
 
-  // Transform user documents to our Document interface with real filenames from IPFS
-  const documents: Document[] = useMemo(() => {
-    if (!processedDocuments || !Array.isArray(processedDocuments)) {
-      console.log("No documents or not an array:", processedDocuments);
+  // Transform user models to our Model interface with real filenames from IPFS
+  const models: Model[] = useMemo(() => {
+    if (!processedModels || !Array.isArray(processedModels)) {
+      console.log("No models or not an array:", processedModels);
       return [];
     }
 
-    console.log("Processing documents:", processedDocuments.length);
+    console.log("Processing models:", processedModels.length);
 
-    return processedDocuments.map((doc: ContractDocument, index: number) => ({
+    return processedModels.map((model: ContractModel, index: number) => ({
       id: `doc-${index}`,
-      fileName: `Document ${index + 1}`, // This will be updated with real name from IPFS
+      fileName: `Model ${index + 1}`, // This will be updated with real name from IPFS
       fileType: "unknown",
       fileSize: 0,
-      cid: doc.cId,
-      documentId: doc.documentId,
-      uploader: doc.uploader,
-      uploadTime: Number(doc.uploadTime),
-      archived: doc.archived,
+      cid: model.cId,
+      modelId: model.modelId,
+      uploader: model.uploader,
+      uploadTime: Number(model.uploadTime),
+      archived: model.archived,
       accessLevel: "private" as const,
     }));
-  }, [processedDocuments]);
+  }, [processedModels]);
 
-  // Update data validation to focus on user documents
-  const hasUserData = processedDocuments !== undefined;
+  // Update data validation to focus on user models
+  const hasUserData = processedModels !== undefined;
 
   // Fetch real filenames from IPFS metadata
-  const [documentNames, setDocumentNames] = useState<Map<string, string>>(
-    new Map(),
-  );
+  const [modelNames, setModelNames] = useState<Map<string, string>>(new Map());
 
   useMemo(() => {
-    if (!processedDocuments || !Array.isArray(processedDocuments)) return;
+    if (!processedModels || !Array.isArray(processedModels)) return;
 
     const fetchAllNames = async () => {
-      const namePromises = processedDocuments.map(
-        async (doc: ContractDocument) => {
-          const name = await fetchIPFSMetadata(doc.cId);
-          return { cid: doc.cId, name };
-        },
-      );
+      const namePromises = processedModels.map(async (model: ContractModel) => {
+        const name = await fetchIPFSMetadata(model.cId);
+        return { cid: model.cId, name };
+      });
 
       try {
         const results = await Promise.allSettled(namePromises);
@@ -403,36 +390,36 @@ export function useDocuments() {
 
         results.forEach((result, index) => {
           if (result.status === "fulfilled") {
-            nameMap.set(processedDocuments[index].cId, result.value.name);
+            nameMap.set(processedModels[index].cId, result.value.name);
           } else {
-            nameMap.set(processedDocuments[index].cId, `Document ${index + 1}`);
+            nameMap.set(processedModels[index].cId, `Model ${index + 1}`);
           }
         });
 
-        setDocumentNames(nameMap);
+        setModelNames(nameMap);
       } catch (error) {
-        console.error("Error fetching document names:", error);
+        console.error("Error fetching model names:", error);
       }
     };
 
     fetchAllNames();
-  }, [processedDocuments, fetchIPFSMetadata]);
+  }, [processedModels, fetchIPFSMetadata]);
 
-  // Final documents with real names from IPFS
-  const finalDocuments: Document[] = useMemo(() => {
-    if (!documents.length) return [];
+  // Final models with real names from IPFS
+  const finalModels: Model[] = useMemo(() => {
+    if (!models.length) return [];
 
-    return documents.map((doc) => ({
+    return models.map((doc) => ({
       ...doc,
-      fileName: documentNames.get(doc.cid) || doc.fileName,
+      fileName: modelNames.get(doc.cid) || doc.fileName,
     }));
-  }, [documents, documentNames]);
+  }, [models, modelNames]);
 
   /**
-   * Upload a document with encryption and IPFS storage
+   * Upload a model with encryption and IPFS storage
    */
-  const uploadDocument = useCallback(
-    async (params: UploadDocumentParams) => {
+  const uploadModel = useCallback(
+    async (params: UploadModelParams) => {
       if (!activeAccount) {
         toast.error("Please connect your wallet first", {
           className: "toast-error",
@@ -444,10 +431,10 @@ export function useDocuments() {
       setError(null);
 
       try {
-        const { docId, cId } = params;
+        const { modelId, cId } = params;
 
         console.log(
-          "============================================\n useDocuments uploading at chainId: ",
+          "============================================\n useModels uploading at chainId: ",
           CHAIN_IDS.HEDERATESTNET,
           "\n============================================",
         );
@@ -458,20 +445,20 @@ export function useDocuments() {
         // Prepare the contract call using thirdweb
         const transaction = prepareContractCall({
           contract: {
-            address: contracts.DocumentRegistry.address,
-            abi: contracts.DocumentRegistry.abi,
+            address: contracts.ModelRegistry.address,
+            abi: contracts.ModelRegistry.abi,
             chain: hederaTestnet,
             client: thirdwebClient,
           },
-          method: "uploadDocument",
-          params: [docId, cId],
+          method: "uploadModel",
+          params: [modelId, cId],
         });
 
         // Send transaction using thirdweb
         sendTransaction(transaction, {
           onSuccess: (result) => {
             console.log("Transaction successful:", result);
-            toast.success("Document registered on blockchain!", {
+            toast.success("Model registered on blockchain!", {
               className: "toast-success",
             });
           },
@@ -484,7 +471,7 @@ export function useDocuments() {
         });
 
         console.log(
-          "============================================\n useDocuments Upload Document Function Called ",
+          "============================================\n useModels Upload Model Function Called ",
           "\n============================================",
         );
       } catch (error) {
@@ -504,27 +491,27 @@ export function useDocuments() {
 
   return {
     // State
-    documents: finalDocuments,
+    models: finalModels,
     events,
-    documentCount: documentCount || 0,
-    isLoading: isLoading || isLoadingUserDocuments || isLoadingEvents,
+    modelCountPerAddress,
+    isLoading: isLoading || isLoadingUserModels || isLoadingEvents,
     error:
       error ||
       (eventsError ? String(eventsError) : null) ||
-      (documentsError ? String(documentsError) : null),
-    getDocumentsByOwner,
+      (modelsError ? String(modelsError) : null),
+    getModelsByOwner,
     hasContractData: hasUserData,
 
     // Actions
-    uploadDocument,
+    uploadModel,
   };
 }
 
 // Helper function to get human-readable event descriptions
-export function getEventDescription(event: DocumentRegistryEventData): string {
+export function getEventDescription(event: ModelRegistryEventData): string {
   switch (event.eventName) {
-    case "DocumentUploaded":
-      return `Document uploaded: ${event.cid.substring(0, 10)}...`;
+    case "ModelUploaded":
+      return `Model uploaded: ${event.cid.substring(0, 10)}...`;
     case "RoleGranted":
       return `Role granted to ${event.account.substring(0, 6)}...${event.account.substring(38)}`;
     case "RoleRevoked":
@@ -535,12 +522,12 @@ export function getEventDescription(event: DocumentRegistryEventData): string {
 }
 
 // Helper function to get event icons/colors
-export function getEventStyle(event: DocumentRegistryEventData): {
+export function getEventStyle(event: ModelRegistryEventData): {
   icon: string;
   color: string;
 } {
   switch (event.eventName) {
-    case "DocumentUploaded":
+    case "ModelUploaded":
       return { icon: "📄", color: "text-blue-600" };
     case "RoleGranted":
       return { icon: "✅", color: "text-green-600" };

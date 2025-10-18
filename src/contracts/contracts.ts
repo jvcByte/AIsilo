@@ -1,5 +1,5 @@
 import type { Abi, Address } from "viem";
-import DOCREG_ABI from "./abis/DocumentRegistry";
+import MODELREG_ABI from "./abis/ModelRegistry";
 
 type TContracts = Record<
   string,
@@ -10,9 +10,9 @@ type TContracts = Record<
 >;
 
 const contracts = {
-  DocumentRegistry: {
-    address: "0x41c88BE9a1A761657E7B4569b89C5A20700F9f8A",
-    abi: DOCREG_ABI,
+  ModelRegistry: {
+    address: "0xc5627F6103a9b569A2EAf7898ae44653a3F7f82F",
+    abi: MODELREG_ABI,
   },
 } as const satisfies TContracts;
 

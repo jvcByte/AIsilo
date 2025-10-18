@@ -1,46 +1,43 @@
-// src/components/TextUpload.tsx
+// src/components/UploadFile.tsx
 import { useState } from "react";
 import { type Address } from "viem";
 import { useActiveAccount } from "thirdweb/react";
+// import { useSignMessage } from "wagmi";
 import { signMessage } from "thirdweb/utils";
-import { useDocuments } from "../hooks/use-documents";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Alert, AlertDescription } from "./ui/alert";
-import {
-  Upload,
-  FileText,
-  Lock,
-  PenTool,
-  CheckCircle2,
-  Type,
-} from "lucide-react";
-import { encryptText } from "../lib/encryption";
+import { useModels } from "../../hooks/use-models";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Upload, FileText, Lock, PenTool, CheckCircle2 } from "lucide-react";
+import { encryptFile } from "../../lib/encryption";
 import { pinata } from "@/lib/ipfs";
 import { toast } from "react-hot-toast";
 
-type UploadStep = "input" | "sign" | "upload" | "complete";
+type UploadStep = "file" | "sign" | "upload" | "complete";
+type Model = File;
 
 interface UploadState {
   step: UploadStep;
-  text: string;
+  file: Model | null;
   signature: Address | null;
   cid: string | null;
   iv: string | null;
 }
 
-export function UploadText() {
+export function UploadModel() {
   const activeAccount = useActiveAccount();
-  const { uploadDocument, isLoading: isContractLoading } = useDocuments();
+  // const { signMessageAsync } = useSignMessage();
+  const { uploadModel, isLoading: isContractLoading } = useModels();
 
   const address = activeAccount?.address;
   const isConnected = !!activeAccount?.address;
 
   const [state, setState] = useState<UploadState>({
-    step: "input",
-    text: "",
+    step: "file",
+    file: null,
     signature: null,
     cid: null,
     iv: null,
@@ -51,22 +48,24 @@ export function UploadText() {
   // Reset function
   const resetUpload = () => {
     setState({
-      step: "input",
-      text: "",
+      step: "file",
+      file: null,
       signature: null,
       cid: null,
       iv: null,
     });
   };
 
-  // Handle text input change
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
 
-    // Validate text length (max 10MB equivalent)
-    const maxLength = 10 * 1024 * 1024; // 10MB in characters (rough estimate)
-    if (text.length > maxLength) {
-      toast.error("Text is too long. Maximum size is approximately 10MB.", {
+    if (!selectedFile) return;
+
+    // Validate file size (max 100MB)
+    const maxSize = 100 * 1024 * 1024;
+    if (selectedFile.size > maxSize) {
+      toast.error("Model size must be less than 100MB", {
         className: "toast-error",
       });
       return;
@@ -74,8 +73,8 @@ export function UploadText() {
 
     setState((prev) => ({
       ...prev,
-      text,
-      step: text.trim() ? "sign" : "input",
+      file: selectedFile,
+      step: "sign",
     }));
   };
 
@@ -94,8 +93,11 @@ export function UploadText() {
     });
 
     try {
+      // const signature = await signMessageAsync({
+      //   message: "Encrypt My Model",
+      // });
       const signature = await signMessage({
-        message: "Encrypt My Text",
+        message: "Encrypt My Model",
         account: activeAccount,
       });
 
@@ -119,31 +121,30 @@ export function UploadText() {
     }
   };
 
-  // Handle text upload to IPFS
+  // Handle file upload to IPFS
   const handleUpload = async () => {
-    if (!state.text.trim() || !state.signature || !address) {
-      toast.error("Please enter some text to upload", {
+    if (!state.file || !state.signature || !address) {
+      toast.error("Missing required data for upload", {
         className: "toast-error",
       });
       return;
     }
 
     setIsProcessing(true);
-    const uploadToast = toast.loading("Encrypting text...", {
+    const uploadToast = toast.loading("Encrypting file...", {
       className: "toast-loading",
     });
 
     try {
-      // Step 1: Encrypt text
-      toast.loading("Encrypting text...", {
+      // Step 1: Encrypt file
+      toast.loading("Encrypting file...", {
         id: uploadToast,
         className: "toast-loading",
       });
-      const { encrypted, iv } = await encryptText(state.text, state.signature);
+      const { encrypted, iv } = await encryptFile(state.file, state.signature);
 
-      // Convert encrypted data to file for IPFS upload
-      const encryptedFile = new File([encrypted], "encrypted-text.txt", {
-        type: "text/plain",
+      const encryptedFile = new File([encrypted], state.file.name, {
+        type: state.file.type,
       });
 
       // Step 2: Get presigned URL
@@ -196,6 +197,15 @@ export function UploadText() {
         .keyvalues({
           iv: iv,
           user: address,
+          title: "GPT-Mini (fine-tuned)",
+          description:
+            "Small, fast language model fine-tuned for on-chain analytics.",
+          author: "alice.hedera",
+          priceHbar: "5",
+          type: "model",
+          tag1: "nlp",
+          tag2: "fine-tuned",
+          tag3: "fast",
         });
 
       if (!upload.cid) {
@@ -213,7 +223,7 @@ export function UploadText() {
         step: "complete",
       }));
 
-      toast.success("Text uploaded to IPFS successfully!", {
+      toast.success("Model uploaded to IPFS successfully!", {
         id: uploadToast,
         className: "toast-success",
       });
@@ -233,8 +243,8 @@ export function UploadText() {
   };
 
   // Handle smart contract write
-  const handleContractWrite = async (docId: string, cid: string) => {
-    if (!uploadDocument) {
+  const handleContractWrite = async (modelId: string, cid: string) => {
+    if (!uploadModel) {
       toast.error("Contract write function not available", {
         className: "toast-error",
       });
@@ -246,12 +256,12 @@ export function UploadText() {
     });
 
     try {
-      await uploadDocument({
-        docId: docId,
+      await uploadModel({
+        modelId: modelId,
         cId: cid,
       });
 
-      toast.success("Text registered on blockchain!", {
+      toast.success("Document registered on blockchain!", {
         id: contractToast,
         className: "toast-success",
       });
@@ -274,7 +284,7 @@ export function UploadText() {
             <Lock className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-xl font-semibold mb-2">Wallet Not Connected</h2>
             <p className="text-muted-foreground">
-              Please connect your wallet to upload text securely.
+              Please connect your wallet to upload files securely.
             </p>
           </CardContent>
         </Card>
@@ -287,44 +297,44 @@ export function UploadText() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center gap-2 mb-6">
-        <Type className="w-6 h-6" />
-        <h1 className="text-2xl font-bold text-foreground">Upload Text</h1>
+        <Upload className="w-6 h-6" />
+        <h1 className="text-2xl font-bold text-foreground">
+          Upload Model / Dataset
+        </h1>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Text Input Card */}
+        {/* Model Selection Card */}
         <Card className="bg-gradient-to-br from-muted to-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Text Input
+              Model Selection
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="text" className="text-foreground">
-                  Enter your text
+                <Label htmlFor="file" className="text-foreground">
+                  Select Model
                 </Label>
-                <textarea
-                  id="text"
-                  value={state.text}
-                  onChange={handleTextChange}
-                  placeholder="Type your text here..."
-                  className="w-full mt-2 p-3 border rounded-md min-h-[200px] font-mono text-sm"
-                  disabled={isLoading}
+                <Input
+                  id="file"
+                  type="file"
+                  onChange={handleFileChange}
+                  className="w-full mt-2"
+                  disabled={state.step !== "file" || isLoading}
                 />
-                {state.text && (
+                {state.file && (
                   <div className="mt-2 p-3 bg-muted rounded-lg">
                     <div className="flex items-center gap-2 flex-wrap">
                       <FileText className="w-4 h-4" />
-                      <span className="font-medium">Text content</span>
-                      <Badge variant="outline">text/plain</Badge>
-                      <Badge variant="secondary">
-                        {state.text.length} characters
+                      <span className="font-medium">{state.file.name}</span>
+                      <Badge variant="outline">
+                        {state.file.type || "unknown"}
                       </Badge>
                       <Badge variant="secondary">
-                        {(new Blob([state.text]).size / 1024).toFixed(2)} KB
+                        {(state.file.size / 1024 / 1024).toFixed(2)} MB
                       </Badge>
                     </div>
                   </div>
@@ -335,7 +345,7 @@ export function UploadText() {
         </Card>
 
         {/* Signature Card */}
-        {state.step === "sign" && state.text.trim() && (
+        {state.step === "sign" && state.file && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -348,13 +358,13 @@ export function UploadText() {
                 <Alert>
                   <Lock className="h-4 w-4" />
                   <AlertDescription>
-                    To encrypt your text securely, please sign this message with
+                    To encrypt your file securely, please sign this message with
                     your wallet. Your signature will be used to generate a
                     unique encryption key.
                   </AlertDescription>
                 </Alert>
                 <div className="p-3 bg-muted rounded-lg">
-                  <code className="text-sm font-mono">"Encrypt My Text"</code>
+                  <code className="text-sm font-mono">"Encrypt My Model"</code>
                 </div>
                 <Button
                   onClick={handleSignMessage}
@@ -391,7 +401,7 @@ export function UploadText() {
               <Alert>
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertDescription>
-                  Your text is ready to be encrypted and uploaded to IPFS.
+                  Your file is ready to be encrypted and uploaded to IPFS.
                 </AlertDescription>
               </Alert>
               <Button
@@ -428,7 +438,7 @@ export function UploadText() {
               <Alert className="border-green-500">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <AlertDescription>
-                  Your text has been successfully encrypted, uploaded to IPFS,
+                  Your file has been successfully encrypted, uploaded to IPFS,
                   and registered on the blockchain.
                 </AlertDescription>
               </Alert>
@@ -443,7 +453,7 @@ export function UploadText() {
                 variant="outline"
                 className="w-full"
               >
-                Upload Another Text
+                Upload Another Model
               </Button>
             </CardContent>
           </Card>

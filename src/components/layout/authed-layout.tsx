@@ -45,7 +45,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     isLoading: isCheckingUser,
     isFetched: isUserFetched,
   } = useReadContract({
-    ...contracts.DocumentRegistry,
+    ...contracts.ModelRegistry,
     functionName: "isUser",
     chainId: CHAIN_IDS.HEDERATESTNET,
     args: address ? [address as `0x${string}`] : undefined,
@@ -65,20 +65,14 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     }
 
     try {
-      console.log(
-        "============================================\n Auth Layout Registering at chainId: ",
-        CHAIN_IDS.HEDERATESTNET,
-        "\n============================================",
-      );
-
       // Define the chain
       const hederaTestnet = defineChain(CHAIN_IDS.HEDERATESTNET);
 
       // Prepare the contract call using thirdweb
       const transaction = prepareContractCall({
         contract: {
-          address: contracts.DocumentRegistry.address,
-          abi: contracts.DocumentRegistry.abi,
+          address: contracts.ModelRegistry.address,
+          abi: contracts.ModelRegistry.abi,
           chain: hederaTestnet,
           client: thirdwebClient,
         },
@@ -106,11 +100,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           });
         },
       });
-
-      console.log(
-        "============================================\n Auth Layout Register User Function Called ",
-        "\n============================================",
-      );
     } catch (error) {
       console.error("Registration failed:", error);
       toast.error(
@@ -156,17 +145,17 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     }
   }, [address, user, isCheckingUser, isUserFetched, isUserError, userError]);
 
-  // Debug logging
-  console.log("AuthenticatedLayout Debug:");
-  console.log("Active account:", activeAccount);
-  console.log("Address:", address);
-  console.log("User status:", user);
-  console.log("Is checking user:", isCheckingUser);
-  console.log("Is user fetched:", isUserFetched);
-  console.log("User error:", userError);
-  console.log("Is user error:", isUserError);
-  console.log("Contract address:", contracts.DocumentRegistry.address);
-  console.log("Show register modal:", showRegisterModal);
+  // // Debug logging
+  // console.log("AuthenticatedLayout Debug:");
+  // console.log("Active account:", activeAccount);
+  // console.log("Address:", address);
+  // console.log("User status:", user);
+  // console.log("Is checking user:", isCheckingUser);
+  // console.log("Is user fetched:", isUserFetched);
+  // console.log("User error:", userError);
+  // console.log("Is user error:", isUserError);
+  // console.log("Contract address:", contracts.ModelRegistry.address);
+  // console.log("Show register modal:", showRegisterModal);
 
   // Show loading state while checking user status
   if (address && isCheckingUser && !isUserFetched) {
@@ -218,11 +207,10 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                       <UserPlus className="w-8 h-8 text-blue-600" />
                     </div>
                     <CardTitle className="text-2xl">
-                      Welcome to Fileit!
+                      Welcome to AIsilo!
                     </CardTitle>
                     <CardDescription className="text-base">
-                      You need to register to access your secure document
-                      storage
+                      You need to register to ensure valid user.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -231,19 +219,19 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Secure encrypted file storage
+                          Access to AI model marketplace
                         </li>
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          IPFS decentralized storage
+                          Upload & manage your AI models
                         </li>
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Emergency access features
+                          Monitization of AI models
                         </li>
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-500" />
-                          Role-based access control
+                          Secure encrypted Model storage
                         </li>
                       </ul>
                     </div>

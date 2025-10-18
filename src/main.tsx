@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "./context/theme-provider";
 import { AuthProvider } from "./context/auth-provider";
 import { Web3Provider } from "@/lib/web3Config";
-import { RouterWrapper } from "@/components/router-wrapper";
+import { RouterWrapper } from "@/context/router-wrapper";
 
 // Render the app
 const rootElement = document.getElementById("root")!;

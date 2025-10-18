@@ -1,9 +1,9 @@
 // contracts/events.ts
 import { parseAbiItem } from "viem";
 
-export interface DocumentUploadedEvent {
+export interface ModelUploadedEvent {
   user: `0x${string}`;
-  docID: string;
+  modelID: string;
   cid: string;
 }
 
@@ -25,16 +25,16 @@ export interface RoleAdminChangedEvent {
   newAdminRole: `0x${string}`;
 }
 
-// Union type for all Document Registry events
-export type DocumentRegistryEvent =
-  | (DocumentUploadedEvent & { eventName: "DocumentUploaded" })
+// Union type for all Model Registry events
+export type ModelRegistryEvent =
+  | (ModelUploadedEvent & { eventName: "ModelUploaded" })
   | (RoleGrantedEvent & { eventName: "RoleGranted" })
   | (RoleRevokedEvent & { eventName: "RoleRevoked" })
   | (RoleAdminChangedEvent & { eventName: "RoleAdminChanged" });
 
-export const DOCUMENT_REGISTRY_EVENTS = {
-  DocumentUploaded: parseAbiItem(
-    "event DocumentUploaded(address indexed user, string docID, string cid)",
+export const MODEL_REGISTRY_EVENTS = {
+  ModelUploaded: parseAbiItem(
+    "event ModelUploaded(address indexed user, string modelID, string cid)",
   ),
   RoleGranted: parseAbiItem(
     "event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)",
@@ -48,12 +48,12 @@ export const DOCUMENT_REGISTRY_EVENTS = {
 } as const;
 
 // Event names array for easier iteration
-export const DOCUMENT_REGISTRY_EVENT_NAMES = Object.keys(
-  DOCUMENT_REGISTRY_EVENTS,
-) as Array<keyof typeof DOCUMENT_REGISTRY_EVENTS>;
+export const MODEL_REGISTRY_EVENT_NAMES = Object.keys(
+  MODEL_REGISTRY_EVENTS,
+) as Array<keyof typeof MODEL_REGISTRY_EVENTS>;
 
 // Helper type for decoded events with metadata
-export type DecodedDocumentRegistryEvent = DocumentRegistryEvent & {
+export type DecodedModelRegistryEvent = ModelRegistryEvent & {
   blockNumber: bigint;
   transactionHash: `0x${string}`;
   logIndex: number;

@@ -1,10 +1,10 @@
 import {
   LayoutDashboard,
   Key,
-  FileUp,
-  FilePenLine,
-  FileDown,
   Clock10,
+  PlaneTakeoff,
+  ClipboardPaste,
+  PlaneLanding,
 } from "lucide-react";
 import { type SidebarData } from "@/lib/types";
 
@@ -24,14 +24,14 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
-          title: "Upload File",
-          url: "/upload-file",
-          icon: FileUp,
+          title: "Upload Model",
+          url: "/upload-model",
+          icon: PlaneTakeoff,
         },
         {
-          title: "Type It",
-          url: "/upload-text",
-          icon: FilePenLine,
+          title: "Copy & Paste",
+          url: "/copy-paste",
+          icon: ClipboardPaste,
         },
       ],
     },
@@ -39,9 +39,9 @@ export const sidebarData: SidebarData = {
       title: "Manage Data",
       items: [
         {
-          title: "Get File",
-          url: "/download-file",
-          icon: FileDown,
+          title: "Download Model",
+          url: "/download-model",
+          icon: PlaneLanding,
         },
         {
           title: "Decrypt File",

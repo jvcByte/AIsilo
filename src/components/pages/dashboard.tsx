@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { FilesByOwner } from "./files-by-owner";
+import { ModelsByOwner } from "./models-by-owner";
 import type { Address } from "viem";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 
@@ -19,7 +19,6 @@ export interface proposalCountEventProps {
   deadline: bigint;
 }
 
-
 export function Dashboard() {
   const activeAccount = useActiveAccount();
   const activeWallet = useActiveWallet();
@@ -28,8 +27,8 @@ export function Dashboard() {
   console.log({
     "Active Wallet": activeWallet,
     "Active Account": activeAccount,
-    "Address": address
-  })
+    Address: address,
+  });
 
   const chain = activeWallet?.getChain();
   console.log("Chain: ", chain);
@@ -65,14 +64,14 @@ export function Dashboard() {
   }, [chain, address, activeWallet]);
 
   const { data: docCountPerAddr } = useReadContract({
-    ...contracts.DocumentRegistry,
-    functionName: "_docCountPerAddr",
+    ...contracts.ModelRegistry,
+    functionName: "_modelCountPerAddr",
     chainId: hederaTestnetChain.id,
     args: [address as Address],
   });
 
   const { data: user } = useReadContract({
-    ...contracts.DocumentRegistry,
+    ...contracts.ModelRegistry,
     functionName: "isUser",
     chainId: hederaTestnetChain.id,
     args: [address as `0x${string}`],
@@ -92,7 +91,7 @@ export function Dashboard() {
       <div className="grid gap-2 grid-cols-2 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Total Files
+            Total Models
           </h3>
           <div className="text-base sm:text-2xl font-bold">
             {docCountPerAddr || "0"}
@@ -100,15 +99,13 @@ export function Dashboard() {
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Protected Files
+            Total Sold
           </h3>
-          <div className="text-base sm:text-2xl font-bold">
-            {docCountPerAddr || "0"}
-          </div>
+          <div className="text-base sm:text-2xl font-bold">0</div>
         </div>
         <div className="rounded-lg border bg-card p-2 md:p-6 bg-gradient-to-tl from-muted to-background">
           <h3 className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Archived Files
+            Archived Models
           </h3>
           <div className="text-base sm:text-2xl font-bold">0</div>
         </div>
@@ -120,8 +117,8 @@ export function Dashboard() {
         </div>
       </div>
       <div className="rounded-lg border bg-card p-6 bg-gradient-to-t from-muted to-background">
-        <h3 className="text-xl font-semibold mb-4">My Documents</h3>
-        <FilesByOwner
+        <h3 className="text-xl font-semibold mb-4">My Models</h3>
+        <ModelsByOwner
           limit={5}
           heightClass="h-[43.5vh] sm:h-[42.5vh] md:h-[31.5vh] lg:h-[49.5vh]"
         />

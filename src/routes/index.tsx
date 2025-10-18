@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import HeroSection from "@/components/layout/hero-section";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { AuthenticatedLayout } from "@/components/layout/authed-layout";
-import { Dashboard } from "@/components/dashboard";
+import { Dashboard } from "@/components/pages/dashboard";
 
 export const Route = createFileRoute("/")({
   component: Index,

@@ -128,7 +128,7 @@ function Marketplace() {
 
               <div className="flex items-center gap-3">
                 <Button asChild variant="outline" className="inline-flex">
-                  <Link to="/upload-file">
+                  <Link to="/copy-paste">
                     <PlusCircleIcon />
                     Create Listing
                   </Link>

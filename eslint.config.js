@@ -13,6 +13,18 @@ export default defineConfig([
     "src/**/routeTree.gen.ts",
     "node_modules/",
     " .vite/",
+    "android/",
+    "android/**",
+    "android/app/build/",
+    "android/app/build/**",
+  ]),
+  ignores([
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.vite/**",
+    "**/android/**",
+    "src/routeTree.gen.ts",
+    "src/**/routeTree.gen.ts",
   ]),
   {
     files: ["**/*.{ts,tsx}"],
@@ -23,7 +35,7 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: globals.browser,
     },
   },

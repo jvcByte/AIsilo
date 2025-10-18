@@ -3,10 +3,10 @@ import { useState } from "react";
 import { type Address } from "viem";
 import { useActiveAccount } from "thirdweb/react";
 import { signMessage } from "thirdweb/utils";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
   Download,
   FileText,
@@ -16,10 +16,10 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
-import { decryptFile } from "../lib/encryption";
+import { decryptFile } from "../../lib/encryption";
 import { pinata } from "@/lib/ipfs";
 import { toast } from "react-hot-toast";
-import { Alert, AlertDescription } from "./ui/alert";
+import { Alert, AlertDescription } from "../ui/alert";
 import { useSearch } from "@tanstack/react-router";
 
 type DownloadStep = "input" | "download" | "complete";
@@ -36,9 +36,9 @@ interface DownloadState {
   error: string | null;
 }
 
-export function DownloadFile() {
+export function DownloadModel() {
   const activeAccount = useActiveAccount();
-  const { cid: urlCid } = useSearch({ from: "/_authenticated/download-file" });
+  const { cid: urlCid } = useSearch({ from: "/_authenticated/download-model" });
 
   const address = activeAccount?.address;
   const isConnected = !!activeAccount?.address;

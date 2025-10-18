@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/temp-route")({
-  component: RouteComponent,
+  component: TempRouteComponent,
 });
 
-function RouteComponent() {
+function TempRouteComponent() {
   const navigate = useNavigate();
   const { history } = useRouter();
   return (

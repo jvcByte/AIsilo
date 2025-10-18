@@ -15,12 +15,12 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
 import { Route as MarketplaceIdRouteImport } from './routes/marketplace/$id'
-import { Route as AuthenticatedUploadTextRouteImport } from './routes/_authenticated/upload-text'
-import { Route as AuthenticatedUploadFileRouteImport } from './routes/_authenticated/upload-file'
+import { Route as AuthenticatedUploadModelRouteImport } from './routes/_authenticated/upload-model'
 import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
-import { Route as AuthenticatedDownloadFileRouteImport } from './routes/_authenticated/download-file'
+import { Route as AuthenticatedDownloadModelRouteImport } from './routes/_authenticated/download-model'
 import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCopyPasteRouteImport } from './routes/_authenticated/copy-paste'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 import { Route as MarketplaceBuyBuyRouteImport } from './routes/marketplace/$buy.buy'
 
@@ -53,25 +53,21 @@ const MarketplaceIdRoute = MarketplaceIdRouteImport.update({
   path: '/marketplace/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedUploadTextRoute = AuthenticatedUploadTextRouteImport.update({
-  id: '/upload-text',
-  path: '/upload-text',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedUploadFileRoute = AuthenticatedUploadFileRouteImport.update({
-  id: '/upload-file',
-  path: '/upload-file',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedUploadModelRoute =
+  AuthenticatedUploadModelRouteImport.update({
+    id: '/upload-model',
+    path: '/upload-model',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTempRouteRoute = AuthenticatedTempRouteRouteImport.update({
   id: '/temp-route',
   path: '/temp-route',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDownloadFileRoute =
-  AuthenticatedDownloadFileRouteImport.update({
-    id: '/download-file',
-    path: '/download-file',
+const AuthenticatedDownloadModelRoute =
+  AuthenticatedDownloadModelRouteImport.update({
+    id: '/download-model',
+    path: '/download-model',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDecryptRoute = AuthenticatedDecryptRouteImport.update({
@@ -82,6 +78,11 @@ const AuthenticatedDecryptRoute = AuthenticatedDecryptRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCopyPasteRoute = AuthenticatedCopyPasteRouteImport.update({
+  id: '/copy-paste',
+  path: '/copy-paste',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
@@ -100,12 +101,12 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/activities': typeof AuthenticatedActivitiesRoute
+  '/copy-paste': typeof AuthenticatedCopyPasteRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
-  '/download-file': typeof AuthenticatedDownloadFileRoute
+  '/download-model': typeof AuthenticatedDownloadModelRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
-  '/upload-file': typeof AuthenticatedUploadFileRoute
-  '/upload-text': typeof AuthenticatedUploadTextRoute
+  '/upload-model': typeof AuthenticatedUploadModelRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/marketplace/$buy/buy': typeof MarketplaceBuyBuyRoute
@@ -115,12 +116,12 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/activities': typeof AuthenticatedActivitiesRoute
+  '/copy-paste': typeof AuthenticatedCopyPasteRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
-  '/download-file': typeof AuthenticatedDownloadFileRoute
+  '/download-model': typeof AuthenticatedDownloadModelRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
-  '/upload-file': typeof AuthenticatedUploadFileRoute
-  '/upload-text': typeof AuthenticatedUploadTextRoute
+  '/upload-model': typeof AuthenticatedUploadModelRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/marketplace/$buy/buy': typeof MarketplaceBuyBuyRoute
@@ -132,12 +133,12 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
+  '/_authenticated/copy-paste': typeof AuthenticatedCopyPasteRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
-  '/_authenticated/download-file': typeof AuthenticatedDownloadFileRoute
+  '/_authenticated/download-model': typeof AuthenticatedDownloadModelRoute
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
-  '/_authenticated/upload-file': typeof AuthenticatedUploadFileRoute
-  '/_authenticated/upload-text': typeof AuthenticatedUploadTextRoute
+  '/_authenticated/upload-model': typeof AuthenticatedUploadModelRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/marketplace/$buy/buy': typeof MarketplaceBuyBuyRoute
@@ -149,12 +150,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/activities'
+    | '/copy-paste'
     | '/dashboard'
     | '/decrypt'
-    | '/download-file'
+    | '/download-model'
     | '/temp-route'
-    | '/upload-file'
-    | '/upload-text'
+    | '/upload-model'
     | '/marketplace/$id'
     | '/marketplace'
     | '/marketplace/$buy/buy'
@@ -164,12 +165,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/activities'
+    | '/copy-paste'
     | '/dashboard'
     | '/decrypt'
-    | '/download-file'
+    | '/download-model'
     | '/temp-route'
-    | '/upload-file'
-    | '/upload-text'
+    | '/upload-model'
     | '/marketplace/$id'
     | '/marketplace'
     | '/marketplace/$buy/buy'
@@ -180,12 +181,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/_authenticated/activities'
+    | '/_authenticated/copy-paste'
     | '/_authenticated/dashboard'
     | '/_authenticated/decrypt'
-    | '/_authenticated/download-file'
+    | '/_authenticated/download-model'
     | '/_authenticated/temp-route'
-    | '/_authenticated/upload-file'
-    | '/_authenticated/upload-text'
+    | '/_authenticated/upload-model'
     | '/marketplace/$id'
     | '/marketplace/'
     | '/marketplace/$buy/buy'
@@ -245,18 +246,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/upload-text': {
-      id: '/_authenticated/upload-text'
-      path: '/upload-text'
-      fullPath: '/upload-text'
-      preLoaderRoute: typeof AuthenticatedUploadTextRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/upload-file': {
-      id: '/_authenticated/upload-file'
-      path: '/upload-file'
-      fullPath: '/upload-file'
-      preLoaderRoute: typeof AuthenticatedUploadFileRouteImport
+    '/_authenticated/upload-model': {
+      id: '/_authenticated/upload-model'
+      path: '/upload-model'
+      fullPath: '/upload-model'
+      preLoaderRoute: typeof AuthenticatedUploadModelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/temp-route': {
@@ -266,11 +260,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTempRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/download-file': {
-      id: '/_authenticated/download-file'
-      path: '/download-file'
-      fullPath: '/download-file'
-      preLoaderRoute: typeof AuthenticatedDownloadFileRouteImport
+    '/_authenticated/download-model': {
+      id: '/_authenticated/download-model'
+      path: '/download-model'
+      fullPath: '/download-model'
+      preLoaderRoute: typeof AuthenticatedDownloadModelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/decrypt': {
@@ -285,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/copy-paste': {
+      id: '/_authenticated/copy-paste'
+      path: '/copy-paste'
+      fullPath: '/copy-paste'
+      preLoaderRoute: typeof AuthenticatedCopyPasteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/activities': {
@@ -306,22 +307,22 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
+  AuthenticatedCopyPasteRoute: typeof AuthenticatedCopyPasteRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute
-  AuthenticatedDownloadFileRoute: typeof AuthenticatedDownloadFileRoute
+  AuthenticatedDownloadModelRoute: typeof AuthenticatedDownloadModelRoute
   AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute
-  AuthenticatedUploadFileRoute: typeof AuthenticatedUploadFileRoute
-  AuthenticatedUploadTextRoute: typeof AuthenticatedUploadTextRoute
+  AuthenticatedUploadModelRoute: typeof AuthenticatedUploadModelRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
+  AuthenticatedCopyPasteRoute: AuthenticatedCopyPasteRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDecryptRoute: AuthenticatedDecryptRoute,
-  AuthenticatedDownloadFileRoute: AuthenticatedDownloadFileRoute,
+  AuthenticatedDownloadModelRoute: AuthenticatedDownloadModelRoute,
   AuthenticatedTempRouteRoute: AuthenticatedTempRouteRoute,
-  AuthenticatedUploadFileRoute: AuthenticatedUploadFileRoute,
-  AuthenticatedUploadTextRoute: AuthenticatedUploadTextRoute,
+  AuthenticatedUploadModelRoute: AuthenticatedUploadModelRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
