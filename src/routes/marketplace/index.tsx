@@ -29,7 +29,7 @@ export const Route = createFileRoute("/marketplace/")({
 
 function ListingCard({ item }: { item: Listing }) {
   return (
-    <Card className="p-4 h-full flex flex-col justify-between border-border">
+    <Card className="p-4 h-full flex flex-col justify-between border-border bg-linear-to-br to-muted from-background">
       <div>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold">{item.title}</h3>
@@ -115,60 +115,62 @@ function Marketplace() {
       <Header />
       <div className="relative bg-linear-to-b to-muted from-background min-h-[90vh] flex items-center overflow-hidden">
         <main className="max-w-6xl mx-auto px-4 py-8 space-y-8 pt-24">
-          {/* Top bar */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Marketplace</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Discover AI models and datasets with on-chain provenance and
-                transparent licensing on Hedera.
-              </p>
+          <div className="fixed top-25 left-100 right-100 space-y-6 space-x-7">
+            {/* Top bar */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold">Marketplace</h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Discover AI models and datasets with on-chain provenance and
+                  transparent licensing on Hedera.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button asChild variant="outline" className="inline-flex">
+                  <Link to="/upload-file">
+                    <PlusCircleIcon />
+                    Create Listing
+                  </Link>
+                </Button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button asChild variant="outline" className="inline-flex">
-                <Link to="/upload-file">
-                  <PlusCircleIcon />
-                  Create Listing
-                </Link>
-              </Button>
-            </div>
-          </div>
+            {/* Search & filters */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+              <div className="flex-1">
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search models, datasets, tags or author..."
+                />
+              </div>
 
-          {/* Search & filters */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-            <div className="flex-1">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search models, datasets, tags or author..."
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant={filterType === "all" ? "default" : "outline"}
-                onClick={() => setFilterType("all")}
-              >
-                All
-              </Button>
-              <Button
-                variant={filterType === "model" ? "default" : "outline"}
-                onClick={() => setFilterType("model")}
-              >
-                Models
-              </Button>
-              <Button
-                variant={filterType === "dataset" ? "default" : "outline"}
-                onClick={() => setFilterType("dataset")}
-              >
-                Datasets
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant={filterType === "all" ? "default" : "outline"}
+                  onClick={() => setFilterType("all")}
+                >
+                  All
+                </Button>
+                <Button
+                  variant={filterType === "model" ? "default" : "outline"}
+                  onClick={() => setFilterType("model")}
+                >
+                  Models
+                </Button>
+                <Button
+                  variant={filterType === "dataset" ? "default" : "outline"}
+                  onClick={() => setFilterType("dataset")}
+                >
+                  Datasets
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Listings grid */}
-          <section>
+          <section className="pt-32">
             {filtered.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 No results — try adjusting your search or filters.
@@ -180,24 +182,6 @@ function Marketplace() {
                 ))}
               </div>
             )}
-          </section>
-
-          {/* Info / getting started */}
-          <section className="p-6 bg-card border border-border rounded-md">
-            <h2 className="text-lg font-semibold mb-2">Getting started</h2>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-              <li>
-                Connect your Hedera-compatible wallet to buy or list assets.
-              </li>
-              <li>
-                Create listings with pricing, license terms, and metadata.
-                Provenance will be recorded on Hedera for transparency.
-              </li>
-              <li>
-                Use the SDK or API to integrate licensed models into your
-                decentralized AI apps.
-              </li>
-            </ul>
           </section>
         </main>
       </div>
