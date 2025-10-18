@@ -17,7 +17,7 @@ function Index() {
 
   if (!isAuthenticated) {
     return (
-      <div className="p-2">
+      <div className="">
         <Header />
         <HeroSection />
       </div>

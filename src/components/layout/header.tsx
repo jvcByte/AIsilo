@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "./theme-switcher";
-import SignInButton from "@/components/wallet/thirdweb-connect-btn";
+import { SignInButton } from "@/components/wallet/thirdweb-connect-btn";
 
 const menuItems = [
   { name: "Market Place", to: "/marketplace" },
@@ -24,7 +24,7 @@ export const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   return (
-    <header className="py-2">
+    <header className="">
       <nav
         data-state={menuState && "active"}
         className={cn(

@@ -1,4 +1,4 @@
-import { ConnectButton, lightTheme } from "thirdweb/react";
+import { ConnectButton, ConnectEmbed, lightTheme } from "thirdweb/react";
 import { thirdwebClient } from "@/lib/thirdweb/thirdweb-client";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { User } from "lucide-react";
@@ -124,4 +124,46 @@ const SignInButton: React.FC<SignInButtonProps> = ({
   );
 };
 
-export default SignInButton;
+const SignInButtonEmbeded: React.FC<SignInButtonProps> = () => {
+  const wallets = [
+    inAppWallet({
+      auth: {
+        options: ["google", "email", "passkey", "phone", "facebook", "apple"],
+      },
+      hidePrivateKeyExport: false,
+    }),
+    createWallet("io.metamask"),
+    createWallet("xyz.argent"),
+  ];
+
+  return (
+    <div>
+      <ConnectEmbed
+        client={thirdwebClient}
+        wallets={wallets}
+        modalSize="wide"
+        termsOfServiceUrl="/terms"
+        privacyPolicyUrl="/privacy"
+        showThirdwebBranding={false}
+        theme={lightTheme({
+          colors: {
+            modalBg:
+              "linear-gradient(to bottom, var(--background), var(--muted)) !important;",
+            borderColor: "var(--border)",
+            accentText: "var(--primary)",
+            separatorLine: "var(--muted)",
+            tertiaryBg: "var(--muted)",
+            skeletonBg: "var(--muted-foreground)",
+            primaryText: "var(--foreground)",
+            secondaryText: "var(--muted-foreground)",
+            selectedTextColor: "var(--primary)",
+            inputAutofillBg: "var(--background)",
+            secondaryButtonBg: "var(--muted)",
+          },
+        })}
+      />
+    </div>
+  );
+};
+
+export { SignInButton, SignInButtonEmbeded };

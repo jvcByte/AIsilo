@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Link } from "@tanstack/react-router";
-import SignInButton from "@/components/wallet/thirdweb-connect-btn";
+import { SignInButton } from "@/components/wallet/thirdweb-connect-btn";
 
 interface FloatingIconProps {
   icon: LucideIcon;
@@ -202,10 +202,10 @@ export default function HeroSection() {
         `}
       </style>
 
-      <main className="relative ">
+      <main className="">
         <section className="relative bg-linear-to-b to-muted from-background min-h-[90vh] flex items-center overflow-hidden">
           {/* Soft radial gradient over the hero */}
-          <div className="absolute inset-0 hero-gradient pointer-events-none" />
+          {/*<div className="absolute inset-0 hero-gradient pointer-events-none" />*/}
 
           {/* Floating icons */}
           {mounted &&
@@ -214,10 +214,10 @@ export default function HeroSection() {
             ))}
 
           {/* Content container */}
-          <div className="relative z-10 mx-auto w-full max-w-6xl px-6 text-center">
+          <div className="mt-25 md:mt-0 mx-auto w-full max-w-6xl px-6 text-center">
             <div className="items-center space-y-8">
               {/* Trust badge */}
-              <div className="hidden md:inline-flex animate-scale-in items-center gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
+              <div className="inline-flex animate-scale-in items-center gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <FolderGit2 className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-primary">
                   Breaking AI Silos
@@ -226,15 +226,12 @@ export default function HeroSection() {
               </div>
 
               {/* Main heading */}
-              <h1 className="leading-[1.2] animate-fade-in-up text-balance text-4xl font-bold md:text-7xl tracking-wider [animation-delay:200ms]">
-                A marketplace for Your AI models & datasets on{" "}
-                <span className="glow-text bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent">
-                  Hedera
-                </span>
+              <h1 className="leading-[1.2] animate-fade-in-up text-balance text-3xl font-bold md:text-7xl tracking-wider [animation-delay:200ms]">
+                A marketplace for Your AI models & datasets
               </h1>
 
               {/* Subheading */}
-              <div className="animate-fade-in-up text-lg md:text-2xl text-muted-foreground mt-6 mb-8 max-w-3xl mx-auto [animation-delay:400ms]">
+              <div className="h-8 animate-fade-in-up text-lg md:text-2xl text-muted-foreground mt-6 mb-8 max-w-3xl mx-auto [animation-delay:400ms]">
                 <HeroTextLoop />
               </div>
 
@@ -251,7 +248,7 @@ export default function HeroSection() {
                     height: "2.5rem",
                     minWidth: "auto",
                     borderRadius: "0.75rem",
-                    padding: "0 1rem",
+                    padding: "0 0.7rem",
                   }}
                   termsOfServiceUrl="https://aisilo.example/terms"
                   privacyPolicyUrl="https://aisilo.example/privacy"

@@ -150,7 +150,7 @@ function Marketplace() {
   }, [query, filterType]);
 
   return (
-    <div className="p-2">
+    <div className="">
       <Header />
       <div className="relative bg-linear-to-b to-muted from-background min-h-[90vh] flex items-center overflow-hidden">
         <main className="max-w-6xl mx-auto px-4 py-8 space-y-8 pt-24">
@@ -165,12 +165,8 @@ function Marketplace() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                asChild
-                variant="outline"
-                className="hidden sm:inline-flex"
-              >
-                <Link to="/create">
+              <Button asChild variant="outline" className="inline-flex">
+                <Link to="/upload-file">
                   <PlusCircleIcon />
                   Create Listing
                 </Link>
@@ -183,7 +179,7 @@ function Marketplace() {
             <div className="flex-1">
               <Input
                 value={query}
-                onChange={(e: any) => setQuery(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search models, datasets, tags or author..."
               />
             </div>

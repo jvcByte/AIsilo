@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "./theme-switcher";
 import { APP_NAME } from "@/lib/config";
-import SignInButton from "@/components/wallet/thirdweb-connect-btn";
+import { SignInButton } from "@/components/wallet/thirdweb-connect-btn";
 
 type AuthenticatedHeaderProps = {
   className?: string;

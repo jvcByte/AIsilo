@@ -21,7 +21,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
       // Small delay to show loading state before redirect
       const timer = setTimeout(() => {
         router.navigate({
-          to: "/",
+          to: location.pathname,
           replace: true,
         });
       }, 500);
