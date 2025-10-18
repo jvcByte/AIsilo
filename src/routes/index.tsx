@@ -1,4 +1,4 @@
-import { HeroHeader } from "@/components/layout/header";
+import { Header } from "@/components/layout/header";
 import { createFileRoute } from "@tanstack/react-router";
 import HeroSection from "@/components/layout/hero-section";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
@@ -13,15 +13,12 @@ function Index() {
   const activeAccount = useActiveAccount();
   const activeWallet = useActiveWallet();
 
-  const isAuthenticated = !!(
-    activeAccount?.address &&
-    activeWallet?.id
-  );
+  const isAuthenticated = !!(activeAccount?.address && activeWallet?.id);
 
   if (!isAuthenticated) {
     return (
       <div className="p-2">
-        <HeroHeader />
+        <Header />
         <HeroSection />
       </div>
     );

@@ -7,12 +7,12 @@ import { ThemeSwitcher } from "./theme-switcher";
 import SignInButton from "@/components/wallet/thirdweb-connect-btn";
 
 const menuItems = [
-  { name: "Docs", to: "/docs" },
+  { name: "Market Place", to: "/marketplace" },
   // { name: "Join", to: "#link" },
   // { name: "About", to  : "#link" },
 ];
 
-export const HeroHeader = () => {
+export const Header = () => {
   const [menuState, setMenuState] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
 
@@ -24,7 +24,7 @@ export const HeroHeader = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   return (
-    <header>
+    <header className="py-2">
       <nav
         data-state={menuState && "active"}
         className={cn(
@@ -33,7 +33,7 @@ export const HeroHeader = () => {
             "bg-background/75 border-b border-black/5 backdrop-blur-lg",
         )}
       >
-        <div className="mx-auto max-w-5xl px-6">
+        <div className="mx-auto max-w-6xl px-3">
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0">
             <div className="flex w-full justify-between gap-6 lg:w-auto">
               <Link

@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DocsRouteImport } from './routes/docs'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,9 +21,9 @@ import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 
-const DocsRoute = DocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -80,7 +80,7 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/docs': typeof DocsRoute
+  '/marketplace': typeof MarketplaceRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
@@ -92,7 +92,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/docs': typeof DocsRoute
+  '/marketplace': typeof MarketplaceRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/decrypt': typeof AuthenticatedDecryptRoute
@@ -106,7 +106,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/docs': typeof DocsRoute
+  '/marketplace': typeof MarketplaceRoute
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
@@ -120,7 +120,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/docs'
+    | '/marketplace'
     | '/activities'
     | '/dashboard'
     | '/decrypt'
@@ -132,7 +132,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/docs'
+    | '/marketplace'
     | '/activities'
     | '/dashboard'
     | '/decrypt'
@@ -145,7 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
-    | '/docs'
+    | '/marketplace'
     | '/_authenticated/activities'
     | '/_authenticated/dashboard'
     | '/_authenticated/decrypt'
@@ -159,16 +159,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  DocsRoute: typeof DocsRoute
+  MarketplaceRoute: typeof MarketplaceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/docs': {
-      id: '/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsRouteImport
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -271,7 +271,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  DocsRoute: DocsRoute,
+  MarketplaceRoute: MarketplaceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

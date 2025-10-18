@@ -2,7 +2,6 @@ import { HeroTextLoop } from "./hero-text-loop";
 import {
   FileText,
   FileLock,
-  Shield,
   FileCheck,
   Cloud,
   type LucideIcon,
@@ -10,6 +9,7 @@ import {
   Server,
   FileBox,
   FileCode,
+  FolderGit2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -26,7 +26,7 @@ interface FloatingIconProps {
   endY: number;
 }
 
-// Floating file icon component
+// Floating icon component (repurposed for AI models & datasets)
 function FloatingIcon({
   icon: Icon,
   delay,
@@ -58,81 +58,83 @@ export default function HeroSection() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Only render floating icons after mount to avoid SSR/rehydration mismatch
     setMounted(true);
   }, []);
 
-  const floatingIcons = [
+  // Floating icons suggest models, datasets, compute, and security
+  const floatingIcons: FloatingIconProps[] = [
     {
-      icon: FileText,
+      icon: FileCode,
       delay: 0,
-      duration: 8,
-      startX: 10,
-      startY: 20,
-      endX: 15,
-      endY: 80,
+      duration: 9,
+      startX: 8,
+      startY: 18,
+      endX: 12,
+      endY: 78,
     },
     {
-      icon: FileLock,
+      icon: FileText,
       delay: 1,
       duration: 10,
-      startX: 85,
-      startY: 15,
-      endX: 80,
-      endY: 75,
+      startX: 22,
+      startY: 70,
+      endX: 18,
+      endY: 22,
     },
     {
       icon: FileBox,
       delay: 2,
-      duration: 9,
-      startX: 5,
-      startY: 60,
-      endX: 10,
-      endY: 30,
+      duration: 11,
+      startX: 45,
+      startY: 12,
+      endX: 50,
+      endY: 80,
     },
     {
       icon: Boxes,
-      delay: 0.5,
-      duration: 11,
-      startX: 90,
-      startY: 50,
-      endX: 88,
-      endY: 20,
-    },
-    {
-      icon: FileCode,
-      delay: 1.5,
-      duration: 7,
-      startX: 15,
-      startY: 80,
-      endX: 20,
-      endY: 25,
-    },
-    {
-      icon: FileCheck,
-      delay: 2.5,
-      duration: 9,
-      startX: 88,
-      startY: 80,
-      endX: 85,
-      endY: 35,
+      delay: 0.6,
+      duration: 8,
+      startX: 78,
+      startY: 25,
+      endX: 74,
+      endY: 72,
     },
     {
       icon: Cloud,
-      delay: 3,
-      duration: 10,
-      startX: 8,
-      startY: 40,
-      endX: 12,
-      endY: 70,
+      delay: 1.8,
+      duration: 9,
+      startX: 60,
+      startY: 82,
+      endX: 58,
+      endY: 28,
     },
     {
       icon: Server,
-      delay: 1.8,
-      duration: 8,
-      startX: 92,
-      startY: 35,
-      endX: 90,
-      endY: 65,
+      delay: 2.2,
+      duration: 12,
+      startX: 90,
+      startY: 50,
+      endX: 86,
+      endY: 18,
+    },
+    {
+      icon: FileCheck,
+      delay: 3,
+      duration: 10,
+      startX: 12,
+      startY: 50,
+      endX: 18,
+      endY: 30,
+    },
+    {
+      icon: FileLock,
+      delay: 0.4,
+      duration: 7,
+      startX: 84,
+      startY: 78,
+      endX: 80,
+      endY: 36,
     },
   ];
 
@@ -145,20 +147,20 @@ export default function HeroSection() {
               transform: translate(0, 0) rotate(0deg) scale(1);
             }
             25% {
-              transform: translate(20px, -30px) rotate(5deg) scale(1.1);
+              transform: translate(18px, -28px) rotate(4deg) scale(1.07);
             }
             50% {
-              transform: translate(-15px, -60px) rotate(-5deg) scale(0.95);
+              transform: translate(-12px, -50px) rotate(-4deg) scale(0.98);
             }
             75% {
-              transform: translate(25px, -40px) rotate(3deg) scale(1.05);
+              transform: translate(22px, -36px) rotate(2deg) scale(1.03);
             }
           }
 
           @keyframes fadeInUp {
             from {
               opacity: 0;
-              transform: translateY(30px);
+              transform: translateY(24px);
             }
             to {
               opacity: 1;
@@ -169,7 +171,7 @@ export default function HeroSection() {
           @keyframes scaleIn {
             from {
               opacity: 0;
-              transform: scale(0.9);
+              transform: scale(0.96);
             }
             to {
               opacity: 1;
@@ -178,15 +180,15 @@ export default function HeroSection() {
           }
 
           .animate-fade-in-up {
-            animation: fadeInUp 1s ease-out forwards;
+            animation: fadeInUp 0.9s ease-out forwards;
           }
 
           .animate-scale-in {
-            animation: scaleIn 0.8s ease-out forwards;
+            animation: scaleIn 0.7s ease-out forwards;
           }
 
           .glow-text {
-            text-shadow: 0 0 40px rgba(250, 7, 7, 0.3);
+            text-shadow: 0 0 40px rgba(0, 0, 0, 0.18);
           }
 
           .hero-gradient {
@@ -199,33 +201,35 @@ export default function HeroSection() {
           }
         `}
       </style>
-      <main>
+
+      <main className="relative ">
         <section className="relative bg-linear-to-b to-muted from-background min-h-[90vh] flex items-center overflow-hidden">
-          {/* Gradient overlay */}
+          {/* Soft radial gradient over the hero */}
           <div className="absolute inset-0 hero-gradient pointer-events-none" />
 
           {/* Floating icons */}
           {mounted &&
-            floatingIcons.map((props, index) => (
-              <FloatingIcon key={index} {...props} />
+            floatingIcons.map((props, idx) => (
+              <FloatingIcon key={idx} {...props} />
             ))}
 
-          {/* Main content */}
+          {/* Content container */}
           <div className="relative z-10 mx-auto w-full max-w-6xl px-6 text-center">
             <div className="items-center space-y-8">
-              {/* Badge */}
+              {/* Trust badge */}
               <div className="hidden md:inline-flex animate-scale-in items-center gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-                <Shield className="w-4 h-4 text-primary" />
+                <FolderGit2 className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-primary">
-                  Decentralized & Secure
+                  Breaking AI Silos
                 </span>
+                <FolderGit2 className="w-4 h-4 text-primary" />
               </div>
 
               {/* Main heading */}
-              <h1 className="animate-fade-in-up text-balance text-4xl font-bold md:text-7xl tracking-tight leading-[1.2] [animation-delay:200ms]">
-                Encrypt & Store Your Files on{" "}
-                <span className="glow-text bg-gradient-to-r from-red-500 via-red-600 to-red-700 bg-clip-text text-transparent">
-                  Blockchain
+              <h1 className="leading-[1.2] animate-fade-in-up text-balance text-4xl font-bold md:text-7xl tracking-wider [animation-delay:200ms]">
+                A marketplace for Your AI models & datasets on{" "}
+                <span className="glow-text bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+                  Hedera
                 </span>
               </h1>
 
@@ -237,46 +241,48 @@ export default function HeroSection() {
               {/* CTA Buttons */}
               <div className="animate-fade-in-up flex gap-4 justify-center items-center [animation-delay:600ms]">
                 <SignInButton
-                  label="Get Started"
+                  label="Add Your Model"
                   connectButtonStyle={{
-                    fontSize: "0.875rem sm:text-base",
-                    fontWeight: "bold",
+                    fontSize: "0.95rem",
+                    fontWeight: "700",
                     color: "var(--background)",
                     backgroundColor: "var(--primary)",
                     border: "2px solid var(--border)",
-                    height: "2.25rem",
+                    height: "2.5rem",
                     minWidth: "auto",
-                    borderRadius: "0.7rem",
+                    borderRadius: "0.75rem",
+                    padding: "0 1rem",
                   }}
-                  termsOfServiceUrl="https://fileit01.vercel.app"
-                  privacyPolicyUrl="https://fileit01.vercel.app"
+                  termsOfServiceUrl="https://aisilo.example/terms"
+                  privacyPolicyUrl="https://aisilo.example/privacy"
                 />
 
                 <Button
                   asChild
                   variant="outline"
-                  className="md:px-8 py-4 bg-card border-2 border-border rounded-lg font-semibold md:text-lg hover:border-primary transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                  className="md:px-8 py-3 bg-card border-2 border-border rounded-lg font-semibold md:text-lg hover:border-primary transition-all duration-300 hover:scale-105 backdrop-blur-sm"
                 >
-                  <Link to="/docs"> Learn More</Link>
+                  <Link to="/marketplace">Explore Catalog</Link>
                 </Button>
               </div>
 
-              {/* Stats */}
-              <div className="animate-fade-in-up grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto [animation-delay:800ms]">
+              {/* Key benefits / stats */}
+              <div className="animate-fade-in-up grid grid-cols-1 sm:grid-cols-4 gap-8 mt-16 max-w-6xl mx-auto [animation-delay:800ms]">
                 <div className="text-center">
-                  <div className="text-xl md:text-4xl font-bold text-primary">
-                    Private
+                  <div className="text-xl md:text-3xl font-bold text-primary">
+                    Curate
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Encrypted Access
+                    Organize models & datasets with rich metadata for easy
+                    discovery.
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl md:text-4xl font-bold text-primary">
-                    Integrity
+                  <div className="text-xl md:text-3xl font-bold text-primary">
+                    Monetize
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Blockchain Verified
+                    License models, set usage fees, and receive direct payments.
                   </div>
                 </div>
                 <div className="text-center">
@@ -284,7 +290,16 @@ export default function HeroSection() {
                     Access
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    IPFS Network
+                    GLobally deploy decentralized AI apps that call models
+                    securely.
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl md:text-4xl font-bold text-primary">
+                    Integrity
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Your Model remains tamper-proof with verifiable provenance.
                   </div>
                 </div>
               </div>
@@ -292,7 +307,7 @@ export default function HeroSection() {
           </div>
 
           {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         </section>
       </main>
     </>

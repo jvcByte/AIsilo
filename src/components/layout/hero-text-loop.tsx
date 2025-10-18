@@ -1,14 +1,9 @@
 import { TextLoop } from "@/components/motion-primitives/text-loop";
 
 const rotatingStatements = [
-  "Your files, encrypted and private.",
-  "Grant access to specific people instantly.",
-  "No passwords. No accounts. Just your wallet.",
-  "Your data stays yours forever.",
-  "Decentralized. Secure. Simple.",
-  "Upload once. Control access forever.",
-  "Works with any EVM compatible wallet.",
-  "No central authority can block you.",
+  "Monetize AI models",
+  "discover high-quality datasets",
+  "verifiable provenance",
 ];
 
 export function HeroTextLoop() {

@@ -7,6 +7,16 @@ html {
     scroll-behavior: smooth;
     overflow-x: hidden;
     overflow-y: auto;
+    /* Reserve scrollbar gutter so layout doesn't shift when scrollbars appear/disappear */
+    scrollbar-gutter: stable;
+    /* Hide native scrollbars while preserving layout */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Hide WebKit scrollbars */
+html::-webkit-scrollbar {
+    display: none;
 }
 
 /* ================================
@@ -187,13 +197,27 @@ html {
     html {
         overflow-x: hidden;
         overflow-y: auto;
+        /* Reserve scrollbar gutter so layout doesn't shift when scrollbars appear/disappear */
+        scrollbar-gutter: stable;
+        /* Hide native scrollbars while preserving layout */
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+    /* Hide WebKit scrollbars for the html element */
+    html::-webkit-scrollbar {
+        display: none;
     }
     body {
         @apply bg-background text-foreground;
         overflow-x: hidden;
         overflow-y: auto;
-        min-height: 100vh;
+        /* Reserve space for the fixed header so pages don't shift when navigating */
+        min-height: calc(100vh - var(--header-height, 4rem));
         position: relative;
+    }
+    /* Hide WebKit scrollbars for the body element */
+    body::-webkit-scrollbar {
+        display: none;
     }
     /* Prevent horizontal overflow on all containers */
     #root,
