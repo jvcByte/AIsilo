@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
 import { Route as MarketplaceIdRouteImport } from './routes/marketplace/$id'
 import { Route as AuthenticatedUploadModelRouteImport } from './routes/_authenticated/upload-model'
+import { Route as AuthenticatedUploadDatasetRouteImport } from './routes/_authenticated/upload-dataset'
 import { Route as AuthenticatedTempRouteRouteImport } from './routes/_authenticated/temp-route'
 import { Route as AuthenticatedDownloadModelRouteImport } from './routes/_authenticated/download-model'
 import { Route as AuthenticatedDecryptRouteImport } from './routes/_authenticated/decrypt'
@@ -57,6 +58,12 @@ const AuthenticatedUploadModelRoute =
   AuthenticatedUploadModelRouteImport.update({
     id: '/upload-model',
     path: '/upload-model',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedUploadDatasetRoute =
+  AuthenticatedUploadDatasetRouteImport.update({
+    id: '/upload-dataset',
+    path: '/upload-dataset',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedTempRouteRoute = AuthenticatedTempRouteRouteImport.update({
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/decrypt': typeof AuthenticatedDecryptRoute
   '/download-model': typeof AuthenticatedDownloadModelRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
+  '/upload-dataset': typeof AuthenticatedUploadDatasetRoute
   '/upload-model': typeof AuthenticatedUploadModelRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace': typeof MarketplaceIndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
   '/decrypt': typeof AuthenticatedDecryptRoute
   '/download-model': typeof AuthenticatedDownloadModelRoute
   '/temp-route': typeof AuthenticatedTempRouteRoute
+  '/upload-dataset': typeof AuthenticatedUploadDatasetRoute
   '/upload-model': typeof AuthenticatedUploadModelRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace': typeof MarketplaceIndexRoute
@@ -138,6 +147,7 @@ export interface FileRoutesById {
   '/_authenticated/decrypt': typeof AuthenticatedDecryptRoute
   '/_authenticated/download-model': typeof AuthenticatedDownloadModelRoute
   '/_authenticated/temp-route': typeof AuthenticatedTempRouteRoute
+  '/_authenticated/upload-dataset': typeof AuthenticatedUploadDatasetRoute
   '/_authenticated/upload-model': typeof AuthenticatedUploadModelRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/': typeof MarketplaceIndexRoute
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/decrypt'
     | '/download-model'
     | '/temp-route'
+    | '/upload-dataset'
     | '/upload-model'
     | '/marketplace/$id'
     | '/marketplace'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/decrypt'
     | '/download-model'
     | '/temp-route'
+    | '/upload-dataset'
     | '/upload-model'
     | '/marketplace/$id'
     | '/marketplace'
@@ -186,6 +198,7 @@ export interface FileRouteTypes {
     | '/_authenticated/decrypt'
     | '/_authenticated/download-model'
     | '/_authenticated/temp-route'
+    | '/_authenticated/upload-dataset'
     | '/_authenticated/upload-model'
     | '/marketplace/$id'
     | '/marketplace/'
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUploadModelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/upload-dataset': {
+      id: '/_authenticated/upload-dataset'
+      path: '/upload-dataset'
+      fullPath: '/upload-dataset'
+      preLoaderRoute: typeof AuthenticatedUploadDatasetRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/temp-route': {
       id: '/_authenticated/temp-route'
       path: '/temp-route'
@@ -312,6 +332,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDecryptRoute: typeof AuthenticatedDecryptRoute
   AuthenticatedDownloadModelRoute: typeof AuthenticatedDownloadModelRoute
   AuthenticatedTempRouteRoute: typeof AuthenticatedTempRouteRoute
+  AuthenticatedUploadDatasetRoute: typeof AuthenticatedUploadDatasetRoute
   AuthenticatedUploadModelRoute: typeof AuthenticatedUploadModelRoute
 }
 
@@ -322,6 +343,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDecryptRoute: AuthenticatedDecryptRoute,
   AuthenticatedDownloadModelRoute: AuthenticatedDownloadModelRoute,
   AuthenticatedTempRouteRoute: AuthenticatedTempRouteRoute,
+  AuthenticatedUploadDatasetRoute: AuthenticatedUploadDatasetRoute,
   AuthenticatedUploadModelRoute: AuthenticatedUploadModelRoute,
 }
 

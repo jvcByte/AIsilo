@@ -2,9 +2,10 @@ import {
   LayoutDashboard,
   Key,
   Clock10,
-  PlaneTakeoff,
   ClipboardPaste,
   PlaneLanding,
+  FileBarChart2Icon,
+  Bot,
 } from "lucide-react";
 import { type SidebarData } from "@/lib/types";
 
@@ -26,7 +27,12 @@ export const sidebarData: SidebarData = {
         {
           title: "Upload Model",
           url: "/upload-model",
-          icon: PlaneTakeoff,
+          icon: Bot,
+        },
+        {
+          title: "Upload Dataset",
+          url: "/upload-dataset",
+          icon: FileBarChart2Icon,
         },
         {
           title: "Copy & Paste",

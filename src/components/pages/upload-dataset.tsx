@@ -27,7 +27,7 @@ interface UploadState {
   iv: string | null;
 }
 
-export function UploadModel() {
+export function UploadDataset() {
   const activeAccount = useActiveAccount();
   // const { signMessageAsync } = useSignMessage();
   const { uploadModel, isLoading: isContractLoading } = useModels();
@@ -62,31 +62,33 @@ export function UploadModel() {
 
     if (!selectedFile) return;
 
-    // Allowed extensions for AI models
+    // Allowed extensions for datasets
     const allowedExtensions = [
-      // ---- model formats ----
-      ".pt",
-      ".pth",
-      ".bin",
-      ".onnx",
-      ".safetensors",
+      // ---- archives ----
+      ".zip",
+      ".tar",
+      ".tgz",
+      ".tar.gz",
+      // ---- dataset formats ----
+      ".csv",
+      ".tsv",
+      ".json",
+      ".yaml",
+      ".yml",
+      ".txt",
+      ".parquet",
+      ".arrow",
+      ".feather",
+      ".npz",
+      ".npy",
       ".h5",
-      ".pb",
-      ".tflite",
-      ".ckpt",
-      ".mar",
-      ".mlmodel",
-      ".trt",
-      ".engine",
-      ".uff",
-      ".caffemodel",
-      ".prototxt",
-      ".pmml",
-      ".rknn",
-      ".armnn",
-      ".xmodel",
-      ".nb",
-      ".dnn",
+      ".tfrecord",
+      ".record",
+      ".lmdb",
+      // --- Metadata / Config ---
+      ".ini",
+      ".cfg",
+      ".md",
     ];
 
     const filename = selectedFile.name || "";
@@ -103,20 +105,18 @@ export function UploadModel() {
       "application/gzip",
       "application/json",
       "text/csv",
+      "text/plain",
+      "text/txt",
       "application/x-parquet",
-      "model/onnx",
     ];
     const mimeAllowed = allowedMimePrefixes.some((p) =>
       selectedFile.type ? selectedFile.type.startsWith(p) : false,
     );
 
     if (!allowedByExt && !mimeAllowed) {
-      toast.error(
-        "Invalid file type. Only AI model file types are allowed (e.g. .pt, .onnx, .safetensors,).",
-        {
-          className: "toast-error",
-        },
-      );
+      toast.error("Invalid file type.", {
+        className: "toast-error",
+      });
       return;
     }
 
@@ -356,16 +356,16 @@ export function UploadModel() {
     <div className="container mx-auto p-4">
       <div className="flex items-center gap-2 mb-6">
         <Upload className="w-6 h-6" />
-        <h1 className="text-2xl font-bold text-foreground">Upload Model</h1>
+        <h1 className="text-2xl font-bold text-foreground">Upload Dataset</h1>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Model Selection Card */}
+        {/* Dataset Selection Card */}
         <Card className="bg-gradient-to-br from-muted to-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Model Selection
+              Dataset Selection
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -381,10 +381,9 @@ export function UploadModel() {
                   className="w-full mt-2"
                   disabled={state.step !== "file" || isLoading}
                   accept="
-                  .pt,.pth,.bin,.onnx,.safetensors,.h5,
-                  .pb,.tflite,.ckpt,.mar,.mlmodel,.trt,
-                  .engine,.uff,.caffemodel,.prototxt,
-                  .pmml,.rknn,.armnn,.xmodel,.nb,.dnn
+                  .zip,.tar,.tgz,.tar.gz,.csv,.tsv,.json,
+                  .yaml,.yml,.txt,.parquet,.arrow,.feather,
+                  .npz,.npy,.h5,.tfrecord,.record,.lmdb,.ini,.cfg,.md
                   "
                 />
                 {state.file && (
@@ -426,7 +425,9 @@ export function UploadModel() {
                   </AlertDescription>
                 </Alert>
                 <div className="p-3 bg-muted rounded-lg">
-                  <code className="text-sm font-mono">"Encrypt My Model"</code>
+                  <code className="text-sm font-mono">
+                    "Encrypt My Dataset"
+                  </code>
                 </div>
                 <Button
                   onClick={handleSignMessage}
@@ -515,7 +516,7 @@ export function UploadModel() {
                 variant="outline"
                 className="w-full"
               >
-                Upload Another Model
+                Upload Another Dataset
               </Button>
             </CardContent>
           </Card>
