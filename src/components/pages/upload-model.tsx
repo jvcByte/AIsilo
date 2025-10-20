@@ -62,10 +62,93 @@ export function UploadModel() {
 
     if (!selectedFile) return;
 
+    // Allowed extensions for AI models and datasets
+    const allowedExtensions = [
+      // ---- model formats ----
+      ".pt",
+      ".pth",
+      ".bin",
+      ".onnx",
+      ".safetensors",
+      ".h5",
+      ".pb",
+      ".tflite",
+      ".ckpt",
+      ".mar",
+      ".mlmodel",
+      ".trt",
+      ".engine",
+      ".uff",
+      ".caffemodel",
+      ".prototxt",
+      ".pmml",
+      ".rknn",
+      ".armnn",
+      ".xmodel",
+      ".nb",
+      ".dnn",
+      // ---- archives ----
+      ".zip",
+      ".tar",
+      ".tgz",
+      ".tar.gz",
+      // ---- dataset formats ----
+      ".csv",
+      ".tsv",
+      ".json",
+      ".yaml",
+      ".yml",
+      ".txt",
+      ".parquet",
+      ".arrow",
+      ".feather",
+      ".npz",
+      ".npy",
+      ".h5",
+      ".tfrecord",
+      ".record",
+      ".lmdb",
+      // --- Metadata / Config ---
+      ".ini",
+      ".cfg",
+      ".md",
+    ];
+
+    const filename = selectedFile.name || "";
+    const lower = filename.toLowerCase();
+    const ext = lower.includes(".") ? lower.slice(lower.lastIndexOf(".")) : "";
+
+    const allowedByExt = allowedExtensions.includes(ext);
+
+    // Fallback: allow some common MIME types (useful when extension is missing)
+    const allowedMimePrefixes = [
+      "application/octet-stream",
+      "application/zip",
+      "application/x-tar",
+      "application/gzip",
+      "application/json",
+      "text/csv",
+      "application/x-parquet",
+      "model/onnx",
+    ];
+    const mimeAllowed = allowedMimePrefixes.some((p) =>
+      selectedFile.type ? selectedFile.type.startsWith(p) : false,
+    );
+
+    if (!allowedByExt && !mimeAllowed) {
+      toast.error(
+        "Invalid file type. Only AI model and dataset file types are allowed (e.g. .pt, .onnx, .safetensors, .csv, .json, .parquet, .zip).",
+        {
+          className: "toast-error",
+        },
+      );
+      return;
+    }
+
     // Validate file size (max 100MB)
     const maxSize = 100 * 1024 * 1024;
     if (selectedFile.size > maxSize) {
-      toast.error("Model size must be less than 100MB", {
+      toast.error("File size must be less than 100MB", {
         className: "toast-error",
       });
       return;
@@ -316,7 +399,7 @@ export function UploadModel() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="file" className="text-foreground">
-                  Select Model
+                  Select File to Upload
                 </Label>
                 <Input
                   id="file"
@@ -324,6 +407,15 @@ export function UploadModel() {
                   onChange={handleFileChange}
                   className="w-full mt-2"
                   disabled={state.step !== "file" || isLoading}
+                  accept="
+                  .pt,.pth,.bin,.onnx,.safetensors,.h5,
+                  .pb,.tflite,.ckpt,.mar,.mlmodel,.trt,
+                  .engine,.uff,.caffemodel,.prototxt,
+                  .pmml,.rknn,.armnn,.xmodel,.nb,.dnn,
+                  .zip,.tar,.tgz,.tar.gz,.csv,.tsv,.json,
+                  .yaml,.yml,.txt,.parquet,.arrow,.feather,
+                  .npz,.npy,.h5,.tfrecord,.record,.lmdb,.ini,.cfg,.md
+                  "
                 />
                 {state.file && (
                   <div className="mt-2 p-3 bg-muted rounded-lg">
