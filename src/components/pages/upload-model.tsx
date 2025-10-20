@@ -381,9 +381,7 @@ export function UploadModel() {
     <div className="container mx-auto p-4">
       <div className="flex items-center gap-2 mb-6">
         <Upload className="w-6 h-6" />
-        <h1 className="text-2xl font-bold text-foreground">
-          Upload Model / Dataset
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground">Upload Model</h1>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-6">
@@ -411,10 +409,7 @@ export function UploadModel() {
                   .pt,.pth,.bin,.onnx,.safetensors,.h5,
                   .pb,.tflite,.ckpt,.mar,.mlmodel,.trt,
                   .engine,.uff,.caffemodel,.prototxt,
-                  .pmml,.rknn,.armnn,.xmodel,.nb,.dnn,
-                  .zip,.tar,.tgz,.tar.gz,.csv,.tsv,.json,
-                  .yaml,.yml,.txt,.parquet,.arrow,.feather,
-                  .npz,.npy,.h5,.tfrecord,.record,.lmdb,.ini,.cfg,.md
+                  .pmml,.rknn,.armnn,.xmodel,.nb,.dnn
                   "
                 />
                 {state.file && (
