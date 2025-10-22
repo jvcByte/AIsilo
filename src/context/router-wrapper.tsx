@@ -1,7 +1,7 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "@/routeTree.gen";
 import { queryClient } from "@/lib/config";
-import { useAppContext } from "@/context/auth-provider";
+import { useAuthContext } from "@/context/auth-provider";
 
 // Create a new router instance
 const router = createRouter({
@@ -25,7 +25,7 @@ declare module "@tanstack/react-router" {
 }
 
 export function RouterWrapper() {
-  const context = useAppContext();
+  const context = useAuthContext();
 
   // Update router context with current auth state
   router.update({

@@ -5,7 +5,7 @@ import { queryClient } from "@/lib/config";
 
 import type { RouterContext } from "@/lib/types";
 
-const AppContext = createContext<RouterContext | undefined>(undefined);
+const AuthContext = createContext<RouterContext | undefined>(undefined);
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -35,15 +35,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   return (
-    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useAppContext() {
-  const context = useContext(AppContext);
+export function useAuthContext() {
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAppContext must be used within an AuthProvider");
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
   return context;
 }
