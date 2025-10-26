@@ -52,7 +52,7 @@ const SignInButton: React.FC<SignInButtonProps> = ({
       hidePrivateKeyExport: false,
     }),
     createWallet("io.metamask"),
-    createWallet("xyz.argent"),
+    createWallet("com.hashpack.wallet"),
   ];
 
   const displayName = truncateAddress(activeAccount?.address);
